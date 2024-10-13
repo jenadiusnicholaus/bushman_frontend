@@ -12,6 +12,7 @@
       label="Email"
       type="email"
     />
+
     <VaValue v-slot="isPasswordVisible" :default-value="false">
       <VaInput
         ref="password1"
@@ -63,6 +64,8 @@
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useForm, useToast } from 'vuestic-ui'
+import axios from 'axios' // Import Axios
+// import { text } from 'stream/consumers'
 
 const { validate } = useForm('form')
 const { push } = useRouter()
@@ -70,17 +73,59 @@ const { init } = useToast()
 
 const formData = reactive({
   email: '',
+  username: '',
   password: '',
   repeatPassword: '',
+  first_name: '',
+  last_name: '',
 })
 
-const submit = () => {
-  if (validate()) {
+const submit = async () => {
+  if (!validate()) {
     init({
-      message: "You've successfully signed up",
-      color: 'success',
+      message: 'Please fill all required fields',
+      color: 'danger',
     })
-    push({ name: 'dashboard' })
+    return
+  }
+  try {
+    const registerUrl = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_REGISTER_URL
+
+    const data = JSON.stringify({
+      username: formData.email,
+      password: formData.password,
+      password2: formData.repeatPassword,
+      email: formData.email,
+      first_name: 'John',
+      last_name: 'Doe',
+    })
+    const config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: registerUrl,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: data,
+    }
+
+    const response = await axios.request(config)
+
+    if (response.status === 201) {
+      sessionStorage.setItem('access', response.data.access)
+      sessionStorage.setItem('refresh', response.data.access)
+
+      init({
+        message: "You've successfully signed up",
+        color: 'success',
+      })
+      push({ name: 'login' })
+    }
+  } catch (error) {
+    init({
+      message: 'Something went wrong, while Creating an account',
+      color: 'danger',
+    })
   }
 }
 

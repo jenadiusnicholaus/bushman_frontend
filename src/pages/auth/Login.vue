@@ -2,7 +2,7 @@
   <VaForm ref="form" @submit.prevent="submit">
     <h1 class="font-semibold text-4xl mb-4">Log in</h1>
     <p class="text-base mb-4 leading-5">
-      New to Vuestic?
+      Bushman
       <RouterLink :to="{ name: 'signup' }" class="font-semibold text-primary">Sign up</RouterLink>
     </p>
     <VaInput
@@ -49,6 +49,7 @@ import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useForm, useToast } from 'vuestic-ui'
 import { validators } from '../../services/utils'
+import axios from 'axios' // Import Axios
 
 const { validate } = useForm('form')
 const { push } = useRouter()
@@ -60,10 +61,38 @@ const formData = reactive({
   keepLoggedIn: false,
 })
 
-const submit = () => {
-  if (validate()) {
-    init({ message: "You've successfully logged in", color: 'success' })
-    push({ name: 'dashboard' })
+const submit = async () => {
+  if (!validate()) {
+    init({ message: 'Please fill all required fields', color: 'error' })
+    return
+  }
+  try {
+    const loginUrl = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_LOGIN_URL
+    const data = JSON.stringify({
+      username: formData.email,
+      password: formData.password,
+    })
+
+    const config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: loginUrl,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: data,
+    }
+
+    const response = await axios.request(config)
+    if (response.status === 200) {
+      sessionStorage.setItem('access', JSON.stringify(response.data.access))
+      sessionStorage.setItem('refresh', JSON.stringify(response.data.refresh))
+
+      init({ message: "You've successfully logged in", color: 'success' })
+      push({ name: 'client-basic-info' })
+    }
+  } catch (error: any) {
+    init({ message: error.response.data.detail, color: 'danger' })
   }
 }
 </script>

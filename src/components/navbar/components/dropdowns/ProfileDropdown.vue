@@ -5,7 +5,7 @@
         <VaButton preset="secondary" color="textPrimary">
           <span class="profile-dropdown__anchor min-w-max">
             <slot />
-            <VaAvatar :size="32" color="warning"> 😍 </VaAvatar>
+            <VaAvatar src="/pholder.jpeg" :size="32" color="warning"> </VaAvatar>
           </span>
         </VaButton>
       </template>
@@ -22,6 +22,7 @@
             :key="item.name"
             class="menu-item px-4 text-base cursor-pointer h-8"
             v-bind="resolveLinkAttribute(item)"
+            @click="clearSessionStorageOnLogout(item)"
           >
             <VaIcon :name="item.icon" class="pr-1" color="secondary" />
             {{ t(`user.${item.name}`) }}
@@ -81,11 +82,6 @@ withDefaults(
             to: 'billing',
             icon: 'mso-receipt_long',
           },
-          {
-            name: 'projects',
-            to: 'projects',
-            icon: 'mso-favorite',
-          },
         ],
       },
       {
@@ -120,8 +116,15 @@ withDefaults(
 )
 
 const isShown = ref(false)
+const clearSessionStorageOnLogout = (item: ProfileListItem) => {
+  if (item.name === 'logout') {
+    sessionStorage.clear()
+  }
+}
 
 const resolveLinkAttribute = (item: ProfileListItem) => {
+  //  clear session storage on logout
+
   return item.to ? { to: { name: item.to } } : item.href ? { href: item.href, target: '_blank' } : {}
 }
 </script>

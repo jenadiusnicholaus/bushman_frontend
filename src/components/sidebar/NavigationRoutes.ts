@@ -17,91 +17,133 @@ export default {
       meta: {
         icon: 'vuestic-iconset-dashboard',
       },
-    },
-    {
-      name: 'users',
-      displayName: 'menu.users',
-      meta: {
-        icon: 'group',
-      },
-    },
-    {
-      name: 'projects',
-      displayName: 'menu.projects',
-      meta: {
-        icon: 'folder_shared',
-      },
-    },
-    {
-      name: 'payments',
-      displayName: 'menu.payments',
-      meta: {
-        icon: 'credit_card',
-      },
       children: [
         {
-          name: 'payment-methods',
-          displayName: 'menu.payment-methods',
+          name: 'quotas',
+          displayName: 'menu.sales-quotas',
         },
         {
-          name: 'pricing-plans',
-          displayName: 'menu.pricing-plans',
+          name: 'client-basic-info',
+          displayName: 'menu.sales-inquiry',
         },
         {
-          name: 'billing',
-          displayName: 'menu.billing',
+          name: 'sales-confirmation',
+          displayName: 'menu.sales-confirmation',
         },
-      ],
-    },
-    {
-      name: 'auth',
-      displayName: 'menu.auth',
-      meta: {
-        icon: 'login',
-      },
-      children: [
+
         {
-          name: 'login',
-          displayName: 'menu.login',
+          name: 'sales-calendar',
+          displayName: 'menu.sales-calendar',
         },
-        {
-          name: 'signup',
-          displayName: 'menu.signup',
-        },
-        {
-          name: 'recover-password',
-          displayName: 'menu.recover-password',
-        },
+
+        // {
+        //   name: 'client-companion',
+        //   displayName: 'menu.client-companion',
+        // },
+        // {
+        //   name: 'client-docs',
+        //   displayName: 'menu.client-docs',
+        // },
       ],
     },
 
     {
-      name: 'faq',
-      displayName: 'menu.faq',
-      meta: {
-        icon: 'quiz',
-      },
-    },
-    {
-      name: '404',
-      displayName: 'menu.404',
-      meta: {
-        icon: 'vuestic-iconset-files',
-      },
-    },
-    {
-      name: 'preferences',
-      displayName: 'menu.preferences',
-      meta: {
-        icon: 'manage_accounts',
-      },
-    },
-    {
-      name: 'settings',
-      displayName: 'menu.settings',
+      name: 'module-settings',
+      displayName: 'menu.module-settings',
       meta: {
         icon: 'settings',
       },
+      children: [
+        {
+          name: 'qoutas-settings',
+          displayName: 'menu.settings-qoutas',
+        },
+      ],
     },
+    // {
+    //   name: 'users',
+    //   displayName: 'menu.users',
+    //   meta: {
+    //     icon: 'group',
+    //   },
+    // },
+    // {
+    //   name: 'projects',
+    //   displayName: 'menu.projects',
+    //   meta: {
+    //     icon: 'folder_shared',
+    //   },
+    // },
+    // {
+    //   name: 'payments',
+    //   displayName: 'menu.payments',
+    //   meta: {
+    //     icon: 'credit_card',
+    //   },
+    //   children: [
+    //     {
+    //       name: 'payment-methods',
+    //       displayName: 'menu.payment-methods',
+    //     },
+    //     {
+    //       name: 'pricing-plans',
+    //       displayName: 'menu.pricing-plans',
+    //     },
+    //     {
+    //       name: 'billing',
+    //       displayName: 'menu.billing',
+    //     },
+    //   ],
+    // },
+    // {
+    //   name: 'auth',
+    //   displayName: 'menu.auth',
+    //   meta: {
+    //     icon: 'login',
+    //   },
+    //   children: [
+    //     {
+    //       name: 'login',
+    //       displayName: 'menu.login',
+    //     },
+    //     {
+    //       name: 'signup',
+    //       displayName: 'menu.signup',
+    //     },
+    //     {
+    //       name: 'recover-password',
+    //       displayName: 'menu.recover-password',
+    //     },
+    //   ],
+    // },
+
+    // {
+    //   name: 'faq',
+    //   displayName: 'menu.faq',
+    //   meta: {
+    //     icon: 'quiz',
+    //   },
+    // },
+    // {
+    //   name: '404',
+    //   displayName: 'menu.404',
+    //   meta: {
+    //     icon: 'vuestic-iconset-files',
+    //   },
+    // },
+    // {
+    //   name: 'preferences',
+    //   displayName: 'menu.preferences',
+    //   meta: {
+    //     icon: 'manage_accounts',
+    //   },
+    // },
+    // {
+    //   name: 'settings',
+    //   displayName: 'menu.settings',
+    //   meta: {
+    //     icon: 'settings',
+    //   },
+    // },
   ] as INavigationRoute[],
 }

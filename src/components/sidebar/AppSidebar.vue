@@ -1,5 +1,5 @@
 <template>
-  <VaSidebar v-model="writableVisible" :width="sidebarWidth" :color="color" minimized-width="0">
+  <VaSidebar v-model="writableVisible" :width="sidebarWidth" :color="color" minimized-width="0" class="colored-sidebar">
     <VaAccordion v-model="value" multiple>
       <VaCollapse v-for="(route, index) in navigationRoutes.routes" :key="index">
         <template #header="{ value: isCollapsed }">
@@ -25,6 +25,7 @@
                 <VaIcon v-if="route.children" :name="arrowDirection(isCollapsed)" size="20px" />
               </VaSidebarItemTitle>
             </VaSidebarItemContent>
+            <VaSpacer />
           </VaSidebarItem>
         </template>
         <template #body>
@@ -92,11 +93,11 @@ export default defineComponent({
       (value.value = navigationRoutes.routes.map((route: INavigationRoute) => routeHasActiveChild(route)))
 
     const sidebarWidth = computed(() => (props.mobile ? '100vw' : '280px'))
-    const color = computed(() => getColor('background-secondary'))
-    const activeColor = computed(() => colorToRgba(getColor('focus'), 0.1))
+    const color = computed(() => getColor('#5C4033'))
+    const activeColor = computed(() => colorToRgba(getColor('#C4A484'), 0.1))
 
-    const iconColor = (route: INavigationRoute) => (routeHasActiveChild(route) ? 'primary' : 'secondary')
-    const textColor = (route: INavigationRoute) => (routeHasActiveChild(route) ? 'primary' : 'textPrimary')
+    const iconColor = (route: INavigationRoute) => (routeHasActiveChild(route) ? '#FFD700' : '#fff')
+    const textColor = (route: INavigationRoute) => (routeHasActiveChild(route) ? '#FFD700' : '#fff')
     const arrowDirection = (state: boolean) => (state ? 'va-arrow-up' : 'va-arrow-down')
 
     watch(() => route.fullPath, setActiveExpand, { immediate: true })

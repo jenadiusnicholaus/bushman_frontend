@@ -19,7 +19,43 @@ const routes: Array<RouteRecordRaw> = [
       {
         name: 'dashboard',
         path: 'dashboard',
-        component: () => import('../pages/admin/dashboard/Dashboard.vue'),
+        // component: () => import('../pages/client/dashboard/Dashboard.vue'),
+        component: RouteViewComponent,
+        children: [
+          {
+            name: 'client-basic-info',
+            path: 'client-basic-info',
+            component: () => import('../pages/client/dashboard/SalesInquiries.vue'),
+          },
+          {
+            name: 'quotas',
+            path: 'quotas',
+            component: () => import('../pages/client/dashboard/QuotaPage.vue'),
+          },
+          {
+            name: 'client-companion',
+            path: 'client-companion',
+            component: () => import('../pages/client/dashboard/ClientCompanion.vue'),
+          },
+          {
+            name: 'client-docs',
+            path: 'client-docs',
+            component: () => import('../pages/client/dashboard/ClientDocs.vue'),
+          },
+          // SalesCalendar
+          {
+            name: 'sales-calendar',
+            path: 'sales-calendar',
+            component: () => import('../pages/client/dashboard/SalesCalendar.vue'),
+          },
+
+          // SalesConfirmation
+          {
+            name: 'sales-confirmation',
+            path: 'sales-confirmation',
+            component: () => import('../pages/client/dashboard/SalesConfirmation.vue'),
+          },
+        ],
       },
       {
         name: 'settings',
@@ -31,16 +67,7 @@ const routes: Array<RouteRecordRaw> = [
         path: 'preferences',
         component: () => import('../pages/preferences/Preferences.vue'),
       },
-      {
-        name: 'users',
-        path: 'users',
-        component: () => import('../pages/users/UsersPage.vue'),
-      },
-      {
-        name: 'projects',
-        path: 'projects',
-        component: () => import('../pages/projects/ProjectsPage.vue'),
-      },
+
       {
         name: 'payments',
         path: '/payments',
@@ -68,8 +95,22 @@ const routes: Array<RouteRecordRaw> = [
         path: '/faq',
         component: () => import('../pages/faq/FaqPage.vue'),
       },
+
+      {
+        name: 'module-settings',
+        path: '/module-settings',
+        component: RouteViewComponent,
+        children: [
+          {
+            name: 'qoutas-settings',
+            path: 'qoutas-settings',
+            component: () => import('../pages/module-settings/qoutas.vue'),
+          },
+        ],
+      },
     ],
   },
+
   {
     path: '/auth',
     component: AuthLayout,

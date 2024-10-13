@@ -1,6 +1,6 @@
 <template>
   <div class="app-navbar-actions">
-    <VaButton
+    <!-- <VaButton
       v-if="!isMobile"
       preset="secondary"
       href="https://ui.vuestic.dev/support/consulting"
@@ -32,7 +32,7 @@
       class="app-navbar-actions__item flex-shrink-0 mx-0"
     >
       <VaIcon :component="VaIconDiscord" />
-    </VaButton>
+    </VaButton> -->
     <NotificationDropdown class="app-navbar-actions__item" />
     <ProfileDropdown class="app-navbar-actions__item app-navbar-actions__item--profile mr-1" />
   </div>
@@ -41,15 +41,15 @@
 <script lang="ts" setup>
 import ProfileDropdown from './dropdowns/ProfileDropdown.vue'
 import NotificationDropdown from './dropdowns/NotificationDropdown.vue'
-import GithubButton from './GitHubButton.vue'
-import VaIconDiscord from '../../icons/VaIconDiscord.vue'
+// import GithubButton from './GitHubButton.vue'
+// import VaIconDiscord from '../../icons/VaIconDiscord.vue'
 
 defineProps({
   isMobile: { type: Boolean, default: false },
 })
 
-import { useI18n } from 'vue-i18n'
-const { t } = useI18n()
+// import { useI18n } from 'vue-i18n'
+// const { t } = useI18n()
 </script>
 
 <style lang="scss">

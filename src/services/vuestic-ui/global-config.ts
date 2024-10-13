@@ -27,6 +27,17 @@ export default defineVuesticConfig({
         },
       },
     },
+    VaButton: {
+      color: 'primary',
+      colors: {
+        default: 'primary',
+        success: 'success',
+        danger: 'error',
+        warning: 'warning',
+        info: 'info',
+      },
+    },
+
     VaModal: {
       mobileFullscreen: false,
       maxHeight: 'calc(100% - 2rem)',
@@ -37,8 +48,14 @@ export default defineVuesticConfig({
       },
     },
     VaDataTable: {
-      disableClientSideSorting: true,
+      disableClientSideSorting: false,
     },
+
+    VaCard: {
+      stripe: true,
+      stripeColor: '#5C4033',
+    },
+
     presets: {
       VaSelect: {
         small: {

@@ -9,6 +9,7 @@ export default {
       info: '#158DE3',
       danger: '#E42222',
       warning: '#FFD43A',
+      primary: '#5C4033',
     },
     dark: {
       backgroundCardPrimary: '#111827',
