@@ -89,7 +89,7 @@ const submit = async () => {
       sessionStorage.setItem('refresh', JSON.stringify(response.data.refresh))
 
       init({ message: "You've successfully logged in", color: 'success' })
-      push({ name: 'client-basic-info' })
+      push({ name: 'dashboard' })
     }
   } catch (error: any) {
     init({ message: error.response.data.detail, color: 'danger' })

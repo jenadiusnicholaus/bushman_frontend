@@ -14,6 +14,7 @@ export default {
     dark: {
       backgroundCardPrimary: '#111827',
       backgroundCardSecondary: '#0f172a',
+      primary: '#FFD700',
     },
   },
 }

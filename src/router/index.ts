@@ -19,12 +19,17 @@ const routes: Array<RouteRecordRaw> = [
       {
         name: 'dashboard',
         path: 'dashboard',
+        component: () => import('../pages/client/dashboard/Dashboard.vue'),
+      },
+      {
+        name: 'sales',
+        path: 'sales',
         // component: () => import('../pages/client/dashboard/Dashboard.vue'),
         component: RouteViewComponent,
         children: [
           {
-            name: 'client-basic-info',
-            path: 'client-basic-info',
+            name: 'sales-inquiry',
+            path: 'sales-inquiry',
             component: () => import('../pages/client/dashboard/SalesInquiries.vue'),
           },
           {
@@ -104,7 +109,35 @@ const routes: Array<RouteRecordRaw> = [
           {
             name: 'qoutas-settings',
             path: 'qoutas-settings',
-            component: () => import('../pages/module-settings/qoutas.vue'),
+            component: () => import('../pages/module-settings/ManageQoutas.vue'),
+          },
+          // manageRegulatoryPackage
+          {
+            name: 'regulatory-package',
+            path: 'regulatory-package',
+            component: () => import('../pages/module-settings/ManageRegulatoryPackage.vue'),
+          },
+          // manageRegulatoryPackage
+
+          // ManageArea
+
+          {
+            name: 'area-settings',
+            path: 'area-settings',
+            component: () => import('../pages/module-settings/ManageArea.vue'),
+          },
+
+          {
+            name: 'species-settings',
+            path: 'species-settings',
+            component: () => import('../pages/module-settings/ManageSpecies.vue'),
+          },
+
+          // PriceList
+          {
+            name: 'price-list',
+            path: 'price-list',
+            component: () => import('../pages/module-settings/PriceList.vue'),
           },
         ],
       },

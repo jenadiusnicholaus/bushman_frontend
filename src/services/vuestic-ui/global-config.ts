@@ -27,6 +27,9 @@ export default defineVuesticConfig({
         },
       },
     },
+    VaSelect: {
+      searchable: true,
+    },
     VaButton: {
       color: 'primary',
       colors: {
@@ -49,6 +52,11 @@ export default defineVuesticConfig({
     },
     VaDataTable: {
       disableClientSideSorting: false,
+      striped: true,
+      hoverable: true,
+      selectable: true,
+      searchable: true,
+      showSelectAll: true,
     },
 
     VaCard: {

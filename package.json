@@ -38,6 +38,7 @@
     "epic-spinners": "^2.0.0",
     "flag-icons": "^6.15.0",
     "ionicons": "^4.6.3",
+    "leaflet": "^1.9.4",
     "medium-editor": "^5.23.3",
     "pdfmake": "^0.2.14",
     "pinia": "^2.1.7",
@@ -46,7 +47,10 @@
     "serve": "^14.2.1",
     "vue-chartjs": "^5.3.0",
     "vue-i18n": "^9.6.2",
+    "vue-phone-number-input": "^1.12.13",
     "vue-router": "^4.2.5",
+    "vue-tel-input": "^9.2.0",
+    "vue2-leaflet": "^2.7.1",
     "vuestic-ui": "^1.10.2"
   },
   "devDependencies": {

@@ -4,20 +4,9 @@
 
     <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between">
       <div class="flex flex-col md:flex-row gap-2 justify-start">
-        <!-- <VaButtonToggle
-          v-model="filters.isActive"
-          color="background-element"
-          border-color="background-element"
-          :options="[
-            { label: 'Active', value: true },
-            { label: 'Inactive', value: false },
-          ]"
-        />
-        <VaInput v-model="filters.search" placeholder="Search">
-          <template #prependInner>
-            <VaIcon name="search" color="secondary" size="small" />
-          </template>
-        </VaInput> -->
+        <VaButton v-if="!showQuotaList" class="px-2 py-2" icon="arrow_back" size="small" @click="showQuota">
+          Go Back
+        </VaButton>
       </div>
       <VaButtonGroup>
         <VaButton
@@ -32,90 +21,94 @@
       </VaButtonGroup>
     </div>
 
-    <VaForm ref="sformRef" class="mb-6">
-      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-4">
-        <VaValue :default-value="false">
-          <VaSelect
-            v-model="sform.salesQuota"
-            :options="quotasOptions"
-            label="Sales Quota"
-            :rules="[(v) => !!v || 'Sales Quota is required']"
-            placeholder="Select Sales Quota"
-          >
-            <template #appendInner>
-              <VaIcon name="av_timer" size="small" color="primary" />
-            </template>
-          </VaSelect>
-        </VaValue>
+    <ModuleTable v-if="showQuotaList" :items="items" :columns="columns" @onView="showQuota"></ModuleTable>
 
-        <VaSelect
-          v-model="sform.area"
-          label="Hunting Area"
-          :options="areasOptions"
-          placeholder="Select Hunting Area"
-          :rules="[(v) => !!v || 'Hunting Area is required']"
-          required
-        />
-      </div>
-
-      <VaDivider orientation="left" class="py-12">
-        <span caption class="px-2">Add a List of Species</span>
-      </VaDivider>
-      <!-- <h3 class="font-bold text-lg mb-4"></h3> -->
-
-      <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between">
-        <div class="flex flex-col md:flex-row gap-2 justify-start">
-          <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-4">
+    <div v-else class="p-2">
+      <VaForm ref="sformRef" class="mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-4">
+          <VaValue :default-value="false">
             <VaSelect
-              v-model="sform.id"
-              label="Species"
-              :options="speciesOptions"
-              placeholder="Select Species"
-              :rules="[(v) => !!v || 'Species is required']"
-              required
-            />
+              v-model="sform.salesQuota"
+              :options="quotasOptions"
+              label="Sales Quota"
+              :rules="[(v) => !!v || 'Sales Quota is required']"
+              placeholder="Select Sales Quota"
+            >
+              <template #appendInner>
+                <VaIcon name="av_timer" size="small" color="primary" />
+              </template>
+            </VaSelect>
+          </VaValue>
 
-            <VaCounter v-model="sform.quantity" label="Quantity" manual-input :min="1" :max="100" />
-          </div>
-        </div>
-        <VaButtonGroup>
-          <VaButton
-            class="px-0 py-0"
-            color="primary"
-            icon="add"
-            size="small"
-            round
-            @click="addNewSpeciesItemToStorage()"
+          <VaSelect
+            v-model="sform.area"
+            label="Hunting Area"
+            :options="areasOptions"
+            placeholder="Select Hunting Area"
+            :rules="[(v) => !!v || 'Hunting Area is required']"
+            required
           />
-        </VaButtonGroup>
+        </div>
+
+        <VaDivider orientation="left" class="py-12">
+          <span caption class="px-2">Add a List of Species</span>
+        </VaDivider>
+        <!-- <h3 class="font-bold text-lg mb-4"></h3> -->
+
+        <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between">
+          <div class="flex flex-col md:flex-row gap-2 justify-start">
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-4">
+              <VaSelect
+                v-model="sform.id"
+                label="Species"
+                :options="speciesOptions"
+                placeholder="Select Species"
+                :rules="[(v) => !!v || 'Species is required']"
+                required
+              />
+
+              <VaCounter v-model="sform.quantity" label="Quantity" manual-input :min="1" :max="100" />
+            </div>
+          </div>
+          <VaButtonGroup>
+            <VaButton
+              class="px-0 py-0"
+              color="primary"
+              icon="add"
+              size="small"
+              round
+              @click="addNewSpeciesItemToStorage()"
+            />
+          </VaButtonGroup>
+        </div>
+      </VaForm>
+
+      <div class="mb-6">
+        <VaList>
+          <VaListLabel v-if="speciesObjects.length > 0" class="text-md mb-2 text-left">Selected Species</VaListLabel>
+          <VaListItem v-for="(s, index) in speciesObjects" :key="index" class="list__item">
+            <VaListItemSection>
+              <VaListItemLabel>
+                Name: {{ s.name }}
+                <VaIcon name="delete" size="small" color="primary" @click="deleteFromStorage(index)" />
+              </VaListItemLabel>
+              <VaListItemLabel caption>Quantity: {{ s.quantity }}</VaListItemLabel>
+            </VaListItemSection>
+          </VaListItem>
+        </VaList>
       </div>
-    </VaForm>
 
-    <div class="mb-6">
-      <VaList>
-        <VaListLabel v-if="speciesObjects.length > 0" class="text-md mb-2 text-left">Selected Species</VaListLabel>
-        <VaListItem v-for="(s, index) in speciesObjects" :key="index" class="list__item">
-          <VaListItemSection>
-            <VaListItemLabel>
-              Name: {{ s.name }}
-              <VaIcon name="delete" size="small" color="primary" @click="deleteFromStorage(index)" />
-            </VaListItemLabel>
-            <VaListItemLabel caption>Quantity: {{ s.quantity }}</VaListItemLabel>
-          </VaListItemSection>
-        </VaListItem>
-      </VaList>
-    </div>
-
-    <div class="mb-6">
-      <VaButton
-        :disabled="!isValidSForm"
-        color="primary"
-        icon="add"
-        icon-color="#fff"
-        @click="validateSForm() && addNewSpeciesToQuota()"
-      >
-        Submit New
-      </VaButton>
+      <div class="mb-6">
+        <VaButton
+          :disabled="!isValidSForm"
+          color="primary"
+          icon="add"
+          icon-color="#fff"
+          @click="validateSForm() && addNewSpeciesToQuota()"
+        >
+          Submit New
+        </VaButton>
+      </div>
     </div>
 
     <VaModal
@@ -166,6 +159,7 @@ import { mapActions } from 'pinia'
 import { reactive } from 'vue'
 import { useToast, useForm } from 'vuestic-ui'
 import handleErrors from '../../utils/handleClientRegFormError'
+import ModuleTable from './components/ModuleTable.vue'
 
 const defaultItem = {
   name: '',
@@ -176,6 +170,9 @@ const defaultItem = {
 
 export default defineComponent({
   name: 'QuotaPage',
+  components: {
+    ModuleTable,
+  },
 
   setup() {
     const formRef = ref(null) as any
@@ -187,6 +184,14 @@ export default defineComponent({
       resetValidation: resetValidationForm,
       reset: resetForm,
     } = useForm(formRef)
+
+    const columns = [
+      { key: 'id', sortable: true, sortingOptions: ['desc', 'asc'] },
+      { key: 'name', sortable: true },
+      { key: 'start_date', sortable: true },
+      { key: 'end_date', sortable: true },
+      { key: 'actions', width: 80 },
+    ]
 
     const {
       isValid: isValidSForm,
@@ -207,10 +212,11 @@ export default defineComponent({
       resetSForm,
       formRef,
       sformRef,
+      columns,
     }
   },
   data() {
-    const items: never[] = []
+    const items: [] = []
 
     // const { isValid, validate, reset, resetValidation } = useForm(formRef)
     const form = reactive({
@@ -229,19 +235,10 @@ export default defineComponent({
       area: null as any,
     })
 
-    const columns = [
-      { key: 'name', sortable: true },
-      { key: 'start_date', sortable: true },
-      { key: 'end_date', sortable: true },
-      // { key: 'description', sortable: true },
-      { key: 'actions', width: 80 },
-    ]
-
     const quotasOptions = [] as any
 
     return {
       items,
-      columns,
       editedItemId: null,
       editedItem: null,
       createdItem: { ...defaultItem },
@@ -254,6 +251,8 @@ export default defineComponent({
       speciesObjects: [] as any,
       showModal: false,
       quotasOptions,
+      showQuotaList: true,
+      quotaItems: [] as any,
     }
   },
 
@@ -284,6 +283,14 @@ export default defineComponent({
     showAddQuotaModal() {
       // this.$refs.sformRef.show()
       this.showModal = !this.showModal
+    },
+    showQuota(e: any) {
+      console.log(e.id)
+      this.showQuotaList = !this.showQuotaList
+      this.sform.salesQuota = {
+        value: e.id,
+        text: this.generateQuotaYear(e.start_date, e.end_date) + ` - ${e.name}`,
+      }
     },
 
     addNewSpeciesItemToStorage() {
@@ -382,7 +389,6 @@ export default defineComponent({
       const response = await this.createQuota(quota)
       if (response.status === 201) {
         this.toast.init({ message: response.data.message, color: 'success' })
-        this.getQs(null)
         this.resetForm()
         this.resetCreatedItem()
       } else {
@@ -438,32 +444,25 @@ export default defineComponent({
         if (response.status === 200) {
           const data = response.data
 
-          if (id !== null) {
-            this.form.id = data.id
-            this.form.name = data.name
-            this.form.start_date = data?.start_date
-            this.form.end_date = data?.end_date
-          } else {
-            this.quotasOptions = data.map((item: any) => {
-              const result = this.generateQuotaYear(item.start_date, item.end_date)
+          this.quotasOptions = data.map((item: any) => {
+            const result = this.generateQuotaYear(item.start_date, item.end_date)
 
-              this.sform.salesQuota = {
-                value: item.id,
-                text: `${result} - ${item.name}`,
-              }
+            // this.sform.salesQuota = {
+            //   value: item.id,
+            //   text: `${result} - ${item.name}`,
+            // }
 
-              return {
-                value: item.id,
-                text: `${result} - ${item.name}`,
-              }
-            })
-            this.items = data.map((item: any) => ({
-              id: item.id,
-              name: item.name,
-              start_date: item.start_date,
-              end_date: item.end_date,
-            }))
-          }
+            return {
+              value: item.id,
+              text: `${result} - ${item.name}`,
+            }
+          })
+          this.items = data.map((item: any) => ({
+            id: item.id,
+            name: item.name,
+            start_date: item.start_date,
+            end_date: item.end_date,
+          }))
         }
       } catch (error) {
         console.log(error)
@@ -473,14 +472,6 @@ export default defineComponent({
     async getSpeciesItems() {
       try {
         const response = await this.getSpeciesList()
-
-        // Start with the default option
-        this.speciesOptions = [
-          {
-            value: 'all',
-            text: 'All',
-          },
-        ]
 
         // Add the species items from the response
         const speciesItems = response.data.map((item: { id: any; name: any }) => {

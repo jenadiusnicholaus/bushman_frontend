@@ -15,6 +15,13 @@ export default {
       name: 'dashboard',
       displayName: 'menu.dashboard',
       meta: {
+        icon: 'vuestic-iconset-home',
+      },
+    },
+    {
+      name: 'sales',
+      displayName: 'menu.sales',
+      meta: {
         icon: 'vuestic-iconset-dashboard',
       },
       children: [
@@ -23,7 +30,7 @@ export default {
           displayName: 'menu.sales-quotas',
         },
         {
-          name: 'client-basic-info',
+          name: 'sales-inquiry',
           displayName: 'menu.sales-inquiry',
         },
         {
@@ -35,15 +42,6 @@ export default {
           name: 'sales-calendar',
           displayName: 'menu.sales-calendar',
         },
-
-        // {
-        //   name: 'client-companion',
-        //   displayName: 'menu.client-companion',
-        // },
-        // {
-        //   name: 'client-docs',
-        //   displayName: 'menu.client-docs',
-        // },
       ],
     },
 
@@ -57,6 +55,27 @@ export default {
         {
           name: 'qoutas-settings',
           displayName: 'menu.settings-qoutas',
+        },
+        // regulatory-package
+        {
+          name: 'regulatory-package',
+          displayName: 'menu.regulatory-package',
+        },
+        {
+          name: 'area-settings',
+          displayName: 'menu.settings-area',
+        },
+
+        // species-settings
+        {
+          name: 'species-settings',
+          displayName: 'menu.settings-species',
+        },
+
+        // price-list
+        {
+          name: 'price-list',
+          displayName: 'menu.price-list',
         },
       ],
     },
