@@ -134,6 +134,7 @@ export default {
 
     async getAllSpeces() {
       try {
+        this.currentQuota = this.yearOptions.find((item: any) => item.value === this.quota)
         const response = await this.getAllSpeciesPerQuotaPerArea(this.quota, this.area, this.species)
         this.speciesItems = response.data.map((item: any) => {
           return {
@@ -165,16 +166,15 @@ export default {
 
           this.quota = currentQuota.id
           this.currentQuota = currentQuota
-
           this.yearOptions = response.data.map((item: any) => {
-            // current select quota
-
             const result = this.generateQuotaYear(item.start_date, item.end_date)
 
             return {
               value: item.id,
               text: `${result} - ${item.name}`,
               name: item.name,
+              start_date: item.start_date,
+              end_date: item.end_date,
             }
           })
         }

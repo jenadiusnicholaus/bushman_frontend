@@ -1,14 +1,7 @@
 <template>
-  <div class="grid sm:grid-cols-2 gap-6 mb-6">
-    <VaSelect v-model="sortBy" label="Sort by" :options="sortByOptions()" />
-    <VaSelect
-      v-model="sortingOrder"
-      label="Sorting order"
-      :options="sortingOrderOptions"
-      :value-by="(option) => option.value"
-    />
-  </div>
-
+  <!-- fiter elemenets  and download btn slot -->
+  <!-- create a slot for filter elements -->
+  <slot name="filter-elements-and-download-btn"> </slot>
   <VaDataTable
     v-model:sort-by="sortBy"
     v-model:sorting-order="sortingOrder"
@@ -37,6 +30,10 @@ export default defineComponent({
     columns: {
       type: Array,
       required: true,
+    },
+    loading: {
+      type: Boolean,
+      default: false,
     },
   },
   emits: ['on-view'],

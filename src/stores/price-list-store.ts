@@ -9,8 +9,16 @@ export const usePriceListStore = defineStore('price-list', {
   },
 
   actions: {
-    async getPriceList() {
-      const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_PRICE_LIST
+    async getPriceList(hunting_type_id: any = '', area_id: any = '', quota_id: any = '') {
+      const url =
+        import.meta.env.VITE_APP_BASE_URL +
+        import.meta.env.VITE_APP_PRICE_LIST +
+        '?hunting_type_id=' +
+        hunting_type_id +
+        '&area_id=' +
+        area_id +
+        '&quota_id=' +
+        quota_id
 
       const config = {
         method: 'get',
@@ -23,10 +31,16 @@ export const usePriceListStore = defineStore('price-list', {
       const response = await axios.request(config)
       return response
     },
-
-    async getPriceListByHuntingType(hunting_type_id: any) {
+    async getPriceListByHuntingType(hunting_type_id: any = '', area_id: any = '', quota_id: any = '') {
       const url =
-        import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_PRICE_LIST + '?hunting_type_id=' + hunting_type_id
+        import.meta.env.VITE_APP_BASE_URL +
+        import.meta.env.VITE_APP_PRICE_LIST +
+        '?hunting_type_id=' +
+        hunting_type_id +
+        '&area_id=' +
+        area_id +
+        '&quota_id=' +
+        quota_id
 
       const config = {
         method: 'get',
