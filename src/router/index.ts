@@ -137,7 +137,7 @@ const routes: Array<RouteRecordRaw> = [
           {
             name: 'price-list',
             path: 'price-list',
-            component: () => import('../pages/module-settings/PriceList.vue'),
+            component: () => import('../pages/module-settings/ManagePriceList.vue'),
           },
         ],
       },

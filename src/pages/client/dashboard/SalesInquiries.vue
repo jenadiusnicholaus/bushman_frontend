@@ -73,8 +73,8 @@
             <VaInput
               v-model="form.address"
               type="text"
-              placeholder="enter your address"
-              :rules="[(value) => (value && value.length > 0) || 'Phone is required']"
+              placeholder="Enter your address"
+              :rules="[(value) => (value && value.length > 0) || 'Address is required']"
               label="Address"
             />
           </div>
@@ -301,33 +301,6 @@ export default defineComponent({
       }
     }
 
-    const deleteSalesInquireItem = async (id: string) => {
-      const result = await confirm('Are you sure you want to delete this item?')
-      const config = {
-        method: 'delete',
-        maxBodyLength: Infinity,
-        url: import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_SALES_INQUIRIES_URL + '?entity_id=' + id,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-      if (result) {
-        const response = await axios.request(config)
-        if (response.status === 200) {
-          init({ message: response.data.message, color: 'warning' })
-          showEditForm.value = false
-          form.id = null
-          form.full_name = ''
-          form.nick_name = ''
-          form.nationality = ''
-          form.category = null
-          form.country = null
-        }
-        getSalesInquiries()
-        resetValidation()
-      }
-    }
-
     const getCategories = async () => {
       const config = {
         method: 'get',
@@ -434,7 +407,7 @@ export default defineComponent({
 
       validators,
       getCountries,
-      deleteSalesInquireItem,
+      // deleteSalesInquireItem,
       getCategories,
       getNationalities,
       getContactTypes,
