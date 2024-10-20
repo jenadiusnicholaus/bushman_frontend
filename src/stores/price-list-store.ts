@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import { format } from 'date-fns'
 
 export const usePriceListStore = defineStore('price-list', {
   state: () => {
@@ -56,6 +57,8 @@ export const usePriceListStore = defineStore('price-list', {
     },
 
     async CreatePriceList(payload: any) {
+      const startDate = payload?.startDate ? format(new Date(payload.startDate), 'yyyy-MM-dd') : null
+      const endDate = payload?.endDate ? format(new Date(payload.endDate), 'yyyy-MM-dd') : null
       const data = JSON.stringify({
         area: payload.area,
         hunting_type_id: payload.huntingTypeId,
@@ -67,14 +70,8 @@ export const usePriceListStore = defineStore('price-list', {
         duration: payload.duration,
         companion_days: payload.companionDays,
         companion_amount: payload.companionAmount,
-        start_date:
-          payload.startDate instanceof Date && !isNaN(payload.startDate.getTime())
-            ? payload.startDate.toISOString().split('T')[0]
-            : null, // or handle the error as appropriate
-        end_date:
-          payload.endDate instanceof Date && !isNaN(payload.endDate.getTime())
-            ? payload.endDate.toISOString().split('T')[0]
-            : null, // or handle the error as appropriate
+        start_date: startDate,
+        end_date: endDate,
         species_object_list: payload.speciesObjectList,
       })
 

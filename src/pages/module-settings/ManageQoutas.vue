@@ -158,7 +158,7 @@ import { useQuotaStore } from '../../stores/quota-store'
 import { mapActions } from 'pinia'
 import { reactive } from 'vue'
 import { useToast, useForm } from 'vuestic-ui'
-import handleErrors from '../../utils/handleClientRegFormError'
+import handleErrors from '../../utils/errorHandler'
 import ModuleTable from './components/ModuleTable.vue'
 
 const defaultItem = {

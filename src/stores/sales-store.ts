@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import { format } from 'date-fns'
 
 export const useSalesInquiriesStore = defineStore('sales_inquiries', {
   state: () => {
@@ -9,8 +10,17 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
   },
 
   actions: {
-    async getSalesInquiries() {
-      const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_SALES_INQUIRIES_URL
+    async getSalesInquiries(seasonId: any, preferredDate: any) {
+      // ?season_id=1&preferred_date=2024-10-14
+      const formattedDate = preferredDate ? format(new Date(preferredDate), 'yyyy-MM-dd') : ''
+
+      const url =
+        import.meta.env.VITE_APP_BASE_URL +
+        import.meta.env.VITE_APP_SALES_INQUIRIES_URL +
+        '?season_id=' +
+        seasonId +
+        '&preferred_date=' +
+        formattedDate
 
       const config = {
         method: 'get',
@@ -26,7 +36,7 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
 
     async createSalesInquiry(payload: any) {
       const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_SALES_INQUIRIES_URL
-
+      const formattedDate = payload?.preferredDate ? format(new Date(payload.preferredDate), 'yyyy-MM-dd') : null
       const data = JSON.stringify({
         categories: ['Hunter'],
         full_name: payload?.fullName,
@@ -39,6 +49,8 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
         no_of_observers: payload?.noOfObservers,
         preferred_species: payload?.species,
         area_id: payload?.areaId,
+        season: payload?.season.value,
+        preferred_date: formattedDate,
       })
 
       const config = {

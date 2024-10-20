@@ -32,7 +32,7 @@
           searchable
           highlight-matched-text
           required-mark
-          @update:modelValue="getAllSpeces()"
+          @update:modelValue="getAllSpieces()"
         />
         <VaSelect
           v-model="form.sales_quota_id"
@@ -43,7 +43,7 @@
           searchable
           highlight-matched-text
           required-mark
-          @update:modelValue="getAllSpeces()"
+          @update:modelValue="getAllSpieces()"
         />
       </div>
       <h3 class="font-bold text-lg mb-2">Description</h3>
@@ -206,7 +206,7 @@
 import { defineComponent, reactive, ref } from 'vue'
 // import axios from 'axios'/
 import { VaForm, VaInput, VaSelect, VaButton } from 'vuestic-ui'
-import handleErrors from '../../../../utils/handleClientRegFormError'
+import handleErrors from '../../../../utils/errorHandler'
 import { validators } from '../../../../services/utils'
 
 // import Salesinquirieslist from '../../client/dashboard/components/Salesinquirieslist.vue'
@@ -337,7 +337,7 @@ export default defineComponent({
 
     onAreaChange(value: any) {
       console.log(value)
-      this.getAllSpeces()
+      this.getAllSpieces()
     },
 
     async submit() {
@@ -490,7 +490,7 @@ export default defineComponent({
       }
     },
 
-    async getAllSpeces() {
+    async getAllSpieces() {
       try {
         // if (this.form.sales_quota_id?.value || this.form?.area?.value) {
         const response = await this.getAllSpeciesPerQuotaPerArea(

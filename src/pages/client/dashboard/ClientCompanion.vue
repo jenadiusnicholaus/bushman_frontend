@@ -206,7 +206,7 @@ import { reactive, ref } from 'vue'
 import { useForm } from 'vuestic-ui'
 import axios from 'axios'
 import { onMounted } from 'vue'
-import handleErrors from '../../../utils/handleClientRegFormError'
+import handleErrors from '../../../utils/errorHandler'
 
 import { useModal, useToast } from 'vuestic-ui'
 

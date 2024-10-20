@@ -13,7 +13,7 @@
     <PricesSpeciesList :species-items="preceListItem.sales_package.species"> </PricesSpeciesList>
     <ComponionCosts :companion-items="preceListItem.componions_hunter"></ComponionCosts>
     <AdditionCharges></AdditionCharges>
-    <PriceListByHuntingType />
+    <!-- <PriceListByHuntingType /> -->
   </template>
 </template>
 
@@ -24,7 +24,7 @@ import { defineComponent } from 'vue'
 import { usePaymentCardsStore } from '../../../../stores/payment-cards'
 import PriceListPackagesDetails from './PriceListPackagesDetails.vue'
 import PriceListQuota from './PriceListQuota.vue'
-import PriceListByHuntingType from './PriceListByHuntingType.vue'
+// import PriceListByHuntingType from './PriceListByHuntingType.vue'
 import PricesSpeciesList from './PricesSpeciesList.vue'
 import ComponionCosts from './ComponionCosts.vue'
 import AdditionCharges from './AdditionCharges.vue'
@@ -32,7 +32,7 @@ import AdditionCharges from './AdditionCharges.vue'
 export default defineComponent({
   components: {
     PriceListQuota,
-    PriceListByHuntingType,
+    // PriceListByHuntingType,
     PriceListPackagesDetails,
     PricesSpeciesList,
     ComponionCosts,

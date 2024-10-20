@@ -19,7 +19,7 @@
 
     <div v-else class="p-2">
       <VaForm ref="sformRef" class="mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6 mb-4">
           <!-- name -->
 
           <VaInput
@@ -37,6 +37,17 @@
             required
           />
         </div>
+        <!-- description -->
+        <div class="mb-4 grid grid-cols-1 md:grid-cols-1">
+          <VaTextarea
+            v-model="sform.description"
+            label="Description"
+            placeholder="Enter Description"
+            :rules="[(v) => !!v || 'Description is required']"
+            required
+          />
+        </div>
+        <!-- start_date -->
       </VaForm>
 
       <div class="mb-6">
@@ -50,13 +61,6 @@
           Save
         </VaButton>
       </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">Or</div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
-        <VaFileUpload v-model="excellFile" dropzone file-types=".xlsx,.xls" />
-      </div>
-      <!-- start_date -->
     </div>
   </VaCard>
 </template>
@@ -67,9 +71,10 @@ import { useQuotaStore } from '../../stores/quota-store'
 import { mapActions } from 'pinia'
 import { reactive } from 'vue'
 import { useToast, useForm } from 'vuestic-ui'
-// import handleErrors from '../../utils/handleClientRegFormError'
 import ModuleTable from './components/ModuleTable.vue'
-
+import { useSpeciesStore } from '../../stores/species-store'
+import handleErrors from '../../utils/errorHandler'
+// import PDFViewer from 'pdf-viewer-vue'
 const defaultItem = {
   name: '',
   start_date: null,
@@ -81,6 +86,7 @@ export default defineComponent({
   name: 'QuotaPage',
   components: {
     ModuleTable,
+    // PDFViewer,
   },
 
   setup() {
@@ -119,6 +125,7 @@ export default defineComponent({
       id: null as any,
       name: '',
       scientific_name: '',
+      description: '',
     })
 
     const quotasOptions = [] as any
@@ -148,6 +155,7 @@ export default defineComponent({
 
   methods: {
     ...mapActions(useQuotaStore, ['getSpeciesList']),
+    ...mapActions(useSpeciesStore, ['createSpecies']),
 
     showSpecies(e: any) {
       console.log(e.id)
@@ -163,7 +171,38 @@ export default defineComponent({
       console.log('Species item deleted:', index)
     },
 
-    async addNewSpecies() {},
+    async addNewSpecies() {
+      const requestData = {
+        name: this.sform.name,
+        scientific_name: this.sform.scientific_name,
+        description: this.sform.description,
+      }
+      try {
+        const response = await this.createSpecies(requestData)
+        if (response.status === 201) {
+          this.toast.init({
+            message: response.data.message,
+            color: 'success',
+          })
+          this.resetSForm()
+          this.getSpeciesItems()
+        }
+      } catch (error: any) {
+        const errors = handleErrors(error.response || error) // Handle any error response
+
+        console.log('Caught errors:', errors) // Log caught errors for debugging
+
+        const message =
+          errors.length > 0
+            ? '\n' + errors.map((error, index) => `${index + 1}. ${error}`).join('\n')
+            : 'An unexpected error occurred. Please try again later.' // Fallback message
+
+        this.toast.init({
+          message, // Use the constructed message
+          color: 'danger',
+        })
+      }
+    },
 
     formatDate(date: Date) {
       const year = date.getFullYear()

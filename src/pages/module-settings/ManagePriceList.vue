@@ -14,6 +14,9 @@
           color="primary"
           label="Add New Quota"
           icon="add"
+          :border-color="'primary'"
+          round
+          preset="secondary"
           size="small"
           @click="showCreateNewPriceListFormMethod"
         >
@@ -21,6 +24,8 @@
         </VaButton>
       </VaButtonGroup>
     </div>
+    <VaDivider />
+
     <template v-if="!ShowCreateNewPriceListForm">
       <template v-if="showPriceList">
         <ModuleTable :items="items" :columns="columns" :loading="loading" @onView="toggleShowPriceListMethod">
@@ -72,7 +77,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, reactive } from 'vue'
-import { mapActions } from 'pinia'
+import { mapActions, mapState } from 'pinia'
 import { useToast, useForm } from 'vuestic-ui'
 import ModuleTable from './components/ModuleTable.vue'
 import PricesListDetails from './components/PricesList/PricesListDetails.vue'
@@ -170,8 +175,10 @@ export default defineComponent({
       huntingTypeValue: null as any,
       areaValue: null as any,
       quotaValue: null as any,
-      logo: '',
     }
+  },
+  computed: {
+    ...mapState(useSettingsStore, ['logo']),
   },
 
   mounted() {
@@ -189,6 +196,7 @@ export default defineComponent({
     ...mapActions(useQuotaStore, ['getAreaList']),
     ...mapActions(useQuotaStore, ['generateQuotaYear']),
     ...mapActions(useSettingsStore, ['getHuntingsTypes']),
+    ...mapActions(useSettingsStore, ['loadLogo']),
 
     toggleShowPriceListMethod(e: any) {
       console.log(e.id)
@@ -352,23 +360,9 @@ export default defineComponent({
       }
     },
 
-    loadLogo() {
-      // Fetch the logo image and convert to base64
-      const img = new Image()
-      img.src = '/logo.png' // Your logo image path
-      img.onload = () => {
-        const canvas = document.createElement('canvas')
-        canvas.width = img.width
-        canvas.height = img.height
-        const ctx: any = canvas.getContext('2d')
-        ctx.drawImage(img, 0, 0)
-        const dataURL = canvas.toDataURL('image/png') // Convert to base64
-        this.logo = dataURL // Assign the base64 string to logo
-      }
-    },
     generatePDF() {
       try {
-        const mylogo = this.logo
+        const myLogo: string = this.logo // Get the logo from the component's data
         console.log('Printable Data List:', this.printableDataList) // Log for inspection
 
         const documentDefinition: any = {
@@ -383,13 +377,11 @@ export default defineComponent({
             margin: [40, 20], // Add margin above the footer
           }),
 
-          header: function (currentPage: number, pageCount: number) {
-            console.log('Current Page:', currentPage) // Log for inspection
-            console.log('Page Count:', pageCount) // Log for inspection
+          header: function () {
             return {
               columns: [
                 {
-                  image: mylogo, // Use logo from the component data
+                  image: myLogo, // Use logo from the component data
                   width: 150, // Adjust width as necessary
                   margin: [0, 15, 0, 0], // Add margin to position the logo
                 },
@@ -409,7 +401,7 @@ export default defineComponent({
 
           content: [
             {
-              text: 'Comprehensive breakdown of sales packages, associated species, and companions.',
+              text: 'Comprehensive breakdown of sales packages, associated species, companions, and pricing details.',
               style: 'subheader',
               alignment: 'center',
               margin: [0, 0, 0, 20],
@@ -417,7 +409,7 @@ export default defineComponent({
             {
               style: 'table',
               table: {
-                widths: ['*', '*', '*', 'auto', 'auto', '*', '*', 'auto'], // Define column widths
+                widths: ['*', '*', '*', 'auto', 'auto', '*', 'auto', 'auto', 'auto'], // Adjust column widths to accommodate new column
                 body: [
                   // Table Header
                   [
@@ -462,13 +454,21 @@ export default defineComponent({
                       margin: [5, 10],
                     },
                     {
-                      text: 'Species Info',
+                      text: 'Hunting Type / Amount',
                       bold: true,
                       fillColor: '#6F4C3E',
                       color: 'white',
                       alignment: 'center',
                       margin: [5, 10],
-                    },
+                    }, // Combined Header
+                    {
+                      text: 'Duration(days)',
+                      bold: true,
+                      fillColor: '#6F4C3E',
+                      color: 'white',
+                      alignment: 'center',
+                      margin: [5, 10],
+                    }, // New Header for Duration
                     {
                       text: 'Companions',
                       bold: true,
@@ -506,8 +506,9 @@ export default defineComponent({
                     const area = item?.price_list_type?.price_list?.area?.name || 'N/A'
                     const quotaName = salesPackage.sales_quota?.name || 'N/A'
                     const createdDate = item?.create_date ? item.create_date.split('T')[0] : 'N/A'
+                    const duration = item?.price_list_type?.duration || 'N/A' // Retrieve duration
 
-                    const speciesInfo = Array.isArray(salesPackage?.species)
+                    Array.isArray(salesPackage?.species)
                       ? salesPackage.species
                           .map(
                             (species: any) =>
@@ -526,10 +527,19 @@ export default defineComponent({
                             .join(', ')
                         : 'No companions information available.'
 
-                    // If additional cost info is available, include it here (Example: 200 for each companion)
+                    // Additional costs calculated
                     const additionalCosts = item.componions_hunter
-                      .reduce((total: any, companion: any) => total + parseFloat(companion.amount), 0)
-                      .toFixed(2)
+                      .reduce(
+                        (total: number, companion: any) =>
+                          total + (isNaN(parseFloat(companion.amount)) ? 0 : parseFloat(companion.amount)),
+                        0,
+                      )
+                      .toFixed(2) // Using NaN check
+
+                    // Extract price list type information
+                    const huntingTypeName = item.price_list_type?.hunting_type?.name || 'N/A'
+                    const currency = item.price_list_type?.currency || 'N/A'
+                    const amount = item.price_list_type?.amount || 'N/A'
 
                     return [
                       { text: salesPackage?.name || 'N/A', margin: [5, 10] },
@@ -537,9 +547,10 @@ export default defineComponent({
                       { text: area, margin: [5, 10] },
                       { text: quotaName, margin: [5, 10] },
                       { text: createdDate, margin: [5, 10] },
-                      { text: speciesInfo, margin: [5, 10] },
+                      { text: `${huntingTypeName} / ${currency}${amount}`, margin: [5, 10] }, // Combined Hunting Type and Amount
+                      { text: duration.toString(), margin: [5, 10] }, // Duration Column
                       { text: companionsInfo, margin: [5, 10] },
-                      { text: `$${additionalCosts}`, margin: [5, 10] },
+                      { text: `$${additionalCosts}`, margin: [5, 10] }, // Displaying currency format
                     ]
                   }),
                 ],

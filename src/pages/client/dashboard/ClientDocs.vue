@@ -56,7 +56,7 @@ import { useForm } from 'vuestic-ui'
 import axios from 'axios'
 import { useToast } from 'vuestic-ui'
 import { onMounted } from 'vue'
-import handleErrors from '../../../utils/handleClientRegFormError'
+import handleErrors from '../../../utils/errorHandler'
 
 const { isValid, validate } = useForm('formRef')
 const { init } = useToast()
