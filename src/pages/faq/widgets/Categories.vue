@@ -32,7 +32,7 @@ const filteredCategories = computed(() => {
     return categories
   }
   return categories.filter((category) => {
-    return category.intro.toLowerCase().includes(value) || category.name.toLowerCase().includes(value)
+    return category.intro.toLowerCase().includes(value as any) || category.name.toLowerCase().includes(value as any)
   })
 })
 </script>

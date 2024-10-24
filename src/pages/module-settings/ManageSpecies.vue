@@ -26,14 +26,14 @@
             v-model="sform.name"
             label="Species Name"
             placeholder="Enter Species Name"
-            :rules="[(v) => !!v || 'Species Name is required']"
+            :rules="[(v: any) => !!v || 'Species Name is required']"
             required
           />
           <VaInput
             v-model="sform.scientific_name"
             label="Scientific Name"
             placeholder="Select Scientific Name"
-            :rules="[(v) => !!v || 'Scientific Name is required']"
+            :rules="[(v: any) => !!v || 'Scientific Name is required']"
             required
           />
         </div>
@@ -43,7 +43,7 @@
             v-model="sform.description"
             label="Description"
             placeholder="Enter Description"
-            :rules="[(v) => !!v || 'Description is required']"
+            :rules="[(v: any) => !!v || 'Description is required']"
             required
           />
         </div>

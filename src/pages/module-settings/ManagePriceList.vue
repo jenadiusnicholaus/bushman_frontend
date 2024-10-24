@@ -80,14 +80,13 @@ import { defineComponent, ref, reactive } from 'vue'
 import { mapActions, mapState } from 'pinia'
 import { useToast, useForm } from 'vuestic-ui'
 import ModuleTable from './components/ModuleTable.vue'
-import PricesListDetails from './components/PricesList/PricesListDetails.vue'
+import PricesListDetails from './components/PricesList/PriceListDetails.vue'
 import { usePriceListStore } from '../../stores/price-list-store'
 import CreatePricesListForm from './components/PricesList/CreatePricesListForm.vue'
 import { useQuotaStore } from '../../stores/quota-store'
 import { useSettingsStore } from '../../stores/settings-store'
 import pdfMake from 'pdfmake/build/pdfmake'
-import pdfFonts from 'pdfmake/build/vfs_fonts'
-
+import * as pdfFonts from 'pdfmake/build/vfs_fonts'
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 const defaultItem = {
   name: '',
@@ -409,7 +408,7 @@ export default defineComponent({
             {
               style: 'table',
               table: {
-                widths: ['*', '*', '*', 'auto', 'auto', '*', 'auto', 'auto', 'auto'], // Adjust column widths to accommodate new column
+                widths: ['*', '*', '*', 'auto', 'auto', '*', 'auto', 'auto', 'auto'], // Adjust column widths
                 body: [
                   // Table Header
                   [
@@ -460,7 +459,7 @@ export default defineComponent({
                       color: 'white',
                       alignment: 'center',
                       margin: [5, 10],
-                    }, // Combined Header
+                    },
                     {
                       text: 'Duration(days)',
                       bold: true,
@@ -468,7 +467,7 @@ export default defineComponent({
                       color: 'white',
                       alignment: 'center',
                       margin: [5, 10],
-                    }, // New Header for Duration
+                    },
                     {
                       text: 'Companions',
                       bold: true,
@@ -490,16 +489,7 @@ export default defineComponent({
                   ...this.printableDataList.map((item: any) => {
                     if (!item || !item?.sales_package) {
                       console.warn('Invalid Item:', item)
-                      return [
-                        { text: 'N/A', margin: [5, 10] },
-                        { text: 'N/A', margin: [5, 10] },
-                        { text: 'N/A', margin: [5, 10] },
-                        { text: 'N/A', margin: [5, 10] },
-                        { text: 'N/A', margin: [5, 10] },
-                        { text: 'N/A', margin: [5, 10] },
-                        { text: 'N/A', margin: [5, 10] },
-                        { text: 'N/A', margin: [5, 10] },
-                      ]
+                      return Array(9).fill({ text: 'N/A', margin: [5, 10] }) // Create an array with 'N/A' values
                     }
 
                     const salesPackage = item.sales_package
@@ -594,6 +584,8 @@ export default defineComponent({
       }
     },
   },
+
+  pdfSpecies() {},
 })
 </script>
 

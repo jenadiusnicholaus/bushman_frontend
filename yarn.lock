@@ -2782,12 +2782,12 @@
     "@types/node" "*"
     form-data "^4.0.0"
 
-"@types/node@*", "@types/node@^20.9.0", "@types/node@>= 14":
-  version "20.9.0"
-  resolved "https://registry.npmjs.org/@types/node/-/node-20.9.0.tgz"
-  integrity sha512-nekiGu2NDb1BcVofVcEKMIwzlx4NjHlcjhoxxKBNLtz15Y1z7MYf549DFvkHSId02Ax6kGwWntIBPC3l/JZcmw==
+"@types/node@*", "@types/node@^20.17.0", "@types/node@>= 14":
+  version "20.17.0"
+  resolved "https://registry.npmjs.org/@types/node/-/node-20.17.0.tgz"
+  integrity sha512-a7zRo0f0eLo9K5X9Wp5cAqTUNGzuFLDG2R7C4HY2BhcMAsxgSPuRvAC1ZB6QkuUQXf0YZAgfOX2ZyrBa2n4nHQ==
   dependencies:
-    undici-types "~5.26.4"
+    undici-types "~6.19.2"
 
 "@types/node@^18.0.0":
   version "18.18.9"
@@ -3238,7 +3238,7 @@
     "@ag-grid-community/styles" "^29.0.0"
     "@ag-grid-community/vue3" "^29.0.0"
 
-"@vuestic/compiler@latest":
+"@vuestic/compiler@^0.1.0":
   version "0.1.0"
   resolved "https://registry.npmjs.org/@vuestic/compiler/-/compiler-0.1.0.tgz"
   integrity sha512-nC1IeZLufwNnqz7DlQV1hgyfHyt3nOIdzTuFg+XZI8A4rpCG1RqeSDREx32S6cB4LyCekVK56/IkKAJxXteJmQ==
@@ -9329,6 +9329,11 @@ undici-types@~5.26.4:
   version "5.26.5"
   resolved "https://registry.npmjs.org/undici-types/-/undici-types-5.26.5.tgz"
   integrity sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==
+
+undici-types@~6.19.2:
+  version "6.19.8"
+  resolved "https://registry.npmjs.org/undici-types/-/undici-types-6.19.8.tgz"
+  integrity sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==
 
 unicode-canonical-property-names-ecmascript@^2.0.0:
   version "2.0.0"

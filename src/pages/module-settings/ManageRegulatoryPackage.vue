@@ -33,7 +33,7 @@
               v-model="packageForm.salesQuota"
               :options="quotasOptions"
               label="Sales Quota"
-              :rules="[(v) => !!v || 'Sales Quota is required']"
+              :rules="[(v: any) => !!v || 'Sales Quota is required']"
               placeholder="Select Sales Quota"
             >
               <template #appendInner>
@@ -47,7 +47,7 @@
             label="Name"
             :options="packageNamesOptions"
             placeholder="Select Package Name"
-            :rules="[(v) => !!v || 'Species is required']"
+            :rules="[(v: any) => !!v || 'Species is required']"
             required
           />
 
@@ -57,7 +57,7 @@
             label="Duration"
             placeholder="Enter package Duration"
             type="text"
-            :rules="[(v) => !!v || 'Duration is required']"
+            :rules="[(v: any) => !!v || 'Duration is required']"
             required
           />
         </div>
@@ -75,7 +75,7 @@
                 label="Species"
                 :options="speciesOptions"
                 placeholder="Select Species"
-                :rules="[(v) => !!v || 'Species is required']"
+                :rules="[(v: any) => !!v || 'Species is required']"
                 required
               />
 

@@ -31,7 +31,7 @@
               v-model="sform.salesQuota"
               :options="quotasOptions"
               label="Sales Quota"
-              :rules="[(v) => !!v || 'Sales Quota is required']"
+              :rules="[(v: any) => !!v || 'Sales Quota is required']"
               placeholder="Select Sales Quota"
             >
               <template #appendInner>
@@ -45,7 +45,7 @@
             label="Hunting Area"
             :options="areasOptions"
             placeholder="Select Hunting Area"
-            :rules="[(v) => !!v || 'Hunting Area is required']"
+            :rules="[(v: any) => !!v || 'Hunting Area is required']"
             required
           />
         </div>
@@ -63,7 +63,7 @@
                 label="Species"
                 :options="speciesOptions"
                 placeholder="Select Species"
-                :rules="[(v) => !!v || 'Species is required']"
+                :rules="[(v: any) => !!v || 'Species is required']"
                 required
               />
 
@@ -127,14 +127,14 @@
             label="Name"
             placeholder="Enter Quota Name"
             type="text"
-            :rules="[(v) => !!v || 'Name is required']"
+            :rules="[(v: any) => !!v || 'Name is required']"
             required
           />
 
           <VaDateInput
             v-model="form.start_date"
             label="Start Date"
-            :rules="[(v) => !!v || 'Start Date is required']"
+            :rules="[(v: any) => !!v || 'Start Date is required']"
             manual-input
             placeholder="Select a date"
           />
@@ -142,7 +142,7 @@
           <VaDateInput
             v-model="form.end_date"
             label="End Date"
-            :rules="[(v) => !!v || 'End Date is required']"
+            :rules="[(v: any) => !!v || 'End Date is required']"
             manual-input
             placeholder="Select a date"
           />

@@ -8,10 +8,11 @@
     :items="items"
     :columns="columns"
     hoverable
+    :loading="loading"
     striped
   >
     <template #cell(actions)="{ rowData }">
-      <VaButton preset="plain" icon="visibility" @click="clickedView(rowData)"> </VaButton>
+      <VaButton preset="plain" :icon="btnViewicon" @click="clickedView(rowData)"> </VaButton>
     </template>
   </VaDataTable>
 </template>
@@ -34,6 +35,10 @@ export default defineComponent({
     loading: {
       type: Boolean,
       default: false,
+    },
+    btnViewicon: {
+      type: String,
+      default: 'visibility',
     },
   },
   emits: ['on-view'],

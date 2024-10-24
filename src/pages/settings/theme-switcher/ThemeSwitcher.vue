@@ -14,8 +14,8 @@ const theme = computed({
   get() {
     return currentPresetName.value
   },
-  set(value) {
-    applyPreset(value)
+  set(value: any) {
+    applyPreset(value as any)
   },
 })
 

@@ -3,7 +3,7 @@
     <VaSelect
       v-model="seasonValue"
       :options="seasonOptions"
-      placeholder="Filter By Hunting Type"
+      placeholder="Filter By Season"
       @update:modelValue="getSalesInquiryList"
     />
     <!-- <Date
@@ -29,9 +29,9 @@
     @filtered="filtered = $event.items"
   >
     <template #cell(actions)="{ rowData }">
-      <!-- <VaButton preset="plain" icon="visibility" @click="clickedView(rowData)"> View </VaButton> -->
+      <VaButton preset="plain" icon="visibility" class="mr-2" @click="btnViewClicked(rowData)"> </VaButton>
 
-      <VaButton preset="plain" icon="download" @click="clickedView(rowData)"> download </VaButton>
+      <VaButton preset="plain" icon="download" @click="btnDownloadClicked(rowData)"></VaButton>
     </template>
     <template #bodyAppend>
       <tr>
@@ -54,7 +54,7 @@ import { useSettingsStore } from '../../../../stores/settings-store'
 
 export default defineComponent({
   name: 'SalesInquiriesList',
-  emits: ['download-btn-pressed'],
+  emits: ['download-btn-pressed', 'view-btn-pressed'],
   data() {
     return {
       loading: ref(false),
@@ -154,17 +154,13 @@ export default defineComponent({
       }
     },
 
-    formatKey(key: string): string {
-      return key
-        .replace(/_/g, ' ') // Replace underscores with spaces
-        .split(' ') // Split the string into words
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
-        .join(' ') // Join the words back into a single string
-    },
-
-    clickedView(rowData: any) {
+    btnDownloadClicked(rowData: any) {
       console.log(rowData)
       this.$emit('download-btn-pressed', rowData)
+    },
+    btnViewClicked(rowData: any) {
+      console.log(rowData)
+      this.$emit('view-btn-pressed', rowData)
     },
   },
 })

@@ -2,7 +2,13 @@
   <VaCard class="w-full">
     <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between px-4 py-2">
       <div class="flex flex-col md:flex-row gap-2 justify-start">
-        <VaButton v-if="showAddSalesInquiriesForm" class="px-2 py-2" icon="arrow_back" size="small" @click="gotBack()">
+        <VaButton
+          v-if="showAddSalesInquiriesForm || showDetailsPage"
+          class="px-2 py-2"
+          icon="arrow_back"
+          size="small"
+          @click="gotBack()"
+        >
           Go Back
         </VaButton>
       </div>
@@ -11,225 +17,237 @@
           class="px-2 py-2"
           color="primary"
           label="Add New Quota"
+          round
+          present="secondary"
+          border-color="primary"
           icon="add"
           size="small"
           @click="toggleAddSalesInquiriesForm()"
-          >Add a New Quota</VaButton
+          >Add sales Inquiry</VaButton
         >
       </VaButtonGroup>
     </div>
 
     <VaCardContent>
-      <Salesinquirieslist v-if="!showAddSalesInquiriesForm" @downloadBtnPressed="downloadInquiries">
-      </Salesinquirieslist>
-      <!-- <VaStepper v-else v-model="step" :steps="steps" vertical controls-hidden> -->
-      <!-- <template #step-content-0> -->
-      <VaForm v-else ref="formRef">
-        <div class="p-1">
-          <!-- <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4"> -->
-          <h3 class="font-bold text-lg mb-2">Basic Information</h3>
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-            <VaInput
-              v-model="form.full_name"
-              type="text"
-              placeholder="Enter your Full name"
-              :rules="[(value) => (value && value.length > 0) || 'Full name is required']"
-              label="Full name"
-            />
-            <!-- <VaInput v-model="form.nick_name" placeholder="Nick name" label="Nick name" /> -->
-            <VaSelect
-              v-model="form.country"
-              placeholder="Select Country"
-              label="Country"
-              :rules="[(v) => v || 'Country is required']"
-              :options="countries"
-              searchable
-              highlight-matched-text
-            />
-            <VaSelect
-              v-model="form.nationality"
-              placeholder="Select Client nationality"
-              label="Client Nationality"
-              :rules="[(v) => v || 'Nationality is required']"
-              :options="nationality"
-              searchable
-              highlight-matched-text
-            />
-          </div>
+      <template v-if="showDetailsPage">
+        <SalesInquiryDetails :item="selectedInquiryItem" />
+      </template>
+      <template v-else>
+        <Salesinquirieslist
+          v-if="!showAddSalesInquiriesForm"
+          @downloadBtnPressed="downloadInquiries"
+          @viewBtnPressed="viewInquiries"
+        >
+        </Salesinquirieslist>
+        <!-- <VaStepper v-else v-model="step" :steps="steps" vertical controls-hidden> -->
+        <!-- <template #step-content-0> -->
+        <VaForm v-else ref="formRef">
+          <div class="p-1">
+            <!-- <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4"> -->
+            <h3 class="font-bold text-lg mb-2">Basic Information</h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+              <VaInput
+                v-model="form.full_name"
+                type="text"
+                placeholder="Enter your Full name"
+                :rules="[(value: any) => (value && value.length > 0) || 'Full name is required']"
+                label="Full name"
+              />
+              <!-- <VaInput v-model="form.nick_name" placeholder="Nick name" label="Nick name" /> -->
+              <VaSelect
+                v-model="form.country"
+                placeholder="Select Country"
+                label="Country"
+                :rules="[(v: any) => v || 'Country is required']"
+                :options="countries"
+                searchable
+                highlight-matched-text
+              />
+              <VaSelect
+                v-model="form.nationality"
+                placeholder="Select Client nationality"
+                label="Client Nationality"
+                :rules="[(v: any) => v || 'Nationality is required']"
+                :options="nationality"
+                searchable
+                highlight-matched-text
+              />
+            </div>
 
-          <!-- Experience and Date Group -->
-          <h3 class="font-bold text-lg mb-2">Contacts</h3>
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-            <VaInput
-              v-model="form.email"
-              type="email"
-              placeholder="Enter your email"
-              :rules="[validators.required, validators.email]"
-              label="Email"
-            />
+            <!-- Experience and Date Group -->
+            <h3 class="font-bold text-lg mb-2">Contacts</h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+              <VaInput
+                v-model="form.email"
+                type="email"
+                placeholder="Enter your email"
+                :rules="[validators.required, validators.email]"
+                label="Email"
+              />
 
-            <VaInput
-              v-model="form.phone"
-              type="tell"
-              placeholder="eg: +971501234567"
-              :rules="[validators.required, validators.tell]"
-              label="Phone"
-            />
-            <!-- <vue-tel-input v-model="form.phone" mode="international" required></vue-tel-input> -->
+              <VaInput
+                v-model="form.phone"
+                type="tell"
+                placeholder="eg: +971501234567"
+                :rules="[validators.required, validators.tell]"
+                label="Phone"
+              />
+              <!-- <vue-tel-input v-model="form.phone" mode="international" required></vue-tel-input> -->
 
-            <VaInput
-              v-model="form.address"
-              type="text"
-              placeholder="Enter your address"
-              :rules="[(value) => (value && value.length > 0) || 'Address is required']"
-              label="Address"
-            />
-          </div>
+              <VaInput
+                v-model="form.address"
+                type="text"
+                placeholder="Enter your address"
+                :rules="[(value: any) => (value && value.length > 0) || 'Address is required']"
+                label="Address"
+              />
+            </div>
 
-          <h3 class="font-bold text-lg mb-2">Participants and hunting days</h3>
-          <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
-            <VaInput
-              v-model="form.no_of_hunters"
-              label="Number of Hunters"
-              placeholder="Enter Number of Hunters"
-              default-value="1"
-              type="number"
-              required
-            />
-            <VaInput
-              v-model="form.no_of_observers"
-              label="Number of Observers(Optional)"
-              placeholder="Enter Number of Observers"
-              type="number"
-              required
-            />
-            <VaInput
-              v-model="form.no_of_days"
-              label="Number of Days"
-              placeholder="Enter Number of Days"
-              type="number"
-              :rules="[(v) => v || 'This field is required']"
-              required
-            />
-            <VaInput
-              v-model="form.no_of_companions"
-              label="Number of Companions(Optional)"
-              placeholder="Enter Number of Companions"
-              type="number"
-              required
-            />
-            <VaSelect
-              v-model="form.area"
-              placeholder="Select Area"
-              label="Hunting area"
-              :rules="[(v) => v || 'Hunting area is required']"
-              :options="areasOptions"
-              searchable
-              highlight-matched-text
-              @update:modelValue="getAllSpieces"
-            />
-          </div>
-          <h3 class="font-bold text-lg mb-2">Season and Tentative Date</h3>
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-            <VaSelect
-              v-model="form.season"
-              placeholder="Select Season"
-              label="Season"
-              :rules="[(v) => v || 'Season is required']"
-              :options="seasonsOptions"
-              searchable
-              highlight-matched-text
-            />
-            <!-- <VaInput
+            <h3 class="font-bold text-lg mb-2">Participants and hunting days</h3>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+              <VaInput
+                v-model="form.no_of_hunters"
+                label="Number of Hunters"
+                placeholder="Enter Number of Hunters"
+                default-value="1"
+                type="number"
+                required
+              />
+              <VaInput
+                v-model="form.no_of_observers"
+                label="Number of Observers(Optional)"
+                placeholder="Enter Number of Observers"
+                type="number"
+                required
+              />
+              <VaInput
+                v-model="form.no_of_days"
+                label="Number of Days"
+                placeholder="Enter Number of Days"
+                type="number"
+                :rules="[(v: any) => v || 'This field is required']"
+                required
+              />
+              <VaInput
+                v-model="form.no_of_companions"
+                label="Number of Companions(Optional)"
+                placeholder="Enter Number of Companions"
+                type="number"
+                required
+              />
+              <VaSelect
+                v-model="form.area"
+                placeholder="Select Area"
+                label="Hunting area"
+                :rules="[(v: any) => v || 'Hunting area is required']"
+                :options="areasOptions"
+                searchable
+                highlight-matched-text
+                @update:modelValue="getAllSpieces"
+              />
+            </div>
+            <h3 class="font-bold text-lg mb-2">Season and Tentative Date</h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+              <VaSelect
+                v-model="form.season"
+                placeholder="Select Season"
+                label="Season"
+                :rules="[(v: any) => v || 'Season is required']"
+                :options="seasonsOptions"
+                searchable
+                highlight-matched-text
+              />
+              <!-- <VaInput
               v-model="form.preferred_date"
               type="date"
               placeholder="Select Preferred Date"
-              :rules="[(v) => v || 'Preferred Date is required']"
+              :rules="[(v: any) => v || 'Preferred Date is required']"
               label="Preferred Date"
             /> -->
-            <VaDateInput
-              v-model="form.preferred_date"
-              label="Preferred Date"
-              placeholder="Select Preferred Date"
-              :rules="[(v) => v || 'Preferred Date is required']"
-              required
-            />
-          </div>
-
-          <h3 class="font-bold text-lg mb-2">Preferred Species</h3>
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-            <VaSelect
-              v-model="form.species"
-              label="Species"
-              :options="speciesOptions"
-              placeholder="Select Species"
-              :rules="[(v) => !!v || 'Species is required']"
-              required
-            />
-
-            <VaCounter
-              v-model="form.quantity"
-              label="Quantity"
-              manual-input
-              :min="1"
-              :max="100"
-              :rules="[(v) => v || 'Quantity is required']"
-            />
-            <!-- </div> -->
-            <VaButtonGroup>
-              <VaButton
-                class="px-0 py-0"
-                color="primary"
-                icon="add"
-                size="small"
-                round
-                @click="addNewSpeciesItemToStorage()"
+              <VaDateInput
+                v-model="form.preferred_date"
+                label="Preferred Date"
+                placeholder="Select Preferred Date"
+                :rules="[(v: any) => v || 'Preferred Date is required']"
+                required
               />
-            </VaButtonGroup>
+            </div>
+
+            <h3 class="font-bold text-lg mb-2">Preferred Species</h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+              <VaSelect
+                v-model="form.species"
+                label="Species"
+                :options="speciesOptions"
+                placeholder="Select Species"
+                :rules="[(v: any) => !!v || 'Species is required']"
+                required
+              />
+
+              <VaCounter
+                v-model="form.quantity"
+                label="Quantity"
+                manual-input
+                :min="1"
+                :max="100"
+                :rules="[(v: any) => v || 'Quantity is required']"
+              />
+              <!-- </div> -->
+              <VaButtonGroup>
+                <VaButton
+                  class="px-0 py-0"
+                  color="primary"
+                  icon="add"
+                  size="small"
+                  round
+                  @click="addNewSpeciesItemToStorage()"
+                />
+              </VaButtonGroup>
+            </div>
+
+            <div class="mt-6">
+              <VaList>
+                <VaListLabel v-if="speciesObjects.length > 0" class="text-md mb-2 text-left"
+                  >Selected Species</VaListLabel
+                >
+                <VaListLabel v-else color="secondary" class="va-text-code mb-2 text-left"
+                  >No Species Selected</VaListLabel
+                >
+
+                <VaListItem v-for="(s, index) in speciesObjects" :key="index" class="list__item">
+                  <VaListItemSection>
+                    <VaListItemLabel>
+                      Name: {{ s.name }}
+                      <VaIcon name="delete" size="small" color="primary" @click="deleteFromStorage(index)" />
+                    </VaListItemLabel>
+                    <VaListItemLabel caption>Quantity: {{ s.quantity }}</VaListItemLabel>
+                  </VaListItemSection>
+                </VaListItem>
+              </VaList>
+            </div>
           </div>
 
-          <div class="mt-6">
-            <VaList>
-              <VaListLabel v-if="speciesObjects.length > 0" class="text-md mb-2 text-left"
-                >Selected Species</VaListLabel
-              >
-              <VaListLabel v-else color="secondary" class="va-text-code mb-2 text-left"
-                >No Species Selected</VaListLabel
-              >
+          <div class="mt-4 d-flex p-2">
+            <VaButton
+              v-if="!showDetailsPage"
+              icon="save"
+              class="mr-3 mb-2"
+              :disabled="!isValidForm"
+              @click="validateForm() && submit()"
+            >
+              Save
+            </VaButton>
+          </div>
+        </VaForm>
 
-              <VaListItem v-for="(s, index) in speciesObjects" :key="index" class="list__item">
-                <VaListItemSection>
-                  <VaListItemLabel>
-                    Name: {{ s.name }}
-                    <VaIcon name="delete" size="small" color="primary" @click="deleteFromStorage(index)" />
-                  </VaListItemLabel>
-                  <VaListItemLabel caption>Quantity: {{ s.quantity }}</VaListItemLabel>
-                </VaListItemSection>
-              </VaListItem>
-            </VaList>
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4">
+            <!-- <SalesAllInfos /> -->
           </div>
         </div>
-
-        <div class="mt-4 d-flex p-2">
-          <VaButton
-            v-if="!showEditForm"
-            icon="save"
-            class="mr-3 mb-2"
-            :disabled="!isValidForm"
-            @click="validateForm() && submit()"
-          >
-            Save
-          </VaButton>
-        </div>
-      </VaForm>
-
-      <div class="p-6">
-        <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4">
-          <!-- <SalesAllInfos /> -->
-        </div>
-      </div>
-      <!-- </template> -->
-      <!-- </VaStepper> -->
+        <!-- </template> -->
+        <!-- </VaStepper> -->
+      </template>
     </VaCardContent>
   </VaCard>
 </template>
@@ -247,10 +265,12 @@ import { mapActions, mapState } from 'pinia'
 import { useQuotaStore } from '../../../stores/quota-store'
 import { useSalesInquiriesStore } from '../../../stores/sales-store'
 import { useSettingsStore } from '../../../stores/settings-store'
+import SalesInquiryDetails from './components/SalesInquiryDetails.vue'
 import pdfMake from 'pdfmake/build/pdfmake'
-import pdfFonts from 'pdfmake/build/vfs_fonts'
+import * as pdfFonts from 'pdfmake/build/vfs_fonts'
 
-pdfMake.vfs = pdfFonts.pdfMake.vfs
+pdfMake.vfs = pdfFonts?.pdfMake?.vfs
+// pdfMake.vfs = pdfFonts.pdfMake.vfs
 export default defineComponent({
   components: {
     Salesinquirieslist,
@@ -258,6 +278,7 @@ export default defineComponent({
     VaInput,
     VaSelect,
     VaButton,
+    SalesInquiryDetails,
   },
   setup() {
     const formRef = ref()
@@ -280,7 +301,7 @@ export default defineComponent({
     } = useForm(contactFormRef)
 
     const { init } = useToast()
-    const showEditForm = ref(false)
+    const showDetailsPage = ref(false)
 
     const form = reactive({
       id: null as any,
@@ -316,6 +337,7 @@ export default defineComponent({
     }
     const gotBack = () => {
       showAddSalesInquiriesForm.value = false
+      showDetailsPage.value = false
       // btnIcon.value = showAddSalesInquiriesForm.value ? 'list_alt' : 'add'
     }
 
@@ -430,7 +452,7 @@ export default defineComponent({
       btnIcon,
       form,
       contactForm,
-      showEditForm,
+      showDetailsPage,
       countries,
       nationality,
       categoryOptions,
@@ -466,6 +488,7 @@ export default defineComponent({
       speciesObjects: [] as any,
       areasOptions: [] as any,
       seasonsOptions: [] as any,
+      selectedInquiryItem: null as any,
     }
   },
   computed: {
@@ -547,6 +570,11 @@ export default defineComponent({
           color: 'danger',
         })
       }
+    },
+
+    viewInquiries(i: any) {
+      this.showDetailsPage = true
+      this.selectedInquiryItem = i.selfitem
     },
 
     downloadInquiries(i: any) {

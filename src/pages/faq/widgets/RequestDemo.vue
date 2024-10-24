@@ -19,7 +19,10 @@
       </p>
       <VaInput
         v-model="email"
-        :rules="[(v) => !!v || 'Email field is required', (v) => /.+@.+\..+/.test(v) || 'Email should be valid']"
+        :rules="[
+          (v: any) => !!v || 'Email field is required',
+          (v: any) => /.+@.+\..+/.test(v as any) || 'Email should be valid',
+        ]"
         class="mb-4"
         label="Email"
         type="email"
@@ -28,7 +31,7 @@
   </VaModal>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 
 import { useForm, useToast } from 'vuestic-ui'

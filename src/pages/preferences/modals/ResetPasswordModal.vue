@@ -84,7 +84,7 @@ const oldPasswordRules = [(v: string) => !!v || 'Old password field is required'
 const newPasswordRules = [
   (v: string) => !!v || 'New password field is required',
   (v: string) => v?.length >= 8 || 'Must be at least 8 characters long',
-  (v: string) => new Set(v).size >= 6 || 'Must contain at least 6 unique characters',
+  (v: string) => new Set(v as any).size >= 6 || 'Must contain at least 6 unique characters',
   (v: string) => v !== oldPassowrd.value || 'New password cannot be the same',
 ]
 

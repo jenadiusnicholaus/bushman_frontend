@@ -7,7 +7,10 @@
     </p>
     <VaInput
       v-model="formData.email"
-      :rules="[(v) => !!v || 'Email field is required', (v) => /.+@.+\..+/.test(v) || 'Email should be valid']"
+      :rules="[
+        (v: any) => !!v || 'Email field is required',
+        (v: any) => /.+@.+\..+/.test(v as string) || 'Email should be valid',
+      ]"
       class="mb-4"
       label="Email"
       type="email"
@@ -36,8 +39,8 @@
         ref="password2"
         v-model="formData.repeatPassword"
         :rules="[
-          (v) => !!v || 'Repeat Password field is required',
-          (v) => v === formData.password || 'Passwords don\'t match',
+          (v: any) => !!v || 'Repeat Password field is required',
+          (v: any) => v === formData.password || 'Passwords don\'t match',
         ]"
         :type="isPasswordVisible.value ? 'text' : 'password'"
         class="mb-4"
@@ -130,10 +133,10 @@ const submit = async () => {
 }
 
 const passwordRules: ((v: string) => boolean | string)[] = [
-  (v) => !!v || 'Password field is required',
-  (v) => (v && v.length >= 8) || 'Password must be at least 8 characters long',
-  (v) => (v && /[A-Za-z]/.test(v)) || 'Password must contain at least one letter',
-  (v) => (v && /\d/.test(v)) || 'Password must contain at least one number',
-  (v) => (v && /[!@#$%^&*(),.?":{}|<>]/.test(v)) || 'Password must contain at least one special character',
+  (v: any) => !!v || 'Password field is required',
+  (v: any) => (v && v.length >= 8) || 'Password must be at least 8 characters long',
+  (v: any) => (v && /[A-Za-z]/.test(v as any)) || 'Password must contain at least one letter',
+  (v: any) => (v && /\d/.test(v as any)) || 'Password must contain at least one number',
+  (v: any) => (v && /[!@#$%^&*(),.?":{}|<>]/.test(v as any)) || 'Password must contain at least one special character',
 ]
 </script>

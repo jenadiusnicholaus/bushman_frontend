@@ -2,38 +2,38 @@
   <VaForm ref="form" @submit.prevent="submit">
     <VaInput
       v-model="localBillingAddress.name"
-      :rules="[(v) => !!v || 'Name field is required']"
+      :rules="[(v: any) => !!v || 'Name field is required']"
       class="mb-4"
       label="Name"
     />
     <VaCheckbox v-model="localBillingAddress.isPrimary" class="mb-4" label="Primary Address" />
     <VaInput
       v-model="localBillingAddress.street"
-      :rules="[(v) => !!v || 'Street field is required']"
+      :rules="[(v: any) => !!v || 'Street field is required']"
       class="mb-4"
       label="Street"
     />
     <VaInput
       v-model="localBillingAddress.city"
-      :rules="[(v) => !!v || 'City field is required']"
+      :rules="[(v: any) => !!v || 'City field is required']"
       class="mb-4"
       label="City"
     />
     <VaInput
       v-model="localBillingAddress.state"
-      :rules="[(v) => !!v || 'State field is required']"
+      :rules="[(v: any) => !!v || 'State field is required']"
       class="mb-4"
       label="State"
     />
     <VaInput
       v-model="localBillingAddress.postalCode"
-      :rules="[(v) => !!v || 'Postal Code field is required']"
+      :rules="[(v: any) => !!v || 'Postal Code field is required']"
       class="mb-4"
       label="Postal Code"
     />
     <VaInput
       v-model="localBillingAddress.country"
-      :rules="[(v) => !!v || 'Country field is required']"
+      :rules="[(v: any) => !!v || 'Country field is required']"
       class="mb-4"
       label="Country"
     />
@@ -61,7 +61,7 @@ const localBillingAddress = ref<BillingAddress>({ ...props.billingAddress })
 
 watch(
   () => props.billingAddress,
-  (value) => {
+  (value: any) => {
     localBillingAddress.value = { ...value }
   },
   { deep: true },

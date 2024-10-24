@@ -6,7 +6,7 @@ export const sleep = (ms = 0) => {
 export const validators = {
   email: (v: string) => {
     const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return pattern.test(v) || 'Please enter a valid email address'
+    return pattern.test(v as any) || 'Please enter a valid email address'
   },
 
   required: (v: any) => !!v || 'This field is required',
@@ -24,7 +24,7 @@ export const validators = {
     // (\d{1,9})        : second part of the local number (1 to 9 digits)
     // $                : end of the string
 
-    return pattern.test(v) || 'Please enter a valid international phone number'
+    return pattern.test(v as any) || 'Please enter a valid international phone number'
   },
 }
 

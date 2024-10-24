@@ -2,7 +2,7 @@
   <VaForm ref="form" @submit.prevent="submit">
     <VaInput
       v-model="paymentCardLocal.name"
-      :rules="[(v) => !!v || 'Card Name field is required']"
+      :rules="[(v: any) => !!v || 'Card Name field is required']"
       class="mb-4"
       label="Card Name"
     />
@@ -10,13 +10,13 @@
     <VaSelect
       v-model="paymentCardLocal.paymentSystem"
       :options="paymentSystemTypeOptions"
-      :rules="[(v) => !!v || 'Payment System field is required']"
+      :rules="[(v: any) => !!v || 'Payment System field is required']"
       class="mb-4"
       label="Payment System"
     />
     <VaInput
       v-model="paymentCardLocal.cardNumberMasked"
-      :rules="[(v) => !!v || 'Card Number field is required']"
+      :rules="[(v: any) => !!v || 'Card Number field is required']"
       class="mb-4"
       label="Card Number"
       mask="creditCard"
@@ -29,8 +29,8 @@
         datePattern: ['m', 'y'],
       }"
       :rules="[
-        (v) => !!v || 'Expiration Date field is required',
-        (v) => /^\d{4}$/.test(v) || 'Expiration Date must be in MM/YY format',
+        (v: any) => !!v || 'Expiration Date field is required',
+        (v: any) => /^\d{4}$/.test(v as any) || 'Expiration Date must be in MM/YY format',
       ]"
       class="mb-4"
       label="Expiration Date"
@@ -61,7 +61,7 @@ const paymentCardLocal = ref({ ...props.paymentCard })
 
 watch(
   () => props.paymentCard,
-  (value) => {
+  (value: any) => {
     paymentCardLocal.value = { ...value }
   },
   { deep: true },

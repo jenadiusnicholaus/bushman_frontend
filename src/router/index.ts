@@ -29,18 +29,13 @@ const routes: Array<RouteRecordRaw> = [
         children: [
           {
             name: 'sales-inquiry',
-            path: 'sales-inquiry',
+            path: '/sales-inquiry',
             component: () => import('../pages/client/dashboard/SalesInquiries.vue'),
           },
           {
             name: 'quotas',
             path: 'quotas',
             component: () => import('../pages/client/dashboard/QuotaPage.vue'),
-          },
-          {
-            name: 'client-companion',
-            path: 'client-companion',
-            component: () => import('../pages/client/dashboard/ClientCompanion.vue'),
           },
           {
             name: 'client-docs',

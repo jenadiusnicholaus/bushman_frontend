@@ -36,7 +36,7 @@
         </div>
         <div class="md:w-48 flex justify-end">
           <!-- <div v-if="plan.type === 'current'" class="font-bold">{{ plan.padletsUsed }} padlets used</div> -->
-          <VaButton>Upgrade</VaButton>
+          <!-- <VaButton>Upgrade</VaButton> -->
           <!-- <VaButton v-else preset="primary" @click="switchPlan(plan.id)">Downgrade</VaButton> -->
         </div>
       </div>

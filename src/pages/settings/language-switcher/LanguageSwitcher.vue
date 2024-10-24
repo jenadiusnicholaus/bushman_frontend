@@ -39,7 +39,7 @@ const model = computed({
   get() {
     return languageCodes[locale.value]
   },
-  set(value) {
+  set(value: any) {
     locale.value = languageName[value]
   },
 })

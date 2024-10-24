@@ -6,6 +6,7 @@ export const usePriceListStore = defineStore('price-list', {
   state: () => {
     return {
       itemsByHuntingType: [] as any,
+      priceList: [] as any,
     }
   },
 
@@ -29,7 +30,11 @@ export const usePriceListStore = defineStore('price-list', {
           'Content-Type': 'application/json',
         },
       }
+
       const response = await axios.request(config)
+      if (response.data.length > 0) {
+        this.priceList = response.data
+      }
       return response
     },
     async getPriceListByHuntingType(hunting_type_id: any = '', area_id: any = '', quota_id: any = '') {

@@ -8,7 +8,7 @@
           v-model="form.package_name"
           type="text"
           placeholder="Enter Package Name"
-          :rules="[(value) => (value && value.length > 0) || 'Package name is required']"
+          :rules="[(value: any) => (value && value.length > 0) || 'Package name is required']"
           label="Package name"
           required-mark
         />
@@ -17,7 +17,7 @@
           v-model="form.hunting_type_id"
           placeholder="Select Hunting Type"
           label="Hunting Type"
-          :rules="[(v) => v || 'Hunting type is required']"
+          :rules="[(v: any) => v || 'Hunting type is required']"
           :options="huntingTypesOptions"
           searchable
           required-mark
@@ -27,7 +27,7 @@
           v-model="form.area"
           placeholder="Select Area"
           label="Hunting area"
-          :rules="[(v) => v || 'Hunting area is required']"
+          :rules="[(v: any) => v || 'Hunting area is required']"
           :options="areasOptions"
           searchable
           highlight-matched-text
@@ -38,7 +38,7 @@
           v-model="form.sales_quota_id"
           placeholder="Select Sales Quota"
           label="Sales Quota"
-          :rules="[(v) => v || 'Sales Quota is required']"
+          :rules="[(v: any) => v || 'Sales Quota is required']"
           :options="salesQuotasOptions"
           searchable
           highlight-matched-text
@@ -55,7 +55,10 @@
           label="Description"
           counter
           required-mark
-          :rules="[(v) => (v && v.length > 0) || 'Required', (v) => (v && v.length < 60) || 'Maximum 120 characters']"
+          :rules="[
+            (v: any) => (v && v.length > 0) || 'Required',
+            (v: any) => (v && v.length < 60) || 'Maximum 120 characters',
+          ]"
         />
       </div>
 
@@ -66,7 +69,7 @@
           v-model="form.amount"
           type="text"
           placeholder="Enter Amount"
-          :rules="[(value) => (value && value.length > 0) || 'Amount is required']"
+          :rules="[(value: any) => (value && value.length > 0) || 'Amount is required']"
           label="Amount"
           required-mark
         />
@@ -75,7 +78,7 @@
           v-model="form.currency"
           placeholder="Select Currency"
           label="Currency"
-          :rules="[(v) => v || 'Currency is required']"
+          :rules="[(v: any) => v || 'Currency is required']"
           :options="currencyOptions"
           searchable
           highlight-matched-text
@@ -88,7 +91,7 @@
           type="text"
           required-mark
           placeholder="Enter Duration"
-          :rules="[(value) => (value && value.length > 0) || 'Duration is required']"
+          :rules="[(value: any) => (value && value.length > 0) || 'Duration is required']"
           label="Duration"
         />
       </div>
@@ -100,7 +103,7 @@
           v-model="form.companion_days"
           type="text"
           placeholder="Enter Companion Days"
-          :rules="[(value) => (value && value.length > 0) || 'Companion Days is required']"
+          :rules="[(value: any) => (value && value.length > 0) || 'Companion Days is required']"
           label="Companion Days"
           required-mark
         />
@@ -109,7 +112,7 @@
           v-model="form.companion_amount"
           type="text"
           placeholder="Enter Companion Amount"
-          :rules="[(value) => (value && value.length > 0) || 'Companion Amount is required']"
+          :rules="[(value: any) => (value && value.length > 0) || 'Companion Amount is required']"
           label="Companion Amount"
           required-mark
         />
@@ -129,14 +132,14 @@
           :options="speciesItemOptions"
           placeholder="Select Species"
           required-mark
-          :rules="[(v) => !!v || 'Species is required']"
+          :rules="[(v: any) => !!v || 'Species is required']"
           required
         />
         <VaInput
           v-model="form.samount"
           type="text"
           placeholder="Species Cost"
-          :rules="[(value) => (value && value.length > 0) || 'Species cost is required']"
+          :rules="[(value: any) => (value && value.length > 0) || 'Species cost is required']"
           label="Species Cost"
           required-mark
         />
@@ -148,7 +151,7 @@
           manual-input
           :min="1"
           :max="100"
-          :rules="[(v) => v || 'Quantity is required']"
+          :rules="[(v: any) => v || 'Quantity is required']"
         />
         <!-- </div> -->
         <VaButtonGroup>
@@ -336,7 +339,7 @@ export default defineComponent({
     // ...mapActions(useSalesInquiriesStore, ['createSalesInquiry']),
 
     onAreaChange(value: any) {
-      console.log(value)
+      console.log(value as any)
       this.getAllSpieces()
     },
 

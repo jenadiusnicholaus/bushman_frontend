@@ -37,7 +37,7 @@
             v-model="areaForm.name"
             label="Name"
             placeholder="Enter Hunting Area Name"
-            :rules="[(v) => !!v || 'Hunting Area Name is required']"
+            :rules="[(v: any) => !!v || 'Hunting Area Name is required']"
             required
           />
 
@@ -46,19 +46,19 @@
             type="textarea"
             label="Description"
             placeholder="Enter Hunting Area Description"
-            :rules="[(v) => !!v || 'Hunting Area Description is required']"
+            :rules="[(v: any) => !!v || 'Hunting Area Description is required']"
             required
           />
         </div>
 
-        <h3 class="font-bold text-lg mb-2">Quota Location</h3>
+        <h3 class="font-bold text-lg mb-2">Area Location</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <VaInput
             v-model="areaForm.lat"
             label="Latitude"
             type="text"
             placeholder="Enter Hunting Area Latitude eg. 12.3456789"
-            :rules="[(v) => !!v || 'Latitude is required']"
+            :rules="[(v: any) => !!v || 'Latitude is required']"
             required
           />
 
@@ -67,7 +67,7 @@
             label="Longitude"
             placeholder="Enter Hunting Area Longitude eg. 12.3456789"
             type="text"
-            :rules="[(v) => !!v || 'Longitude is required']"
+            :rules="[(v: any) => !!v || 'Longitude is required']"
             required
           />
         </div>
