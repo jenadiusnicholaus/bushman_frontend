@@ -75,6 +75,8 @@ export const usePriceListStore = defineStore('price-list', {
         duration: payload.duration,
         companion_days: payload.companionDays,
         companion_amount: payload.companionAmount,
+        observer_days: payload.observerDays,
+        observer_amount: payload.observerAmount,
         start_date: startDate,
         end_date: endDate,
         species_object_list: payload.speciesObjectList,

@@ -25,7 +25,6 @@ export const useRegulatoryPackageStore = defineStore('regulatory-package-store',
     async createNewRegulatoryPackage(payload: any) {
       const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_REGULATORY_HUNTING_PACKAGES_URL
       const data = JSON.stringify({
-        quota_id: payload.quotaId,
         name: payload.name,
         duration: payload.duration,
         species_object_list: payload.speciesObjectList,

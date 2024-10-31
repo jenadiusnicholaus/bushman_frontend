@@ -9,6 +9,7 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
       salesInquiries: [] as any,
       results: [] as any,
       loadingresults: false,
+      priceBreakDown: null as any,
     }
   },
 
@@ -70,10 +71,9 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
       return response
     },
 
-    async searchSalesInquiries(query: any) {
+    async getallSalesConfirmation() {
       this.loadingresults = true
-      const url =
-        import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_SEARCH_SALES_INQUIRIES_URL + '?query=' + query
+      const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_SALES_CONFIRMATION_VSET_URL
 
       const config = {
         method: 'get',
@@ -88,38 +88,22 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
         const response = await axios.request(config)
         if (response.data.length > 0 && response.status === 200) {
           this.loadingresults = false
-          this.results = response.data.map((item: any) => ({
-            id: item.id,
-            selfitem: item,
-            name: item?.entity?.full_name,
-            code: item?.code,
-            country: item?.entity?.country?.name,
-            nationality: item?.entity?.nationality.name,
-            contacts: item?.entity?.contacts?.map((contact: any) => ({
-              id: contact.id,
-              name: contact?.contact,
-              contactable: contact?.contactable,
-            })),
-            preference: {
-              no_of_hunters: item?.preference?.no_of_hunters,
-              no_of_observers: item?.preference?.no_of_observers,
-              no_of_days: item?.preference?.no_of_days,
-              no_of_companions: item?.preference?.no_of_companions,
-              special_requests: item?.preference?.special_requests,
-              budget_estimation: item?.preference?.budget_estimation,
-              prev_experience: item?.preference?.prev_experience,
-              preferred_date: formatDateTime(item?.preference?.preferred_date),
-              accommodation_type: item?.preference?.accommodation_type,
-              payment_method: item?.preference?.payment_method,
-            },
-            preferred_species: item?.preferred_species?.map((species: any) => ({
-              id: species?.id,
-              name: species?.species?.name,
-              quantity: species?.quantity,
-            })),
-          }))
+          this.results = response.data.map((item: any) => {
+            return {
+              sales_inquiry_code: item.sales_inquiry.id,
+              name: item.proposed_package?.package.name,
+              airport_name: item.itinerary.airport_name,
+              charter_in: formatDateTime(item.itinerary.charter_in),
+              charter_out: formatDateTime(item.itinerary.charter_out),
+              arrival: formatDateTime(item.itinerary.arrival),
+              status: item?.status?.status ?? 'No Status',
+              selfitem: item,
+              // total_sales_amount: item.total_sales_amount,
+              // total_sales_amount_usd: item.total_sales_amount_usd,
+            }
+          })
+          return response
         }
-        return response
       } catch (error) {
         console.log(error)
         this.loadingresults = false
@@ -138,6 +122,7 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
         charter_out: payload.charterOut,
         arrival: payload.arrival,
         installments: payload.installments,
+        regulatory_package_id: payload.regulatoryPackageId,
       })
 
       const config = {
@@ -154,6 +139,61 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
       return response
     },
 
-    get,
+    async getSalesPriceBreakdown(payload: any) {
+      //     # http://localhost:8000/api/v1.0/sales-confirmation/total-sales-amount/?package_id=1&sales_inquiry_id=1
+      // VITE_APP_SALESPRICE_BREAK_DOWN_URL=sales-confirmation/total-sales-amount/
+      const url =
+        import.meta.env.VITE_APP_BASE_URL +
+        import.meta.env.VITE_APP_SALESPRICE_BREAK_DOWN_URL +
+        '?package_id=' +
+        payload.packageId +
+        '&sales_inquiry_id=' +
+        payload.salesInquiryId
+      const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+
+      try {
+        const response = await axios.request(config)
+        this.priceBreakDown = response.data
+        return response
+      } catch (error) {
+        console.log(error)
+        return error
+      }
+    },
+
+    async updatesalesConfirmationStatus(payload: any) {
+      const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_SALES_CONFIRMATION_STATUS_VSET_URL
+      const data = new FormData()
+
+      data.append('doc_type_id', payload.docTypeId)
+      data.append('entity_id', payload.entityId)
+      // data.append('documents', JSON.stringify(payload.documents))
+      data.append('contract_doc', payload.contractDoc)
+      data.append('payment_doc', payload.paymentDoc)
+      data.append('sales_confirmation_proposal_id', payload.salesConfirmationProposalId)
+      data.append('status_id', payload.statusId)
+      data.append('area_id', payload.areaId)
+      data.append('quota_id', payload.quotaId)
+
+      const config = {
+        method: 'patch',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        data: data,
+      }
+
+      const response = await axios.request(config)
+      return response
+    },
   },
 })

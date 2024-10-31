@@ -1,169 +1,638 @@
 <template>
-  <VaSplit
-    class="split-demo h-[40rem] py-6"
-    :limits="[
-      ['30px', '20rem'],
-      [5 as any, 'any'],
-    ]"
-  >
-    <template #start>
-      <div class="p-6">
-        <VaTitle style="font-weight: bold">Sales Inquiry Details</VaTitle>
+  <div class="sales-confirmation">
+    <h1 class="header">Sales Confirmation Details</h1>
 
-        <h2>Inquiry Code: {{ item?.code }}</h2>
-        <VaTitle>Created on: {{ formatDate(item?.create_date) }}</VaTitle>
+    <!-- Actions Button Section -->
+    <div class="action-buttons">
+      <VaButton
+        roud
+        preset="secondary"
+        class="px-2 py-2 px-md-4 py-md-4 mr-2"
+        icon="file_download"
+        size="small"
+        border-color="primary"
+        @click="downloadConfirmation"
+        >Download</VaButton
+      >
 
-        <VaDivider />
-        <div class="flex flex-col py-4 px-6">
-          <VaTitle style="font-weight: bold">Client Information</VaTitle>
-          <p>Full Name: {{ safeString(item?.entity?.full_name) }}</p>
-          <p>Nationality: {{ safeString(item?.entity?.nationality?.name) }}</p>
-          <p>Country: {{ safeString(item?.entity?.country?.name) }}</p>
+      <template v-if="salesData?.status?.status === 'pending' || salesData?.status?.status === 'provision_sales'">
+        <VaButton
+          roud
+          preset="secondary"
+          border-color="primary"
+          class="px-2 py-2"
+          icon="check_circle"
+          :disabled="disabledConfirmButton"
+          size="small"
+          @click="showModal"
+          >{{ confirmText }}</VaButton
+        >
+      </template>
 
-          <VaTitle style="font-weight: bold">Contacts:</VaTitle>
-          <VaList>
-            <VaListItem v-for="(contact, index) in safeArray(item.entity?.contacts)" :key="index">
-              <VaListItemContent>{{ contact.contact }}</VaListItemContent>
-            </VaListItem>
-          </VaList>
+      <template v-else-if="salesData?.status?.status === 'confirmed'">
+        <VaButton
+          roud
+          :color="buttonColor"
+          class="px-2 py-2 mr-2"
+          :disabled="disabledConfirmButton"
+          size="small"
+          @click="cancel()"
+          >{{ confirmText }}</VaButton
+        >
 
-          <VaDivider />
+        <VaButton
+          roud
+          color="success"
+          class="px-2 py-2"
+          :disabled="disabledConfirmButton"
+          size="small"
+          @click="complete()"
+          >Complete</VaButton
+        >
+      </template>
+    </div>
 
-          <VaTitle style="font-weight: bold">Preference Information</VaTitle>
-          <p>Preferred Date: {{ formatDate(item?.preference?.preferred_date) }}</p>
-          <p>Number of Hunters: {{ safeString(item?.preference?.no_of_hunters?.toString()) }}</p>
-          <p>Number of Companions: {{ safeString(item?.preference?.no_of_companions?.toString()) }}</p>
-          <p>Number of Days: {{ safeString(item?.preference?.no_of_days?.toString()) }}</p>
-
-          <VaDivider />
-
-          <VaTitle style="font-weight: bold">Preferred Species</VaTitle>
-          <VaList>
-            <VaListItem v-if="safeArray(item?.preferred_species).length === 0">
-              <VaListItemContent>No preferred species listed.</VaListItemContent>
-            </VaListItem>
-            <VaListItem v-for="(species, index) in safeArray(item?.preferred_species)" :key="index">
-              <VaListItemContent>
-                {{ safeString(species.species?.name) }} (Quantity: {{ safeString(species?.quantity?.toString()) }})
-              </VaListItemContent>
-            </VaListItem>
-          </VaList>
-
-          <VaDivider />
-
-          <VaTitle style="font-weight: bold">Area Information</VaTitle>
-          <VaList>
-            <VaListItem v-if="safeArray(item.area).length === 0">
-              <VaListItemContent>No area information available.</VaListItemContent>
-            </VaListItem>
-            <VaListItem v-for="(area, index) in safeArray(item.area)" :key="index">
-              <VaListItemContent>
-                Area ID: {{ safeString(area.id.toString()) }}, Area: {{ safeString(area.area?.name || 'Unnamed') }}
-              </VaListItemContent>
-            </VaListItem>
-          </VaList>
-
-          <VaDivider />
-
-          <VaTitle style="font-weight: bold">Remarks</VaTitle>
-          <p>{{ safeString(item?.remarks, 'No remarks provided.') }}</p>
+    <!-- Sales Inquiry -->
+    <section class="section">
+      <h2>Sales Inquiry</h2>
+      <div class="details-grid">
+        <div><strong>ID:</strong> {{ salesData?.id ?? 'N/A' }}</div>
+        <div><strong>Code:</strong> {{ salesData?.sales_inquiry?.code ?? 'N/A' }}</div>
+        <div><strong>Created Date:</strong> {{ formatDate(salesData?.created_date) ?? 'N/A' }}</div>
+        <div><strong>Remarks:</strong> {{ salesData?.sales_inquiry?.remarks ?? 'None' }}</div>
+        <div>
+          <strong>Status:</strong>
+          <VaBadge
+            :text="salesData?.status?.status ?? 'N/A'"
+            :color="getStatusColor(salesData?.status?.status)"
+            class="mr-2"
+          />
         </div>
       </div>
-    </template>
-    <template #grabber>
-      <div class="custom-grabber">
-        <VaIcon name="swap_horiz" />
+    </section>
+
+    <!-- Status Information -->
+    <section class="section">
+      <h2>Status Information</h2>
+      <div class="details-grid">
+        <div><strong>Status ID:</strong> {{ salesData?.status?.id ?? 'N/A' }}</div>
+        <div><strong>Status:</strong> {{ salesData?.status?.status ?? 'No status' }}</div>
+        <div><strong>Created At:</strong> {{ formatDate(salesData?.status?.created_at) ?? 'N/A' }}</div>
+        <div><strong>Updated At:</strong> {{ formatDate(salesData?.status?.updated_at) ?? 'N/A' }}</div>
       </div>
-    </template>
-    <template #end>
-      <div class="p-6">
-        <SalesProposalForm :item="item"> </SalesProposalForm>
+    </section>
+
+    <!-- Client Information -->
+    <section class="section">
+      <h2>Client Information</h2>
+      <div class="details-grid">
+        <div><strong>Full Name:</strong> {{ salesData?.sales_inquiry?.entity?.full_name ?? 'N/A' }}</div>
+        <div><strong>Email:</strong> {{ getContactByType(1)?.contact ?? 'N/A' }}</div>
+        <div><strong>Phone:</strong> {{ getContactByType(4)?.contact ?? 'N/A' }}</div>
+        <div><strong>Address:</strong> {{ getContactByType(3)?.contact ?? 'N/A' }}</div>
+        <div><strong>Nationality:</strong> {{ salesData?.sales_inquiry?.entity?.nationality?.name ?? 'N/A' }}</div>
+        <div><strong>Country:</strong> {{ salesData?.sales_inquiry?.entity?.country?.name ?? 'N/A' }}</div>
       </div>
-    </template>
-  </VaSplit>
+    </section>
+
+    <!-- Client Preferences -->
+    <section class="section">
+      <h2>Client Preferences</h2>
+      <div class="details-grid">
+        <div><strong>No. of Hunters:</strong> {{ salesData?.sales_inquiry?.preference?.no_of_hunters ?? 'N/A' }}</div>
+        <div>
+          <strong>No. of Observers:</strong> {{ salesData?.sales_inquiry?.preference?.no_of_observers ?? 'N/A' }}
+        </div>
+        <div><strong>No. of Days:</strong> {{ salesData?.sales_inquiry?.preference?.no_of_days ?? 'N/A' }}</div>
+        <div>
+          <strong>No. of Companions:</strong> {{ salesData?.sales_inquiry?.preference?.no_of_companions ?? 'N/A' }}
+        </div>
+        <div>
+          <strong>Preferred Date:</strong>
+          {{ formatDate(salesData?.sales_inquiry?.preference?.preferred_date) ?? 'N/A' }}
+        </div>
+        <div>
+          <strong>Special Requests:</strong> {{ salesData?.sales_inquiry?.preference?.special_requests ?? 'None' }}
+        </div>
+      </div>
+    </section>
+
+    <!-- Preferred Species Table -->
+    <section class="section">
+      <h2>Preferred Species</h2>
+      <div class="va-table-responsive">
+        <table class="va-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Scientific Name</th>
+              <th>Quantity</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="species in salesData?.sales_inquiry?.preferred_species ?? []" :key="species.id">
+              <td>{{ species.species?.name ?? 'N/A' }}</td>
+              <td>{{ species.species?.scientific_name ?? 'N/A' }}</td>
+              <td>{{ species.quantity ?? 'N/A' }}</td>
+              <td>{{ species.species?.description ?? 'N/A' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Area Information -->
+    <section class="section">
+      <h2>Area Information</h2>
+      <div class="details-grid">
+        <div><strong>Area Name:</strong> {{ salesData?.sales_inquiry?.area[0]?.area?.name ?? 'N/A' }}</div>
+        <div><strong>Description:</strong> {{ salesData?.sales_inquiry?.area[0]?.area?.description ?? 'N/A' }}</div>
+      </div>
+    </section>
+
+    <!-- Itinerary -->
+    <section class="section">
+      <h2>Itinerary</h2>
+      <div class="details-grid">
+        <div><strong>Airport Name:</strong> {{ salesData?.itinerary?.airport_name ?? 'N/A' }}</div>
+        <div><strong>Arrival:</strong> {{ formatDate(salesData?.itinerary?.arrival) ?? 'N/A' }}</div>
+        <div><strong>Charter In:</strong> {{ formatDate(salesData?.itinerary?.charter_in) ?? 'N/A' }}</div>
+        <div><strong>Charter Out:</strong> {{ formatDate(salesData?.itinerary?.charter_out) ?? 'N/A' }}</div>
+      </div>
+    </section>
+
+    <!-- Installments -->
+    <section class="section">
+      <h2>Installments</h2>
+      <VaDataTable :items="salesData?.installments ?? []" :columns="columns" />
+    </section>
+
+    <!-- Proposed Package -->
+    <section class="section">
+      <h2>Proposed Package</h2>
+      <div class="details-grid">
+        <div><strong>Name:</strong> {{ salesData?.proposed_package?.sales_package?.name ?? 'N/A' }}</div>
+        <div><strong>Description:</strong> {{ salesData?.proposed_package?.sales_package?.description ?? 'N/A' }}</div>
+        <div><strong>Amount:</strong> {{ salesData?.proposed_package?.price_list_type?.amount ?? 'N/A' }}</div>
+        <div>
+          <strong>Duration (days):</strong> {{ salesData?.proposed_package?.price_list_type?.duration ?? 'N/A' }}
+        </div>
+        <div>
+          <strong>Hunting Type:</strong> {{ salesData?.proposed_package?.price_list_type?.hunting_type?.name ?? 'N/A' }}
+        </div>
+      </div>
+      <h3>Species Included</h3>
+      <ul class="species-list">
+        <li v-for="species in salesData?.proposed_package?.sales_package?.species ?? []" :key="species.id">
+          {{ species.species?.name ?? 'N/A' }} ({{ species.species?.scientific_name ?? 'N/A' }}):
+          <strong>{{ species.amount ?? 'N/A' }}</strong>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Price Breakdown -->
+    <section class="section">
+      <h2>Price Breakdown</h2>
+      <div class="details-grid">
+        <div>
+          <strong>Total Amount:</strong>
+          {{ salesData?.price_break_down?.total_amount?.currency?.symbol ?? 'N/A' }}
+          {{ salesData?.price_break_down?.total_amount?.amount ?? 'N/A' }}
+        </div>
+        <div>
+          <strong>Companion Cost:</strong>
+          <div>
+            Number of Companions:
+            {{ salesData?.price_break_down?.companion_cost_details?.number_of_companions ?? 'N/A' }}
+          </div>
+          <div>
+            Cost per Companion:
+            {{ salesData?.price_break_down?.companion_cost_details?.cost_per_companion?.currency?.symbol ?? 'N/A' }}
+            {{ salesData?.price_break_down?.companion_cost_details?.cost_per_companion?.amount ?? 'N/A' }}
+          </div>
+          <div>
+            Total Companion Cost:
+            {{ salesData?.price_break_down?.companion_cost_details?.total_companion_cost?.currency?.symbol ?? 'N/A' }}
+            {{ salesData?.price_break_down?.companion_cost_details?.total_companion_cost?.amount ?? 'N/A' }}
+          </div>
+        </div>
+        <div>
+          <strong>Observer Cost:</strong>
+          <div>
+            Number of Observers: {{ salesData?.price_break_down?.observer_cost_details?.number_of_observers ?? 'N/A' }}
+          </div>
+          <div>
+            Cost per Observer:
+            {{ salesData?.price_break_down?.observer_cost_details?.cost_per_observer?.currency?.symbol ?? 'N/A' }}
+            {{ salesData?.price_break_down?.observer_cost_details?.cost_per_observer?.amount ?? 'N/A' }}
+          </div>
+          <div>
+            Total Observer Cost:
+            {{ salesData?.price_break_down?.observer_cost_details?.total_observer_cost?.currency?.symbol ?? 'N/A' }}
+            {{ salesData?.price_break_down?.observer_cost_details?.total_observer_cost?.amount ?? 'N/A' }}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <VaModal v-model="isOpened" :overlay="true" no-outside-dismiss :hide-default-actions="true" :close-button="true">
+      <template v-if="salesData?.status?.status == 'pending'">
+        <div class="flex flex-row">
+          <VaCheckbox v-model="selection" array-value="provision_sales" label="signed contract" class="mb-6" />
+          <VaCheckbox v-model="selection" array-value="confirm" label="payment document" class="mb-6" />
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <template v-if="selection.includes('provision_sales')">
+            <VaFileUpload
+              v-model="file"
+              dropzone
+              upload-button-text="Upload Signed Contract"
+              drop-zone-text=""
+              color="secondary"
+              file-types="application/pdf"
+              :max-size="1000000"
+              :max-files="1"
+            />
+          </template>
+          <template v-if="selection.includes('confirm')">
+            <div class="col-span-2">
+              <h3 class="mb-2">Payment Details</h3>
+              <VaFileUpload
+                v-model="payfile"
+                upload-button-text="Upload Payment Document"
+                dropzone
+                color="secondary"
+                drop-zone-text=""
+                file-types="application/pdf"
+                :max-size="1000000"
+                :max-files="1"
+              />
+              <div class="mb-2">
+                <VaInput
+                  v-model="paymentDetails.bank_name"
+                  label="Bank Name"
+                  placeholder="Enter Bank Name"
+                  type="text"
+                />
+              </div>
+              <div class="mb-2">
+                <VaInput
+                  v-model="paymentDetails.account_number"
+                  label="Account Number"
+                  placeholder="Enter Account Number"
+                  type="text"
+                />
+              </div>
+              <div class="mb-2">
+                <VaInput
+                  v-model="paymentDetails.payment_method"
+                  label="Payment Method"
+                  placeholder="Enter Payment Method"
+                  type="text"
+                />
+              </div>
+            </div>
+          </template>
+        </div>
+      </template>
+
+      <template v-else-if="salesData?.status?.status == 'provision_sales'">
+        <h3 class="mb-2">Payment Details</h3>
+        <VaFileUpload
+          v-model="payfile"
+          upload-button-text="Upload Payment Document"
+          dropzone
+          color="secondary"
+          drop-zone-text=""
+          file-types="application/pdf"
+          :max-size="1000000"
+          :max-files="1"
+        />
+        <div class="mb-2">
+          <VaInput v-model="paymentDetails.bank_name" label="Bank Name" placeholder="Enter Bank Name" type="text" />
+        </div>
+        <div class="mb-2">
+          <VaInput
+            v-model="paymentDetails.account_number"
+            label="Account Number"
+            placeholder="Enter Account Number"
+            type="text"
+          />
+        </div>
+        <div class="mb-2">
+          <VaInput
+            v-model="paymentDetails.payment_method"
+            label="Payment Method"
+            placeholder="Enter Payment Method"
+            type="text"
+          />
+        </div>
+      </template>
+      <VaButton class="mt-2" @click="submit">Save</VaButton>
+    </VaModal>
+  </div>
 </template>
 
 <script lang="ts">
-import { useForm } from 'vuestic-ui'
-import { defineComponent, ref, reactive } from 'vue'
+import { mapActions } from 'pinia'
+import { defineComponent } from 'vue'
 import { useSettingsStore } from '../../../../stores/settings-store'
-import SalesProposalForm from './SalesProposalForm.vue'
+import { useSalesInquiriesStore } from '../../../../stores/sales-store'
+import handleErrors from '../../../../utils/errorHandler'
+import getStatusColor from '../../../../utils/status_color'
 
 export default defineComponent({
-  name: 'SalesConfirmationClientDetails',
-  components: {
-    SalesProposalForm,
-  },
   props: {
-    item: {
+    salesData: {
       type: Object,
       required: true,
     },
   },
-
+  emits: ['download-confirmation'],
   data() {
-    const formRef = ref()
-    const {
-      isValid: isValidForm,
-      validate: validateForm,
-      resetValidation: resetValidationForm,
-      reset: resetForm,
-    } = useForm(formRef)
-
-    const form = reactive({
-      id: null as any,
-      package_id: null as any,
-      airport: null as any,
-      departure: null as any,
-      charters: null as any,
-      arrival: null as any,
-      hotel_booking: null as any,
-    })
+    // Description, Amount Due, Days, Due Limit, and Status Columns
+    const columns = [
+      { key: 'description', label: 'Description' },
+      { key: 'amount_due', label: 'Amount Due (USD)' },
+      { key: 'days', label: 'Days' }, // Added days
+      { key: 'due_limit', label: 'Due Limit' }, // Added due limit
+    ]
 
     return {
-      isValidForm,
-      validateForm,
-      resetValidationForm,
-      resetForm,
-      formRef,
-      form,
+      columns,
+      isOpened: false,
+      file: [],
+      payfile: [],
+      docType: null as any,
+      docTypes: [],
+      confirmText: 'Confirm',
+      disabledConfirmButton: false,
+      selection: ['provision_sales'],
+      paymentDetails: {
+        bank_name: '',
+        account_number: '',
+        payment_method: '',
+      },
+      buttonColor: 'primary',
+
+      statusOptions: [
+        { value: 'provision_sales', text: 'Confirmed, but no disposit yet' },
+        { value: 'confirmed', text: 'Confirmed, With a disposit' },
+        { value: 'declined', text: 'Declined' },
+        { value: 'cancelled', text: 'Cancelled' },
+        { value: 'completed', text: 'Completed' },
+      ],
+      getStatusColor,
+      files: [] as any[],
+      status: '',
     }
   },
-  computed: {
-    logo() {
-      return useSettingsStore().logo // Get the logo from the store
-    },
+  mounted() {
+    this.getDocTypeOptions()
+    this.showConfirmButtonTextByStatus()
   },
   methods: {
-    formatDate(dateString: string | number | Date) {
-      return dateString ? new Date(dateString).toLocaleDateString() : 'Not provided'
+    ...mapActions(useSettingsStore, ['getDocTypes']),
+    ...mapActions(useSalesInquiriesStore, ['updatesalesConfirmationStatus']),
+    getContactByType(type: any) {
+      return this.salesData.sales_inquiry.entity.contacts.find((contact: any) => contact.contact_type === type)
     },
-    safeArray(arr: any) {
-      return arr || []
+    formatDate(dateString: any) {
+      const options: any = { year: 'numeric', month: 'long', day: 'numeric' }
+      return new Date(dateString).toLocaleDateString(undefined, options)
     },
-    safeString(str: any, fallback = 'Not provided') {
-      return str || fallback
+
+    downloadConfirmation() {
+      this.$emit('download-confirmation', this.salesData)
     },
-    gotBack() {
-      // Your logic to go back to the previous view
+
+    complete() {
+      this.status = 'completed'
+      this.submit()
     },
+
+    async cancel() {
+      const confirm = await this.$vaModal.confirm('Are you sure you want to cancel this sales?')
+      if (confirm) {
+        this.status = 'cancelled'
+        this.submit()
+      }
+    },
+
+    updateStatus(selection: string[], file: any, payfile: any): void {
+      const fileExists = (fileToCheck: any) => this.files.some((existingFile: any) => existingFile.file === fileToCheck)
+
+      if (this.salesData.status.status === 'pending') {
+        // Check for both provision sales and payment document selection
+        if (selection.includes('provision_sales') && selection.includes('confirm') && selection.length === 2) {
+          this.status = 'confirmed'
+
+          // Check for only provision sales selection
+        } else if (selection.includes('provision_sales') && selection.length === 1) {
+          this.status = 'provision_sales'
+
+          // Check for only payment confirmation selection
+        } else if (selection.includes('confirm') && selection.length === 1) {
+          this.status = 'confirmed'
+        }
+
+        // Handle if the status is already provision_sales
+      } else if (this.salesData.status.status === 'provision_sales' && !fileExists(payfile[0])) {
+        this.status = 'confirmed'
+      }
+    },
+
+    async submit() {
+      this.updateStatus(this.selection, this.file, this.payfile)
+
+      const payload = {
+        entityId: this.salesData.sales_inquiry.entity.id,
+        contractDoc: this.file[0],
+        paymentDoc: this.payfile[0],
+        salesConfirmationProposalId: this.salesData.id,
+        statusId: this.status,
+        quotaId: this.salesData.proposed_package.sales_package.sales_quota.id,
+        areaId: this.salesData.sales_inquiry.area[0].area.id,
+      }
+
+      try {
+        const response = await this.updatesalesConfirmationStatus(payload)
+        if (response.status === 200) {
+          this.$vaToast.init({
+            message: response.data.message,
+            color: 'success',
+          })
+          this.isOpened = false
+        } else {
+          this.$vaToast.init({
+            message: 'Failed to update Sales ',
+            color: 'danger',
+          })
+        }
+      } catch (error: any) {
+        const errors = handleErrors(error.response)
+        this.$vaToast.init({
+          message: '\n' + errors.map((error, index) => `${index + 1}. ${error}`).join('\n'),
+          color: 'danger',
+        })
+      }
+    },
+
+    showConfirmButtonTextByStatus() {
+      switch (this.salesData.status.status) {
+        case 'confirmed':
+          this.confirmText = 'Cancel Now'
+          this.disabledConfirmButton = false
+          this.buttonColor = 'danger'
+          break
+        case 'completed':
+          this.confirmText = 'Sales Done'
+          this.disabledConfirmButton = true
+          break
+        case 'declined':
+          this.confirmText = 'Confirm and Decline'
+          this.disabledConfirmButton = false
+          break
+        case 'cancelled':
+          this.confirmText = 'Confirm and Cancel'
+          this.disabledConfirmButton = false
+          break
+        case 'provision_sales':
+          this.confirmText = 'Confirm a Provision Sales'
+          this.disabledConfirmButton = false
+          break
+        default:
+          this.confirmText = 'Confirm'
+          break
+
+        // case 'provision_sales':
+        //   this.confirmText = 'Confirm and Provision Sales'
+      }
+    },
+
+    async getDocTypeOptions() {
+      try {
+        const response = await this.getDocTypes()
+
+        // Log the response to see the structure
+        console.log('Response from getDocTypes:', response)
+
+        if (response.status === 200) {
+          // Update the docTypes array
+          const docTypesArray = response.data.map((docType: any) => ({
+            value: docType.id,
+            text: docType.name,
+          }))
+
+          // Log the docTypes array to verify the mapping
+          console.log('Mapped docTypes:', docTypesArray)
+
+          // Update the component's data property
+          this.docTypes = docTypesArray
+        } else {
+          console.error('Failed to fetch document types: ', response)
+        }
+      } catch (error) {
+        console.error('Error fetching document types: ', error)
+      }
+    },
+
+    showModal() {
+      this.isOpened = true
+    },
+
+    // getStatus(
   },
 })
 </script>
 
-<style lang="scss" scoped>
-.sales-inquiry {
-  margin: 20px;
+<style scoped>
+.sales-confirmation {
+  font-family: 'Arial', sans-serif;
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  /* background-color: #f9f9f9; */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.split-demo {
-  & .custom-grabber {
-    height: 100%;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--va-background-element);
-  }
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: flex-end; /* Align buttons to the right */
+  margin-bottom: 20px;
+}
+
+.section {
+  margin-bottom: 20px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 15px;
+}
+
+h2 {
+  font-size: 20px;
+  color: #444;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.va-table-responsive {
+  overflow-x: auto;
+}
+
+.va-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.va-table th,
+.va-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+.va-table th {
+  background-color: #f2f2f2;
+  color: #333;
+  font-weight: bold;
+}
+
+.installments-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.installments-table th,
+.installments-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+.installments-table th {
+  background-color: #f2f2f2;
+  color: #333;
+  font-weight: bold;
+}
+
+.installments-table tr:hover {
+  background-color: #f1f1f1;
 }
 </style>

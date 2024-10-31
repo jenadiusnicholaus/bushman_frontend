@@ -15,14 +15,14 @@ export default {
       name: 'dashboard',
       displayName: 'menu.dashboard',
       meta: {
-        icon: 'vuestic-iconset-home',
+        icon: 'vuestic-iconset-dashboard',
       },
     },
     {
       name: 'sales',
       displayName: 'menu.sales',
       meta: {
-        icon: 'vuestic-iconset-dashboard',
+        icon: 'real_estate_agent',
       },
       children: [
         {

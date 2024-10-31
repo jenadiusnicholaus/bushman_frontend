@@ -26,6 +26,7 @@
     "@fullcalendar/core": "^6.1.15",
     "@fullcalendar/daygrid": "^6.1.15",
     "@fullcalendar/interaction": "^6.1.15",
+    "@fullcalendar/multimonth": "^6.1.15",
     "@fullcalendar/vue3": "^6.1.15",
     "@gtm-support/vue-gtm": "^2.0.0",
     "@vuestic/ag-grid-theme": "^1.1.4",

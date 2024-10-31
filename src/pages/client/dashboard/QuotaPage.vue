@@ -142,10 +142,10 @@ export default {
             area: item.area.name,
             scientific_name: item.species.scientific_name,
             no_of_species: item.quantity,
-            provision_sales: 1, // New column
-            confirmed: 0, // New column
-            canceled: 0, // New column
-            taken: 0, // New column
+            provision_sales: item.provision_quantity,
+            confirmed: item.confirmed_quantity,
+            canceled: item.declined_quantity || item.cancelled_quantity,
+            taken: item.completed_quantity, // New column
           }
         })
       } catch (error) {

@@ -28,7 +28,7 @@
     <div v-else class="p-2">
       <VaForm ref="packageFormRef" class="mb-6">
         <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-4">
-          <VaValue :default-value="false">
+          <!-- <VaValue :default-value="false">
             <VaSelect
               v-model="packageForm.salesQuota"
               :options="quotasOptions"
@@ -40,7 +40,7 @@
                 <VaIcon name="av_timer" size="small" color="primary" />
               </template>
             </VaSelect>
-          </VaValue>
+          </VaValue> -->
           <!-- packageNamesOptions -->
           <VaSelect
             v-model="packageForm.name"
@@ -116,7 +116,7 @@
           color="primary"
           icon="add"
           icon-color="#fff"
-          @click="validatepackageForm() && addNewpackageToQuota()"
+          @click="validatepackageForm() && addNewRegulatoryPackage()"
         >
           Submit New
         </VaButton>
@@ -194,7 +194,7 @@ export default defineComponent({
 
     const packageForm = reactive({
       id: null as any,
-      quata: null as any,
+      // quata: null as any,
       duration: null as any,
       name: null as any,
       quantity: 0,
@@ -204,7 +204,7 @@ export default defineComponent({
 
     const columns = [
       { key: 'name', sortable: true },
-      { key: 'quota', sortable: true },
+      { key: 'duration', sortable: true },
       // { key: 'description', sortable: true },
       // { key: 'actions', width: 80 },
     ]
@@ -308,7 +308,7 @@ export default defineComponent({
       console.log('Species item deleted:', index)
     },
 
-    async addNewpackageToQuota() {
+    async addNewRegulatoryPackage() {
       if (this.speciesObjects.length === 0) {
         this.toast.init({ message: 'Please add at least one species item.', color: 'warning' })
         return
@@ -316,10 +316,8 @@ export default defineComponent({
       const rdata = {
         name: this.packageForm.name.value,
         duration: this.packageForm.duration,
-        quotaId: this.packageForm.salesQuota.value,
         speciesObjectList: this.speciesObjects,
       }
-      console.log(rdata)
 
       try {
         const response = await this.createNewRegulatoryPackage(rdata)
@@ -371,8 +369,7 @@ export default defineComponent({
           this.items = data.map((item: any) => ({
             id: item.id,
             name: item.name,
-            Duration: item.duration,
-            quota: item.quota.name,
+            duration: item.duration,
           }))
         }
       } catch (error) {

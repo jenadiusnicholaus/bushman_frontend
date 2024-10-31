@@ -32,7 +32,7 @@ export default defineComponent({
       { key: 'quantity', label: 'Quantity', sortable: true },
       { key: 'amount', label: 'Amount', sortable: true },
       //   actions
-      { key: 'actions', label: 'Actions', sortable: false },
+      // { key: 'actions', label: 'Actions', sortable: false },
     ]
 
     return {

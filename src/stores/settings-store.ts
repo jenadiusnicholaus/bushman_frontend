@@ -72,5 +72,40 @@ export const useSettingsStore = defineStore('settings-store', {
         this.logo = dataURL // Assign the base64 string to logo
       }
     },
+
+    // get doc types
+    async getDocTypes() {
+      const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_DOC_TYPES_URL
+
+      const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+      const response = await axios.request(config)
+      return response
+    },
+
+    async getLicenceRegulatoryHuntingPackageSpecies(payload: any) {
+      console.log(payload)
+      const url =
+        import.meta.env.VITE_APP_BASE_URL +
+        import.meta.env.VITE_APP_LICENCE_REGULATORY_HUNTING_PACKAGE_SPECIES_URL +
+        `?quota_id=${payload.quotaId}`
+
+      const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+      const response = await axios.request(config)
+      return response
+    },
   },
 })

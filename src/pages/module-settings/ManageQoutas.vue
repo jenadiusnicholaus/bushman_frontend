@@ -33,6 +33,7 @@
               label="Sales Quota"
               :rules="[(v: any) => !!v || 'Sales Quota is required']"
               placeholder="Select Sales Quota"
+              @update:modelValue="getLicencePackageSpecies"
             >
               <template #appendInner>
                 <VaIcon name="av_timer" size="small" color="primary" />
@@ -65,6 +66,7 @@
                 placeholder="Select Species"
                 :rules="[(v: any) => !!v || 'Species is required']"
                 required
+                @update:modelValue="updateQuantitySelectedSpecies"
               />
 
               <VaCounter v-model="sform.quantity" label="Quantity" manual-input :min="1" :max="100" />
@@ -160,6 +162,7 @@ import { reactive } from 'vue'
 import { useToast, useForm } from 'vuestic-ui'
 import handleErrors from '../../utils/errorHandler'
 import ModuleTable from './components/ModuleTable.vue'
+import { useSettingsStore } from '../../stores/settings-store'
 
 const defaultItem = {
   name: '',
@@ -229,7 +232,6 @@ export default defineComponent({
 
     const sform = reactive({
       id: null as any,
-      quata: null as any,
       quantity: 1,
       salesQuota: null as any,
       area: null as any,
@@ -258,19 +260,23 @@ export default defineComponent({
 
   mounted() {
     this.getQs()
-    this.getSpeciesItems()
+    this.getLicencePackageSpecies()
     this.getAreas()
   },
 
   methods: {
-    ...mapActions(useQuotaStore, ['getQuotas']),
-    ...mapActions(useQuotaStore, ['createQuota']),
-    ...mapActions(useQuotaStore, ['updateQuota']),
-    ...mapActions(useQuotaStore, ['deleteQuota']),
-    ...mapActions(useQuotaStore, ['getSpeciesList']),
-    ...mapActions(useQuotaStore, ['getAreaList']),
-    ...mapActions(useQuotaStore, ['generateQuotaYear']),
-    ...mapActions(useQuotaStore, ['createQuotaAreaSpecies']),
+    ...mapActions(useQuotaStore, [
+      'getQuotas',
+      'createQuota',
+      'updateQuota',
+      'deleteQuota',
+      'getSpeciesList',
+      'getAreaList',
+      'generateQuotaYear',
+      'createQuotaAreaSpecies',
+    ]),
+
+    ...mapActions(useSettingsStore, ['getLicenceRegulatoryHuntingPackageSpecies']),
 
     resetEditedItem() {
       this.editedItem = null
@@ -285,12 +291,16 @@ export default defineComponent({
       this.showModal = !this.showModal
     },
     showQuota(e: any) {
-      console.log(e.id)
       this.showQuotaList = !this.showQuotaList
       this.sform.salesQuota = {
         value: e.id,
         text: this.generateQuotaYear(e.start_date, e.end_date) + ` - ${e.name}`,
       }
+      this.getLicencePackageSpecies()
+    },
+
+    updateQuantitySelectedSpecies(species: any) {
+      this.sform.quantity = species.quantity
     },
 
     addNewSpeciesItemToStorage() {
@@ -332,24 +342,28 @@ export default defineComponent({
       console.log('Species item deleted:', index)
     },
 
-    // this.form.description = item.description
+    async getLicencePackageSpecies() {
+      console.log('Getting species items for the selected sales quota', this.sform.salesQuota.value)
 
-    // async deleteItemById(id: any) {
-    //   // this.items = [...this.items.slice(0, id), ...this.items.slice(id + 1)]
-    //   // console.log(row)
+      try {
+        const response = await this.getLicenceRegulatoryHuntingPackageSpecies({
+          quotaId: this.sform.salesQuota.value,
+        })
+        const speciesItems = response.data.map((item: any) => {
+          //  update the selected species quantity
+          this.sform.quantity = item.quantity
+          return {
+            value: item.species.id,
+            text: item.species.name,
+            quantity: item.quantity,
+          }
+        })
+        this.speciesOptions = speciesItems
+      } catch (error) {
+        console.log(error)
+      }
+    },
 
-    //   console.log(id)
-    //   try {
-    //     const response = await this.deleteQuota(id)
-    //     if (response.status === 200) {
-    //       this.items = this.items.filter((item) => item.id !== id)
-    //       this.toast.init({ message: response.data.message, color: 'info' })
-    //       // getQs()
-    //     }
-    //   } catch (error) {
-    //     this.toast.init({ message: error.response.data.message, color: 'danger' })
-    //   }
-    // },
     async addNewSpeciesToQuota() {
       if (this.speciesObjects.length === 0) {
         this.toast.init({ message: 'Please add at least one species item.', color: 'warning' })
@@ -360,7 +374,6 @@ export default defineComponent({
         quota_id: this.sform.salesQuota.value,
         speciesObjects: this.speciesObjects,
       }
-      console.log(rdata)
 
       try {
         const response = await this.createQuotaAreaSpecies(rdata)
@@ -469,24 +482,24 @@ export default defineComponent({
       }
     },
 
-    async getSpeciesItems() {
-      try {
-        const response = await this.getSpeciesList()
+    // async getSpeciesItems() {
+    //   try {
+    //     const response = await this.getSpeciesList()
 
-        // Add the species items from the response
-        const speciesItems = response.data.map((item: { id: any; name: any }) => {
-          return {
-            value: item.id,
-            text: item.name,
-          }
-        })
+    //     // Add the species items from the response
+    //     const speciesItems = response.data.map((item: { id: any; name: any }) => {
+    //       return {
+    //         value: item.id,
+    //         text: item.name,
+    //       }
+    //     })
 
-        // Combine default option with species items
-        this.speciesOptions = this.speciesOptions.concat(speciesItems)
-      } catch (error) {
-        console.log(error)
-      }
-    },
+    //     // Combine default option with species items
+    //     this.speciesOptions = this.speciesOptions.concat(speciesItems)
+    //   } catch (error) {
+    //     console.log(error)
+    //   }
+    // },
 
     async getAreas() {
       try {

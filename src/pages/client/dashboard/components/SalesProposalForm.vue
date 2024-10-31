@@ -3,12 +3,21 @@
     <h3 class="font-bold text-lg mb-2">Package Details</h3>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
       <VaSelect
+        v-model="form.regulatory_package_id"
+        :options="regulatoryPackages"
+        :rules="[(value: any) => value || 'Regulatory Package is required']"
+        placeholder="Select Regulatory Package"
+        label="Regulatory Package"
+      />
+      <VaSelect
         v-model="form.package_id"
         :options="packages"
         :rules="[(value: any) => value || 'Package is required']"
         placeholder="Select Package"
-        label="Package"
+        label="Sales Package"
+        @update:modelValue="getSalesPriceBreakdownForClient"
       />
+      <!-- regulatory_package_id -->
     </div>
     <h3 class="font-bold text-lg mb-2">Itinerary Details</h3>
 
@@ -42,7 +51,21 @@
       />
     </div>
 
-    <h3 class="font-bold text-lg mb-2">Create Client Installment plan</h3>
+    <!-- "total_amount": {
+        "amount": 9400.0,
+        "currency": {
+            "code": "USD",
+            "symbol": "$"
+        }
+    }, -->
+
+    <h3 class="font-bold text-lg mb-2">
+      Create Client Installment plan
+      <span v-if="priceBreakDown">
+        - <b>{{ priceBreakDown.total_amount.currency.symbol }}{{ priceBreakDown.total_amount.amount }}</b>
+      </span>
+    </h3>
+
     <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
       <VaInput
         v-model="form.installment_desc"
@@ -121,10 +144,11 @@
 <script lang="ts">
 import { useForm, useToast } from 'vuestic-ui'
 import { defineComponent, ref, reactive } from 'vue'
-import { mapActions } from 'pinia'
+import { mapActions, mapState } from 'pinia'
 import { useSalesInquiriesStore } from '../../../../stores/sales-store'
 import { usePriceListStore } from '../../../../stores/price-list-store'
 import handleErrors from '../../../../utils/errorHandler'
+import { useRegulatoryPackageStore } from '../../../../stores/regulatrory-store'
 
 export default defineComponent({
   props: {
@@ -187,6 +211,7 @@ export default defineComponent({
       installment_due_amount: null as any,
       installment_due_days: 0,
       installment_due_limit: null as any,
+      regulatory_package_id: null as any,
     })
 
     return {
@@ -207,16 +232,23 @@ export default defineComponent({
     return {
       packages,
       installments: [] as any,
+      regulatoryPackages: [] as any,
     }
+  },
+  computed: {
+    ...mapState(useSalesInquiriesStore, ['priceBreakDown']),
   },
 
   mounted() {
     this.getPL()
+    this.getPackages()
   },
 
   methods: {
     ...mapActions(useSalesInquiriesStore, ['createSalesConfirmationFinalization']),
     ...mapActions(usePriceListStore, ['getPriceList']),
+    ...mapActions(useSalesInquiriesStore, ['getSalesPriceBreakdown']),
+    ...mapActions(useRegulatoryPackageStore, ['getRegulatoryPackages']),
 
     async getPL() {
       const response = await this.getPriceList()
@@ -249,6 +281,14 @@ export default defineComponent({
       this.installments.splice(index, 1)
     },
 
+    async getSalesPriceBreakdownForClient() {
+      const payLoad = {
+        salesInquiryId: this.item.id,
+        packageId: this.form.package_id.value,
+      }
+      await this.getSalesPriceBreakdown(payLoad)
+    },
+
     async onSubmit() {
       const requestDate = {
         charterIn: this.form.charter_in,
@@ -257,6 +297,7 @@ export default defineComponent({
         airportName: this.form.airport_name,
         packageId: this.form.package_id.value,
         salesInquiryId: this.item.id,
+        regulatoryPackageId: this.form.regulatory_package_id.value,
         installments: this.installments,
       }
 
@@ -272,14 +313,29 @@ export default defineComponent({
           this.init({ message: response.data.message, color: 'error' })
         }
       } catch (error: any) {
-        this.resetForm()
-        this.resetValidationForm()
-        this.installments = []
+        // this.resetForm()
+        // this.resetValidationForm()
+        // this.installments = []
         const errors = handleErrors(error.response)
         this.init({
           message: '\n' + errors.map((error, index) => `${index + 1}. ${error}`).join('\n'),
           color: 'danger',
         })
+      }
+    },
+
+    async getPackages() {
+      try {
+        const response = await this.getRegulatoryPackages()
+        if (response.status === 200) {
+          const data = response.data
+          this.regulatoryPackages = data.map((item: any) => ({
+            value: item.id,
+            text: item.name,
+          }))
+        }
+      } catch (error) {
+        console.log(error)
       }
     },
   },

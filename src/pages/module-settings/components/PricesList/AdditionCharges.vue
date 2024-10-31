@@ -32,7 +32,7 @@ export default defineComponent({
       { key: 'service_name', label: 'Service Name', sortable: true },
       { key: 'amount', label: 'Amount', sortable: true },
       //   actions
-      { key: 'actions', label: 'Actions', sortable: false },
+      // { key: 'actions', label: 'Actions', sortable: false },
     ]
 
     return {

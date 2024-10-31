@@ -11,7 +11,10 @@
     <PriceListPackagesDetails :prece-list-item="preceListItem" />
     <PriceListQuota :item="preceListItem" />
     <PricesSpeciesList :species-items="preceListItem.sales_package.species"> </PricesSpeciesList>
-    <ComponionCosts :companion-items="preceListItem.componions_hunter"></ComponionCosts>
+
+    <ObComCosts :companion-items="preceListItem.componions_hunter" :title="'Companion Costs'"></ObComCosts>
+    <ObComCosts :companion-items="preceListItem.observer" :title="'Observer Cost'"></ObComCosts>
+
     <AdditionCharges></AdditionCharges>
     <!-- <PriceListByHuntingType /> -->
   </template>
@@ -26,7 +29,7 @@ import PriceListPackagesDetails from './PriceListPackagesDetails.vue'
 import PriceListQuota from './PriceListQuota.vue'
 // import PriceListByHuntingType from './PriceListByHuntingType.vue'
 import PricesSpeciesList from './PricesSpeciesList.vue'
-import ComponionCosts from './ComponionCosts.vue'
+import ObComCosts from './ObComCosts.vue'
 import AdditionCharges from './AdditionCharges.vue'
 
 export default defineComponent({
@@ -35,7 +38,7 @@ export default defineComponent({
     // PriceListByHuntingType,
     PriceListPackagesDetails,
     PricesSpeciesList,
-    ComponionCosts,
+    ObComCosts,
     AdditionCharges,
   },
 

@@ -54,7 +54,7 @@ export default defineVuesticConfig({
       disableClientSideSorting: false,
       striped: true,
       hoverable: true,
-      selectable: true,
+      // selectable: true,
       searchable: true,
       showSelectAll: true,
     },

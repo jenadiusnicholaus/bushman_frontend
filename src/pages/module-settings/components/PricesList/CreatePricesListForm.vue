@@ -104,7 +104,7 @@
           type="text"
           placeholder="Enter Companion Days"
           :rules="[(value: any) => (value && value.length > 0) || 'Companion Days is required']"
-          label="Companion Days"
+          label=" Days"
           required-mark
         />
 
@@ -113,7 +113,29 @@
           type="text"
           placeholder="Enter Companion Amount"
           :rules="[(value: any) => (value && value.length > 0) || 'Companion Amount is required']"
-          label="Companion Amount"
+          label=" Amount"
+          required-mark
+        />
+      </div>
+
+      <!-- companion group -->
+      <h3 class="font-bold text-lg mb-2">Oberver Charges</h3>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+        <VaInput
+          v-model="form.observer_days"
+          type="text"
+          placeholder="Enter oberver Days"
+          :rules="[(value: any) => (value && value.length > 0) || 'Companion Days is required']"
+          label=" Days"
+          required-mark
+        />
+
+        <VaInput
+          v-model="form.observer_amount"
+          type="text"
+          placeholder="Enter oberver Amount"
+          :rules="[(value: any) => (value && value.length > 0) || 'Companion Amount is required']"
+          label=" Amount"
           required-mark
         />
       </div>
@@ -124,7 +146,7 @@
         <VaDateInput v-model="form.end_date" required-mark label="End Date" manual-input />
       </div>
 
-      <h3 class="font-bold text-lg mb-2">Preferred Species</h3>
+      <h3 class="font-bold text-lg mb-2">Species</h3>
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
         <VaSelect
           v-model="form.species"
@@ -261,6 +283,8 @@ export default defineComponent({
       area: null as any,
       companion_days: 0,
       companion_amount: 0,
+      observer_days: 0,
+      observer_amount: 0,
     })
 
     const contactForm = reactive({
@@ -366,6 +390,8 @@ export default defineComponent({
         speciesObjectList: this.speciesObjects,
         companionDays: this.form.companion_days,
         companionAmount: this.form.companion_amount,
+        observerDays: this.form.observer_days,
+        observerAmount: this.form.observer_amount,
       }
 
       try {
@@ -375,6 +401,7 @@ export default defineComponent({
           this.init({ message: response.data.message, color: 'success' })
           this.resetForm()
           this.resetValidationForm()
+          this.speciesObjects = []
         }
       } catch (error: any) {
         const errors = handleErrors(error.response)

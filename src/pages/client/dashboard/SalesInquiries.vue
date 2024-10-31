@@ -12,7 +12,7 @@
           Go Back
         </VaButton>
       </div>
-      <VaButtonGroup v-if="!showAddSalesInquiriesForm">
+      <VaButtonGroup v-if="!showAddSalesInquiriesForm && !showDetailsPage">
         <VaButton
           class="px-2 py-2"
           color="primary"
@@ -30,6 +30,8 @@
 
     <VaCardContent>
       <template v-if="showDetailsPage">
+        <!-- <SalesConfirmationClientDetails :item="selectedInquiryItem"> </SalesConfirmationClientDetails> -->
+        <!--  -->
         <SalesInquiryDetails :item="selectedInquiryItem" />
       </template>
       <template v-else>
@@ -97,6 +99,7 @@
               <VaInput
                 v-model="form.address"
                 type="text"
+                :max-length="30"
                 placeholder="Enter your address"
                 :rules="[(value: any) => (value && value.length > 0) || 'Address is required']"
                 label="Address"
@@ -105,14 +108,14 @@
 
             <h3 class="font-bold text-lg mb-2">Participants and hunting days</h3>
             <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
-              <VaInput
+              <!-- <VaInput
                 v-model="form.no_of_hunters"
                 label="Number of Hunters"
                 placeholder="Enter Number of Hunters"
                 default-value="1"
                 type="number"
                 required
-              />
+              /> -->
               <VaInput
                 v-model="form.no_of_observers"
                 label="Number of Observers(Optional)"
@@ -258,6 +261,7 @@ import axios from 'axios'
 import { VaForm, VaInput, VaSelect, VaButton } from 'vuestic-ui'
 import handleErrors from '../../../utils/errorHandler'
 import { validators } from '../../../services/utils'
+// import SalesConfirmationClientDetails from './components/SalesConfirmationClientDetails.vue'
 
 import Salesinquirieslist from './components/Salesinquirieslist.vue'
 import { useForm, useToast } from 'vuestic-ui'
@@ -279,6 +283,7 @@ export default defineComponent({
     VaSelect,
     VaButton,
     SalesInquiryDetails,
+    // SalesConfirmationClientDetails,
   },
   setup() {
     const formRef = ref()
@@ -313,7 +318,7 @@ export default defineComponent({
       email: '',
       phone: '',
       address: '',
-      no_of_hunters: 0,
+      no_of_hunters: 1,
       no_of_observers: 0,
       no_of_days: 0,
       no_of_companions: 0,
