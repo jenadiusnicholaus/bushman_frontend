@@ -257,7 +257,6 @@
           </template>
           <template v-if="selection.includes('confirm')">
             <div class="col-span-2">
-              <h3 class="mb-2">Payment Details</h3>
               <VaFileUpload
                 v-model="payfile"
                 upload-button-text="Upload Payment Document"

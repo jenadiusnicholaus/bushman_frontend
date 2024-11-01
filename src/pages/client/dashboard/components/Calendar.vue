@@ -251,7 +251,7 @@ export default {
             backgroundColor: this.getStatusColor(event.status.status),
             textColor: this.getTextColor(event.status.status),
             extendedProps: {
-              species: event?.proposed_package?.sales_package?.species,
+              species: event?.sales_inquiry?.preferred_species,
               preference: event?.sales_inquiry?.preference,
               contacts: event?.sales_inquiry?.entity?.contacts,
               proposed_package: event?.proposed_package,
