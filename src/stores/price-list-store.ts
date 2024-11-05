@@ -61,13 +61,49 @@ export const usePriceListStore = defineStore('price-list', {
       return response
     },
 
-    async CreatePriceList(payload: any) {
+    async getSalesPackageList() {
+      const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_SALES_PACKAGE_VSET_URL,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+
+      const response = await axios.request(config)
+      return response
+    },
+
+    async createSalesPackage(payload: any) {
+      // VITE_APP_SALES_PACKAGE_VSET_URL=settings/sales-package-vset/
+      const data = JSON.stringify({
+        name: payload.name,
+        description: payload.description,
+        species_object_list: payload.speciesObjectList,
+      })
+
+      const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_SALES_PACKAGE_VSET_URL,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data: data,
+      }
+
+      const response = await axios.request(config)
+      return response
+    },
+
+    async createPriceList(payload: any) {
       const startDate = payload?.startDate ? format(new Date(payload.startDate), 'yyyy-MM-dd') : null
       const endDate = payload?.endDate ? format(new Date(payload.endDate), 'yyyy-MM-dd') : null
       const data = JSON.stringify({
         area: payload.area,
         hunting_type_id: payload.huntingTypeId,
-        name: payload.name,
+        sales_package_id: payload.sales_package_id,
         description: payload.description,
         sales_quota_id: payload.salesQuotaId,
         amount: payload.amount,

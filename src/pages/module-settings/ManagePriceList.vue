@@ -30,7 +30,7 @@
       <template v-if="showPriceList">
         <ModuleTable :items="items" :columns="columns" :loading="loading" @onView="toggleShowPriceListMethod">
           <template #filter-elements-and-download-btn>
-            <div class="grid sm:grid-cols-4 gap-6 mb-6">
+            <div class="grid sm:grid-cols-3 gap-6 mb-6">
               <VaSelect
                 v-model="huntingTypeValue"
                 :options="huntingTypeOptions"
@@ -43,24 +43,18 @@
                 placeholder="Filter By Area"
                 @update:modelValue="getPriceLists"
               />
-              <VaSelect
+              <!-- <VaSelect
                 v-model="quotaValue"
                 :options="quotasOptions"
                 placeholder="Filter By Quota"
                 @update:modelValue="getPriceLists"
-              />
+              /> -->
               <!-- <div class="flex justify-end"> -->
-              <VaButton
-                class="px-2 py-0"
-                color="primary"
-                label="Download"
-                icon="download"
-                size="small"
-                @click="generatePDF()"
-              >
+              <VaButton class="px-2 py-0" color="primary" label="Download" icon="download" size="small">
                 Download
               </VaButton>
               <!-- </div> -->
+              <!-- @click="generatePDF()" -->
             </div>
           </template>
         </ModuleTable>
@@ -85,9 +79,9 @@ import { usePriceListStore } from '../../stores/price-list-store'
 import CreatePricesListForm from './components/PricesList/CreatePricesListForm.vue'
 import { useQuotaStore } from '../../stores/quota-store'
 import { useSettingsStore } from '../../stores/settings-store'
-import pdfMake from 'pdfmake/build/pdfmake'
-import * as pdfFonts from 'pdfmake/build/vfs_fonts'
-pdfMake.vfs = pdfFonts.pdfMake.vfs
+// import pdfMake from 'pdfmake/build/pdfmake'
+// import * as pdfFonts from 'pdfmake/build/vfs_fonts'
+// pdfMake.vfs = pdfFonts.pdfMake.vfs
 const defaultItem = {
   name: '',
   start_date: null,
@@ -109,7 +103,7 @@ export default defineComponent({
     const columns = [
       { key: 'id', sortable: true, sortingOptions: ['desc', 'asc'] },
       { key: 'package_name', sortable: true },
-      { key: 'quota', sortable: true },
+      // { key: 'quota', sortable: true },
       { key: 'area', sortable: true },
       { key: 'hunting_type', sortable: true },
       { key: 'amount', sortable: true },
@@ -207,6 +201,7 @@ export default defineComponent({
     goBack() {
       this.showPriceList = !this.showPriceList
       this.ShowCreateNewPriceListForm = false
+      this.getPriceLists()
     },
 
     showCreateNewPriceListFormMethod() {
@@ -233,11 +228,7 @@ export default defineComponent({
 
       try {
         // hunting_type_id: any = '', area_id: any = '', quota_id: any = ''
-        const response = await this.getPriceList(
-          this.huntingTypeValue?.value ?? '',
-          this.areaValue?.value ?? '',
-          this.quotaValue?.value ?? '',
-        )
+        const response = await this.getPriceList(this.huntingTypeValue?.value ?? '', this.areaValue?.value ?? '', '')
         if (response.status === 200) {
           this.loading = false
           this.printableDataList = response?.data
@@ -245,7 +236,7 @@ export default defineComponent({
             id: item?.id,
             item: item,
             package_name: item?.sales_package?.name,
-            quota: item?.sales_package?.sales_quota?.name,
+            // quota: item?.sales_package?.sales_quota?.name,
             area: item?.price_list_type?.price_list?.area.name,
             hunting_type: item?.price_list_type?.hunting_type?.name,
             amount: `${item?.price_list_type?.currency}${item?.price_list_type.amount}`,
@@ -359,233 +350,231 @@ export default defineComponent({
       }
     },
 
-    generatePDF() {
-      try {
-        const myLogo: string = this.logo // Get the logo from the component's data
-        console.log('Printable Data List:', this.printableDataList) // Log for inspection
+    // generatePDF() {
+    //   try {
+    //     const myLogo: string = this.logo // Get the logo from the component's data
+    //     console.log('Printable Data List:', this.printableDataList) // Log for inspection
 
-        const documentDefinition: any = {
-          pageSize: 'A1',
-          pageMargins: [40, 60, 40, 60], // left, top, right, bottom
+    //     const documentDefinition: any = {
+    //       pageSize: 'A1',
+    //       pageMargins: [40, 60, 40, 60], // left, top, right, bottom
 
-          footer: (currentPage: number, pageCount: number) => ({
-            columns: [
-              { text: `Generated on: ${new Date().toLocaleDateString()}`, alignment: 'left', style: 'footer' },
-              { text: `Page ${currentPage} of ${pageCount}`, alignment: 'right', style: 'footer' },
-            ],
-            margin: [40, 20], // Add margin above the footer
-          }),
+    //       footer: (currentPage: number, pageCount: number) => ({
+    //         columns: [
+    //           { text: `Generated on: ${new Date().toLocaleDateString()}`, alignment: 'left', style: 'footer' },
+    //           { text: `Page ${currentPage} of ${pageCount}`, alignment: 'right', style: 'footer' },
+    //         ],
+    //         margin: [40, 20], // Add margin above the footer
+    //       }),
 
-          header: function () {
-            return {
-              columns: [
-                {
-                  image: myLogo, // Use logo from the component data
-                  width: 150, // Adjust width as necessary
-                  margin: [0, 15, 0, 0], // Add margin to position the logo
-                },
-                {
-                  text: 'Quota List Report',
-                  style: 'header',
-                  alignment: 'right',
-                  margin: [0, 20, 0, 0], // Add margin to position title
-                  fontSize: 24,
-                  bold: true,
-                  color: '#4A4A4A',
-                },
-              ],
-              margin: [0, 0, 0, 10], // Overall header margin
-            }
-          },
+    //       header: function () {
+    //         return {
+    //           columns: [
+    //             {
+    //               image: myLogo, // Use logo from the component data
+    //               width: 150, // Adjust width as necessary
+    //               margin: [0, 15, 0, 0], // Add margin to position the logo
+    //             },
+    //             {
+    //               text: 'Quota List Report',
+    //               style: 'header',
+    //               alignment: 'right',
+    //               margin: [0, 20, 0, 0], // Add margin to position title
+    //               fontSize: 24,
+    //               bold: true,
+    //               color: '#4A4A4A',
+    //             },
+    //           ],
+    //           margin: [0, 0, 0, 10], // Overall header margin
+    //         }
+    //       },
 
-          content: [
-            {
-              text: 'Comprehensive breakdown of sales packages, associated species, companions, and pricing details.',
-              style: 'subheader',
-              alignment: 'center',
-              margin: [0, 0, 0, 20],
-            },
-            {
-              style: 'table',
-              table: {
-                widths: ['*', '*', '*', 'auto', 'auto', '*', 'auto', 'auto', 'auto'], // Adjust column widths
-                body: [
-                  // Table Header
-                  [
-                    {
-                      text: 'Sales Package',
-                      bold: true,
-                      fillColor: '#6F4C3E',
-                      color: 'white',
-                      alignment: 'center',
-                      margin: [5, 10],
-                    },
-                    {
-                      text: 'Description',
-                      bold: true,
-                      fillColor: '#6F4C3E',
-                      color: 'white',
-                      alignment: 'center',
-                      margin: [5, 10],
-                    },
-                    {
-                      text: 'Area',
-                      bold: true,
-                      fillColor: '#6F4C3E',
-                      color: 'white',
-                      alignment: 'center',
-                      margin: [5, 10],
-                    },
-                    {
-                      text: 'Quota',
-                      bold: true,
-                      fillColor: '#6F4C3E',
-                      color: 'white',
-                      alignment: 'center',
-                      margin: [5, 10],
-                    },
-                    {
-                      text: 'Created Date',
-                      bold: true,
-                      fillColor: '#6F4C3E',
-                      color: 'white',
-                      alignment: 'center',
-                      margin: [5, 10],
-                    },
-                    {
-                      text: 'Hunting Type / Amount',
-                      bold: true,
-                      fillColor: '#6F4C3E',
-                      color: 'white',
-                      alignment: 'center',
-                      margin: [5, 10],
-                    },
-                    {
-                      text: 'Duration(days)',
-                      bold: true,
-                      fillColor: '#6F4C3E',
-                      color: 'white',
-                      alignment: 'center',
-                      margin: [5, 10],
-                    },
-                    {
-                      text: 'Companions',
-                      bold: true,
-                      fillColor: '#6F4C3E',
-                      color: 'white',
-                      alignment: 'center',
-                      margin: [5, 10],
-                    },
-                    {
-                      text: 'Additional Costs',
-                      bold: true,
-                      fillColor: '#6F4C3E',
-                      color: 'white',
-                      alignment: 'center',
-                      margin: [5, 10],
-                    },
-                  ],
-                  // Loop through printableDataList and populate table rows
-                  ...this.printableDataList.map((item: any) => {
-                    if (!item || !item?.sales_package) {
-                      console.warn('Invalid Item:', item)
-                      return Array(9).fill({ text: 'N/A', margin: [5, 10] }) // Create an array with 'N/A' values
-                    }
+    //       content: [
+    //         {
+    //           text: 'Comprehensive breakdown of sales packages, associated species, companions, and pricing details.',
+    //           style: 'subheader',
+    //           alignment: 'center',
+    //           margin: [0, 0, 0, 20],
+    //         },
+    //         {
+    //           style: 'table',
+    //           table: {
+    //             widths: ['*', '*', '*', 'auto', 'auto', '*', 'auto', 'auto', 'auto'], // Adjust column widths
+    //             body: [
+    //               // Table Header
+    //               [
+    //                 {
+    //                   text: 'Sales Package',
+    //                   bold: true,
+    //                   fillColor: '#6F4C3E',
+    //                   color: 'white',
+    //                   alignment: 'center',
+    //                   margin: [5, 10],
+    //                 },
+    //                 {
+    //                   text: 'Description',
+    //                   bold: true,
+    //                   fillColor: '#6F4C3E',
+    //                   color: 'white',
+    //                   alignment: 'center',
+    //                   margin: [5, 10],
+    //                 },
+    //                 {
+    //                   text: 'Area',
+    //                   bold: true,
+    //                   fillColor: '#6F4C3E',
+    //                   color: 'white',
+    //                   alignment: 'center',
+    //                   margin: [5, 10],
+    //                 },
+    //                 {
+    //                   text: 'Quota',
+    //                   bold: true,
+    //                   fillColor: '#6F4C3E',
+    //                   color: 'white',
+    //                   alignment: 'center',
+    //                   margin: [5, 10],
+    //                 },
+    //                 {
+    //                   text: 'Created Date',
+    //                   bold: true,
+    //                   fillColor: '#6F4C3E',
+    //                   color: 'white',
+    //                   alignment: 'center',
+    //                   margin: [5, 10],
+    //                 },
+    //                 {
+    //                   text: 'Hunting Type / Amount',
+    //                   bold: true,
+    //                   fillColor: '#6F4C3E',
+    //                   color: 'white',
+    //                   alignment: 'center',
+    //                   margin: [5, 10],
+    //                 },
+    //                 {
+    //                   text: 'Duration(days)',
+    //                   bold: true,
+    //                   fillColor: '#6F4C3E',
+    //                   color: 'white',
+    //                   alignment: 'center',
+    //                   margin: [5, 10],
+    //                 },
+    //                 {
+    //                   text: 'Companions',
+    //                   bold: true,
+    //                   fillColor: '#6F4C3E',
+    //                   color: 'white',
+    //                   alignment: 'center',
+    //                   margin: [5, 10],
+    //                 },
+    //                 {
+    //                   text: 'Additional Costs',
+    //                   bold: true,
+    //                   fillColor: '#6F4C3E',
+    //                   color: 'white',
+    //                   alignment: 'center',
+    //                   margin: [5, 10],
+    //                 },
+    //               ],
+    //               // Loop through printableDataList and populate table rows
+    //               ...this.printableDataList.map((item: any) => {
+    //                 if (!item || !item?.sales_package) {
+    //                   console.warn('Invalid Item:', item)
+    //                   return Array(9).fill({ text: 'N/A', margin: [5, 10] }) // Create an array with 'N/A' values
+    //                 }
 
-                    const salesPackage = item.sales_package
-                    const area = item?.price_list_type?.price_list?.area?.name || 'N/A'
-                    const quotaName = salesPackage.sales_quota?.name || 'N/A'
-                    const createdDate = item?.create_date ? item.create_date.split('T')[0] : 'N/A'
-                    const duration = item?.price_list_type?.duration || 'N/A' // Retrieve duration
+    //                 const salesPackage = item.sales_package
+    //                 const area = item?.price_list_type?.price_list?.area?.name || 'N/A'
+    //                 const quotaName = salesPackage.sales_quota?.name || 'N/A'
+    //                 const createdDate = item?.create_date ? item.create_date.split('T')[0] : 'N/A'
+    //                 const duration = item?.price_list_type?.duration || 'N/A' // Retrieve duration
 
-                    Array.isArray(salesPackage?.species)
-                      ? salesPackage.species
-                          .map(
-                            (species: any) =>
-                              `${species?.species?.name || 'Unknown Species'} (Quantity: ${
-                                species?.quantity || 0
-                              }, Amount: ${species?.amount || '0.00'})`,
-                          )
-                          .join(', ')
-                      : 'No species information available.'
+    //                 Array.isArray(salesPackage?.species)
+    //                   ? salesPackage.species
+    //                       .map(
+    //                         (species: any) =>
+    //                           `${species?.species?.name || 'Unknown Species'} (Quantity: ${
+    //                             species?.quantity || 0
+    //                           }, Amount: ${species?.amount || '0.00'})`,
+    //                       )
+    //                       .join(', ')
+    //                   : 'No species information available.'
 
-                    // Companions' information (days and costs)
-                    const companionsInfo =
-                      Array.isArray(item.componions_hunter) && item.componions_hunter.length > 0
-                        ? item.componions_hunter
-                            .map((companion: any) => `Days: ${companion.days}, Cost: ${companion.amount}`)
-                            .join(', ')
-                        : 'No companions information available.'
+    //                 // Companions' information (days and costs)
+    //                 const companionsInfo =
+    //                   Array.isArray(item.componions_hunter) && item.componions_hunter.length > 0
+    //                     ? item.componions_hunter
+    //                         .map((companion: any) => `Days: ${companion.days}, Cost: ${companion.amount}`)
+    //                         .join(', ')
+    //                     : 'No companions information available.'
 
-                    // Additional costs calculated
-                    const additionalCosts = item.componions_hunter
-                      .reduce(
-                        (total: number, companion: any) =>
-                          total + (isNaN(parseFloat(companion.amount)) ? 0 : parseFloat(companion.amount)),
-                        0,
-                      )
-                      .toFixed(2) // Using NaN check
+    //                 // Additional costs calculated
+    //                 const additionalCosts = item.componions_hunter
+    //                   .reduce(
+    //                     (total: number, companion: any) =>
+    //                       total + (isNaN(parseFloat(companion.amount)) ? 0 : parseFloat(companion.amount)),
+    //                     0,
+    //                   )
+    //                   .toFixed(2) // Using NaN check
 
-                    // Extract price list type information
-                    const huntingTypeName = item.price_list_type?.hunting_type?.name || 'N/A'
-                    const currency = item.price_list_type?.currency || 'N/A'
-                    const amount = item.price_list_type?.amount || 'N/A'
+    //                 // Extract price list type information
+    //                 const huntingTypeName = item.price_list_type?.hunting_type?.name || 'N/A'
+    //                 const currency = item.price_list_type?.currency || 'N/A'
+    //                 const amount = item.price_list_type?.amount || 'N/A'
 
-                    return [
-                      { text: salesPackage?.name || 'N/A', margin: [5, 10] },
-                      { text: salesPackage?.description || 'N/A', margin: [5, 10] },
-                      { text: area, margin: [5, 10] },
-                      { text: quotaName, margin: [5, 10] },
-                      { text: createdDate, margin: [5, 10] },
-                      { text: `${huntingTypeName} / ${currency}${amount}`, margin: [5, 10] }, // Combined Hunting Type and Amount
-                      { text: duration.toString(), margin: [5, 10] }, // Duration Column
-                      { text: companionsInfo, margin: [5, 10] },
-                      { text: `$${additionalCosts}`, margin: [5, 10] }, // Displaying currency format
-                    ]
-                  }),
-                ],
-              },
-              layout: {
-                hLineWidth: (i: any) => (i === 0 ? 2 : 1), // Bold for the header
-                vLineWidth: () => 0, // No vertical lines
-                hLineColor: () => '#ccc',
-                paddingLeft: () => 10,
-                paddingRight: () => 10,
-                paddingTop: () => 10,
-                paddingBottom: () => 10,
-              },
-            },
-          ],
-          styles: {
-            header: {
-              fontSize: 24,
-              bold: true,
-              color: '#4A4A4A',
-              margin: [0, 20, 0, 10],
-            },
-            subheader: {
-              fontSize: 14,
-              bold: true,
-              margin: [0, 0, 0, 10],
-              color: '#555555',
-            },
-            footer: {
-              fontSize: 10,
-              margin: [0, 0, 0, 0],
-              alignment: 'left',
-            },
-          },
-        }
+    //                 return [
+    //                   { text: salesPackage?.name || 'N/A', margin: [5, 10] },
+    //                   { text: salesPackage?.description || 'N/A', margin: [5, 10] },
+    //                   { text: area, margin: [5, 10] },
+    //                   { text: quotaName, margin: [5, 10] },
+    //                   { text: createdDate, margin: [5, 10] },
+    //                   { text: `${huntingTypeName} / ${currency}${amount}`, margin: [5, 10] }, // Combined Hunting Type and Amount
+    //                   { text: duration.toString(), margin: [5, 10] }, // Duration Column
+    //                   { text: companionsInfo, margin: [5, 10] },
+    //                   { text: `$${additionalCosts}`, margin: [5, 10] }, // Displaying currency format
+    //                 ]
+    //               }),
+    //             ],
+    //           },
+    //           layout: {
+    //             hLineWidth: (i: any) => (i === 0 ? 2 : 1), // Bold for the header
+    //             vLineWidth: () => 0, // No vertical lines
+    //             hLineColor: () => '#ccc',
+    //             paddingLeft: () => 10,
+    //             paddingRight: () => 10,
+    //             paddingTop: () => 10,
+    //             paddingBottom: () => 10,
+    //           },
+    //         },
+    //       ],
+    //       styles: {
+    //         header: {
+    //           fontSize: 24,
+    //           bold: true,
+    //           color: '#4A4A4A',
+    //           margin: [0, 20, 0, 10],
+    //         },
+    //         subheader: {
+    //           fontSize: 14,
+    //           bold: true,
+    //           margin: [0, 0, 0, 10],
+    //           color: '#555555',
+    //         },
+    //         footer: {
+    //           fontSize: 10,
+    //           margin: [0, 0, 0, 0],
+    //           alignment: 'left',
+    //         },
+    //       },
+    //     }
 
-        pdfMake.createPdf(documentDefinition).download('quota_list.pdf')
-      } catch (error) {
-        console.error('Error generating PDF:', error)
-        alert('An error occurred while generating the PDF. Please try again.')
-      }
-    },
+    //     pdfMake.createPdf(documentDefinition).download('quota_list.pdf')
+    //   } catch (error) {
+    //     console.error('Error generating PDF:', error)
+    //     alert('An error occurred while generating the PDF. Please try again.')
+    //   }
+    // },
   },
-
-  pdfSpecies() {},
 })
 </script>
 

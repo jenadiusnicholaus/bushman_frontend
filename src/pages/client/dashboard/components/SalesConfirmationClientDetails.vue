@@ -179,7 +179,8 @@
           <strong>Duration (days):</strong> {{ salesData?.proposed_package?.price_list_type?.duration ?? 'N/A' }}
         </div>
         <div>
-          <strong>Hunting Type:</strong> {{ salesData?.proposed_package?.price_list_type?.hunting_type?.name ?? 'N/A' }}
+          <strong>Hunting Type:</strong>
+          {{ salesData?.proposed_package?.price_list_type?.hunting_type?.name ?? 'N/A' }}
         </div>
       </div>
       <h3>Species Included</h3>
@@ -220,7 +221,8 @@
         <div>
           <strong>Observer Cost:</strong>
           <div>
-            Number of Observers: {{ salesData?.price_break_down?.observer_cost_details?.number_of_observers ?? 'N/A' }}
+            Number of Observers:
+            {{ salesData?.price_break_down?.observer_cost_details?.number_of_observers ?? 'N/A' }}
           </div>
           <div>
             Cost per Observer:
@@ -235,101 +237,172 @@
         </div>
       </div>
     </section>
+    <!-- <VaInnerLoading :loading="loading"> -->
+    <VaModal
+      v-model="isOpened"
+      :overlay="true"
+      size="large"
+      no-outside-dismiss
+      :hide-default-actions="true"
+      :close-button="true"
+    >
+      <VaProgressBar v-if="loading" :indeterminate="loading" class="mb-4 mt-6" />
 
-    <VaModal v-model="isOpened" :overlay="true" no-outside-dismiss :hide-default-actions="true" :close-button="true">
       <template v-if="salesData?.status?.status == 'pending'">
         <div class="flex flex-row">
-          <VaCheckbox v-model="selection" array-value="provision_sales" label="signed contract" class="mb-6" />
-          <VaCheckbox v-model="selection" array-value="confirm" label="payment document" class="mb-6" />
+          <VaCheckbox
+            v-model="selection"
+            :disabled="true"
+            array-value="provision_sales"
+            label="Signed Contract"
+            class="mb-6"
+          />
+          <VaCheckbox v-model="selection" array-value="confirm" label="Payment Document" class="mb-6" />
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <template v-if="selection.includes('provision_sales')">
-            <VaFileUpload
-              v-model="file"
-              dropzone
-              upload-button-text="Upload Signed Contract"
-              drop-zone-text=""
-              color="secondary"
-              file-types="application/pdf"
-              :max-size="1000000"
-              :max-files="1"
-            />
-          </template>
-          <template v-if="selection.includes('confirm')">
-            <div class="col-span-2">
-              <VaFileUpload
-                v-model="payfile"
-                upload-button-text="Upload Payment Document"
-                dropzone
-                color="secondary"
-                drop-zone-text=""
-                file-types="application/pdf"
-                :max-size="1000000"
-                :max-files="1"
-              />
-              <div class="mb-2">
-                <VaInput
-                  v-model="paymentDetails.bank_name"
-                  label="Bank Name"
-                  placeholder="Enter Bank Name"
-                  type="text"
+
+        <div class="flex flex-col">
+          <div class="flex flex-row mb-4">
+            <template v-if="selection.includes('provision_sales')">
+              <div class="flex-1">
+                <VaFileUpload
+                  v-model="file"
+                  dropzone
+                  upload-button-text="Upload Signed Contract"
+                  drop-zone-text=""
+                  color="secondary"
+                  file-types="application/pdf"
+                  :max-size="1000000"
+                  :max-files="1"
                 />
               </div>
-              <div class="mb-2">
-                <VaInput
-                  v-model="paymentDetails.account_number"
-                  label="Account Number"
-                  placeholder="Enter Account Number"
-                  type="text"
+            </template>
+
+            <template v-if="selection.includes('confirm')">
+              <div class="flex-1">
+                <VaFileUpload
+                  v-model="payfile"
+                  upload-button-text="Upload Payment Document"
+                  dropzone
+                  color="secondary"
+                  drop-zone-text=""
+                  file-types="application/pdf"
+                  :max-size="1000000"
+                  :max-files="1"
                 />
               </div>
-              <div class="mb-2">
-                <VaInput
-                  v-model="paymentDetails.payment_method"
-                  label="Payment Method"
-                  placeholder="Enter Payment Method"
-                  type="text"
-                />
-              </div>
+            </template>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="mb-2">
+              <VaDateInput v-model="paymentForm.date" label="Transaction Date" placeholder="Enter Transaction Date" />
             </div>
-          </template>
+
+            <div class="mb-2">
+              <VaSelect
+                v-model="paymentForm.accountType"
+                :options="accountsOption"
+                label="Account"
+                placeholder="Select Account"
+              />
+            </div>
+
+            <div class="mb-2">
+              <VaInput
+                v-model="paymentForm.reference_number"
+                label="Reference Number"
+                type="text"
+                placeholder="Enter Reference Number"
+              />
+            </div>
+
+            <div class="mb-3">
+              <VaInput v-model="paymentForm.amount" label="Amount" type="text" placeholder="Enter Amount" />
+            </div>
+            <div class="mb-2">
+              <VaSelect
+                v-model="paymentForm.currency_id"
+                :options="currencyOptions"
+                label="Currency"
+                placeholder="Select Currency"
+              />
+            </div>
+          </div>
+
+          <VaTextarea
+            v-model="paymentForm.narration"
+            label="Narration"
+            type="text"
+            placeholder="Enter Narration"
+            class="w-full h-full"
+          />
         </div>
       </template>
 
       <template v-else-if="salesData?.status?.status == 'provision_sales'">
-        <h3 class="mb-2">Payment Details</h3>
         <VaFileUpload
-          v-model="payfile"
-          upload-button-text="Upload Payment Document"
+          v-model="file"
           dropzone
-          color="secondary"
+          upload-button-text="Upload Signed Contract"
           drop-zone-text=""
+          color="secondary"
           file-types="application/pdf"
           :max-size="1000000"
           :max-files="1"
         />
-        <div class="mb-2">
-          <VaInput v-model="paymentDetails.bank_name" label="Bank Name" placeholder="Enter Bank Name" type="text" />
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div class="mb-2">
+            <VaSelect
+              v-model="paymentForm.currency_id"
+              :options="currencyOptions"
+              label="Currency"
+              placeholder="Select Currency"
+            />
+          </div>
+
+          <div class="mb-2">
+            <VaDateInput v-model="paymentForm.date" label="Transaction Date" placeholder="Enter Transaction Date" />
+          </div>
+
+          <div class="mb-2">
+            <VaSelect
+              v-model="paymentForm.accountType"
+              :options="accountsOption"
+              label="Account"
+              placeholder="Select Account"
+            />
+          </div>
+
+          <div class="mb-2">
+            <VaInput
+              v-model="paymentForm.reference_number"
+              label="Reference Number"
+              type="text"
+              placeholder="Enter Reference Number"
+            />
+          </div>
+
+          <div class="mb-3">
+            <VaInput v-model="paymentForm.amount" label="Amount" type="text" placeholder="Enter Amount" />
+          </div>
         </div>
-        <div class="mb-2">
-          <VaInput
-            v-model="paymentDetails.account_number"
-            label="Account Number"
-            placeholder="Enter Account Number"
-            type="text"
-          />
-        </div>
-        <div class="mb-2">
-          <VaInput
-            v-model="paymentDetails.payment_method"
-            label="Payment Method"
-            placeholder="Enter Payment Method"
-            type="text"
-          />
-        </div>
+
+        <VaTextarea
+          v-model="paymentForm.narration"
+          label="Narration"
+          type="text"
+          placeholder="Enter Narration"
+          class="w-full h-full"
+        />
       </template>
-      <VaButton class="mt-2" @click="submit">Save</VaButton>
+
+      <div>
+        <VaButton :disabled="loading" class="mt-2" @click="submit">Save</VaButton>
+      </div>
     </VaModal>
+
+    <!-- </VaInnerLoading> -->
   </div>
 </template>
 
@@ -340,6 +413,8 @@ import { useSettingsStore } from '../../../../stores/settings-store'
 import { useSalesInquiriesStore } from '../../../../stores/sales-store'
 import handleErrors from '../../../../utils/errorHandler'
 import getStatusColor from '../../../../utils/status_color'
+import { useAccountsStore } from '../../../../stores/account-store'
+import { format } from 'date-fns'
 
 export default defineComponent({
   props: {
@@ -368,12 +443,17 @@ export default defineComponent({
       confirmText: 'Confirm',
       disabledConfirmButton: false,
       selection: ['provision_sales'],
-      paymentDetails: {
-        bank_name: '',
-        account_number: '',
-        payment_method: '',
+      paymentForm: {
+        currency_id: null as any,
+        date: null as any,
+        accountType: null as any,
+        reference_number: null as any,
+        amount: this.salesData.price_break_down.total_amount.amount,
+        narration: '',
       },
       buttonColor: 'primary',
+      createDRTransaction: false,
+      createCRTransaction: false,
 
       statusOptions: [
         { value: 'provision_sales', text: 'Confirmed, but no disposit yet' },
@@ -385,15 +465,40 @@ export default defineComponent({
       getStatusColor,
       files: [] as any[],
       status: '',
+      loading: false,
+      transaction_type: '',
+      accountsOption: [
+        {
+          value: 'CASH_IN_HAND',
+          text: 'Cash in Hand',
+        },
+        {
+          value: 'BANK',
+          text: 'Bank trasfer',
+        },
+      ] as any,
+      currencyOptions: [
+        {
+          value: 1,
+          text: 'USD',
+        },
+        {
+          value: 2,
+          text: 'Tsh',
+        },
+      ],
     }
   },
   mounted() {
     this.getDocTypeOptions()
     this.showConfirmButtonTextByStatus()
+    console.log(this.salesData)
+    console.log(this.salesData.price_break_down.total_amount.account)
   },
   methods: {
     ...mapActions(useSettingsStore, ['getDocTypes']),
     ...mapActions(useSalesInquiriesStore, ['updatesalesConfirmationStatus']),
+    ...mapActions(useAccountsStore, ['createTransaction']),
     getContactByType(type: any) {
       return this.salesData.sales_inquiry.entity.contacts.find((contact: any) => contact.contact_type === type)
     },
@@ -419,31 +524,91 @@ export default defineComponent({
       }
     },
 
-    updateStatus(selection: string[], file: any, payfile: any): void {
-      const fileExists = (fileToCheck: any) => this.files.some((existingFile: any) => existingFile.file === fileToCheck)
+    handleTransactionTypeStatus(selection: string[], file: any, payfile: any): void {
+      this.loading = true
 
+      const fileExists = (fileToCheck: any) => this.files.some((existingFile: any) => existingFile.file === fileToCheck)
       if (this.salesData.status.status === 'pending') {
         // Check for both provision sales and payment document selection
         if (selection.includes('provision_sales') && selection.includes('confirm') && selection.length === 2) {
           this.status = 'confirmed'
+          this.transaction_type = 'RECEIPT'
+
+          this.createCRTransaction = true
+
+          if (file[0] === undefined && payfile[0] === undefined) {
+            // this.paymentDocRequired = true
+            this.$vaToast.init({
+              message: 'Please upload both Signed Contract and Payment Document',
+              color: 'danger',
+            })
+            this.loading = false
+            return
+          }
 
           // Check for only provision sales selection
         } else if (selection.includes('provision_sales') && selection.length === 1) {
           this.status = 'provision_sales'
+          this.transaction_type = 'SALES_INVOICE'
+          this.createDRTransaction = true
+
+          if (file[0] === undefined) {
+            this.$vaToast.init({
+              message: 'Please upload Signed Contract',
+              color: 'danger',
+            })
+            this.loading = false
+
+            return
+          }
 
           // Check for only payment confirmation selection
         } else if (selection.includes('confirm') && selection.length === 1) {
           this.status = 'confirmed'
+          this.transaction_type = 'RECEIPT'
+          this.createCRTransaction = true
+
+          if (payfile[0] === undefined) {
+            this.$vaToast.init({
+              message: 'Please upload Payment Document',
+              color: 'danger',
+            })
+            this.loading = false
+
+            return
+          }
         }
 
         // Handle if the status is already provision_sales
       } else if (this.salesData.status.status === 'provision_sales' && !fileExists(payfile[0])) {
         this.status = 'confirmed'
+        this.transaction_type = 'RECEIPT'
+        this.createCRTransaction = true
+
+        if (payfile[0] === undefined) {
+          this.$vaToast.init({
+            message: 'Please upload Payment Document',
+            color: 'danger',
+          })
+        }
       }
     },
 
     async submit() {
-      this.updateStatus(this.selection, this.file, this.payfile)
+      this.handleTransactionTypeStatus(this.selection, this.file, this.payfile)
+
+      const transactionPayload = {
+        currency_id: this.paymentForm.currency_id.value,
+        date: format(this.paymentForm.date, 'yyyy-MM-dd'),
+        account_type: this.paymentForm.accountType.value,
+        reference_number: this.paymentForm.reference_number,
+        transaction_type: this.transaction_type,
+        amount: this.paymentForm.amount,
+        narration: this.paymentForm.narration,
+        accountable_id: this.salesData.sales_inquiry.entity.id,
+        accountable_type_id: this.salesData.sales_inquiry.entity.category.id,
+        sales_confirmation_id: this.salesData.id,
+      }
 
       const payload = {
         entityId: this.salesData.sales_inquiry.entity.id,
@@ -455,28 +620,63 @@ export default defineComponent({
         areaId: this.salesData.sales_inquiry.area[0].area.id,
       }
 
+      console.log(payload)
+      console.log(transactionPayload)
+
       try {
-        const response = await this.updatesalesConfirmationStatus(payload)
-        if (response.status === 200) {
-          this.$vaToast.init({
-            message: response.data.message,
-            color: 'success',
-          })
-          this.isOpened = false
+        const transactionResponse = await this.createTransaction(transactionPayload)
+
+        if (transactionResponse.status === 201) {
+          await this.delay(1000) // Optional delay before creating transaction if needed
+
+          if (this.createCRTransaction) {
+            // Wait for this API call to finish
+            const response = await this.updatesalesConfirmationStatus(payload)
+
+            // Now check if the transaction was successful
+            if (response.status === 200) {
+              this.isOpened = false
+              this.loading = false
+              this.$vaToast.init({
+                message: transactionResponse.data.message,
+                color: 'success',
+              })
+
+              // Optional additional API call here if needed
+              // e.g. await this.callAnotherAPI();
+            } else {
+              this.$vaToast.init({
+                message: 'Failed to create transaction',
+                color: 'danger',
+              })
+            }
+          } else if (this.createDRTransaction) {
+            // Similar logic for DR transaction creation
+            // const transactionResponse = await this.createTransaction(transactionPayload);
+          }
         } else {
           this.$vaToast.init({
-            message: 'Failed to update Sales ',
+            message: 'Failed to update Sales',
             color: 'danger',
           })
         }
       } catch (error: any) {
         const errors = handleErrors(error.response)
-        this.$vaToast.init({
-          message: '\n' + errors.map((error, index) => `${index + 1}. ${error}`).join('\n'),
-          color: 'danger',
-        })
+        if (errors.length > 0) {
+          this.$vaToast.init({
+            message: '\n' + errors.map((error, index) => `${index + 1}. ${error}`).join('\n'),
+            color: 'danger',
+          })
+        }
       }
     },
+
+    // Helper function to create a delay
+    delay(ms: any) {
+      return new Promise((resolve) => setTimeout(resolve, ms))
+    },
+
+    // Function to call another API
 
     showConfirmButtonTextByStatus() {
       switch (this.salesData.status.status) {

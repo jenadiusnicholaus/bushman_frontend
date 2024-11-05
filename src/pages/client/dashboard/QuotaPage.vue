@@ -31,7 +31,7 @@
         @update:modelValue="getAllSpeces()"
       />
       <!-- <VaButton icon="print" icon-color="#fff" @click="createPDF"> print</VaButton> -->
-      <VaButton icon="download" @click="createPDF"> Download </VaButton>
+      <VaButton icon="download"> Download </VaButton>
     </div>
     <!-- :filter-method="" -->
     <VaDataTable :items="speciesItems" :columns="columns" :filter="filter" :loading="loading">
@@ -67,10 +67,9 @@ import { mapActions } from 'pinia'
 import { useQuotaStore } from '../../../stores/quota-store'
 import { ref } from 'vue'
 import { useToast } from 'vuestic-ui'
-import pdfMake from 'pdfmake/build/pdfmake'
-import * as pdfFonts from 'pdfmake/build/vfs_fonts'
-pdfMake.vfs = pdfFonts.pdfMake.vfs
-
+// import pdfMake from 'pdfmake/build/pdfmake'
+// import { pdfMake as pdfFonts } from 'pdfmake/build/vfs_fonts' // Use named import
+// pdfMake.vfs = pdfFonts.vfs // Assign VFS directly
 export default {
   setup() {
     const columns = [
@@ -223,145 +222,145 @@ export default {
         console.log(error)
       }
     },
-    createPDF() {
-      const data = this.speciesItems
+    // createPDF() {
+    //   const data = this.speciesItems
 
-      if (data.length === 0) {
-        this.init({ message: 'No data to print', color: 'warning' })
-        return
-      }
+    //   if (data.length === 0) {
+    //     this.init({ message: 'No data to print', color: 'warning' })
+    //     return
+    //   }
 
-      const logoUrl = this.logo
+    //   const logoUrl = this.logo
 
-      const convertImageToBase64 = (url: string): Promise<string> => {
-        return new Promise((resolve, reject) => {
-          const img = new Image()
-          img.crossOrigin = 'Anonymous'
+    //   const convertImageToBase64 = (url: string): Promise<string> => {
+    //     return new Promise((resolve, reject) => {
+    //       const img = new Image()
+    //       img.crossOrigin = 'Anonymous'
 
-          img.onload = () => {
-            const canvas = document.createElement('canvas')
-            canvas.width = img.width
-            canvas.height = img.height
-            const ctx = canvas.getContext('2d')
+    //       img.onload = () => {
+    //         const canvas = document.createElement('canvas')
+    //         canvas.width = img.width
+    //         canvas.height = img.height
+    //         const ctx = canvas.getContext('2d')
 
-            if (ctx) {
-              ctx.drawImage(img, 0, 0)
-              const dataURL = canvas.toDataURL('image/png')
-              resolve(dataURL)
-            } else {
-              reject(new Error('Failed to get canvas context'))
-            }
-          }
+    //         if (ctx) {
+    //           ctx.drawImage(img, 0, 0)
+    //           const dataURL = canvas.toDataURL('image/png')
+    //           resolve(dataURL)
+    //         } else {
+    //           reject(new Error('Failed to get canvas context'))
+    //         }
+    //       }
 
-          img.onerror = (error: any) => {
-            reject(new Error(`Error loading image: ${error.message}`))
-          }
+    //       img.onerror = (error: any) => {
+    //         reject(new Error(`Error loading image: ${error.message}`))
+    //       }
 
-          img.src = url
-        })
-      }
+    //       img.src = url
+    //     })
+    //   }
 
-      const currentDateTime = new Date().toLocaleString() // Get the current date/time
+    //   const currentDateTime = new Date().toLocaleString() // Get the current date/time
 
-      convertImageToBase64(logoUrl)
-        .then((base64Image) => {
-          const docDefinition: any = {
-            pageSize: { width: 594 * 2.83465, height: 841 * 2.83465 }, // A1 size in points
-            pageMargins: [60, 100, 60, 100], // Margins for A1 size
-            header: {
-              margin: [10, 10, 10, 0],
-              columns: [
-                {
-                  image: base64Image,
-                  width: 150,
-                  alignment: 'left',
-                },
-                {
-                  text: 'Quota Report\n\n',
-                  alignment: 'right',
-                  fontSize: 36, // Larger font size for A1 format
-                  bold: true,
-                },
-              ],
-            },
-            content: [
-              {
-                text: `Quota Report for ${this.currentQuota.name} (${this.currentQuota.start_date} - ${this.currentQuota.end_date})`,
-                style: 'header',
-                fontSize: 48, // Header font size
-                margin: [0, 20, 0, 10],
-              },
-              {
-                style: 'table',
-                table: {
-                  headerRows: 1,
-                  widths: ['auto', '*', '*', '*', '*', '*', '*', '*'], // Dynamic column widths
-                  body: [
-                    [
-                      { text: 'ID', bold: true, fillColor: '#f0f0f0', alignment: 'center', fontSize: 24 },
-                      { text: 'Name', bold: true, fillColor: '#f0f0f0', alignment: 'center', fontSize: 24 },
-                      { text: 'Scientific Name', bold: true, fillColor: '#f0f0f0', alignment: 'center', fontSize: 24 },
-                      { text: 'No. of Species', bold: true, fillColor: '#f0f0f0', alignment: 'center', fontSize: 24 },
-                      { text: 'Provision Sales', bold: true, fillColor: '#f0f0f0', alignment: 'center', fontSize: 24 },
-                      { text: 'Confirmed', bold: true, fillColor: '#f0f0f0', alignment: 'center', fontSize: 24 },
-                      { text: 'Canceled', bold: true, fillColor: '#f0f0f0', alignment: 'center', fontSize: 24 },
-                      { text: 'Taken', bold: true, fillColor: '#f0f0f0', alignment: 'center', fontSize: 24 },
-                    ],
-                    ...data.map((item: any) => [
-                      { text: item?.id || 'N/A', alignment: 'center', fontSize: 18 },
-                      { text: item?.name || 'N/A', alignment: 'left', fontSize: 18, minWidth: 150 },
-                      { text: item?.scientific_name || 'N/A', alignment: 'left', fontSize: 18, minWidth: 200 },
-                      { text: item?.no_of_species || 0, alignment: 'center', fontSize: 18 },
-                      { text: item?.provision_sales || 0, alignment: 'center', fontSize: 18 },
-                      { text: item?.confirmed || 0, alignment: 'center', fontSize: 18 },
-                      { text: item?.canceled || 0, alignment: 'center', fontSize: 18 },
-                      { text: item?.taken || 0, alignment: 'center', fontSize: 18 },
-                    ]),
-                  ],
-                },
-                layout: {
-                  hLineColor: (i: any) => (i === 0 ? 'black' : '#cccccc'),
-                  vLineColor: (i: any) => (i === 0 ? 'black' : '#cccccc'),
-                  hLineWidth: (i: any) => (i === 0 ? 1 : 0.5),
-                  vLineWidth: (i: any) => (i === 0 ? 1 : 0.5),
-                },
-              },
-            ],
-            footer: (currentPage: any, pageCount: any) => {
-              return {
-                columns: [
-                  {
-                    text: `Created on: ${currentDateTime}`, // Display current date/time on the left
-                    fontSize: 12,
-                    alignment: 'left',
-                    margin: [60, 10, 0, 0],
-                  },
-                  {
-                    text: `Page ${currentPage} of ${pageCount}`, // Page numbers on the right
-                    fontSize: 12,
-                    alignment: 'right',
-                    margin: [0, 10, 60, 0],
-                  },
-                ],
-                margin: [0, 0, 0, 10], // Margin for the footer
-              }
-            },
-            styles: {
-              header: {
-                fontSize: 48,
-                bold: true,
-                margin: [0, 20, 0, 10],
-              },
-            },
-          }
+    //   convertImageToBase64(logoUrl)
+    //     .then((base64Image) => {
+    //       const docDefinition: any = {
+    //         pageSize: { width: 594 * 2.83465, height: 841 * 2.83465 }, // A1 size in points
+    //         pageMargins: [60, 100, 60, 100], // Margins for A1 size
+    //         header: {
+    //           margin: [10, 10, 10, 0],
+    //           columns: [
+    //             {
+    //               image: base64Image,
+    //               width: 150,
+    //               alignment: 'left',
+    //             },
+    //             {
+    //               text: 'Quota Report\n\n',
+    //               alignment: 'right',
+    //               fontSize: 36, // Larger font size for A1 format
+    //               bold: true,
+    //             },
+    //           ],
+    //         },
+    //         content: [
+    //           {
+    //             text: `Quota Report for ${this.currentQuota.name} (${this.currentQuota.start_date} - ${this.currentQuota.end_date})`,
+    //             style: 'header',
+    //             fontSize: 48, // Header font size
+    //             margin: [0, 20, 0, 10],
+    //           },
+    //           {
+    //             style: 'table',
+    //             table: {
+    //               headerRows: 1,
+    //               widths: ['auto', '*', '*', '*', '*', '*', '*', '*'], // Dynamic column widths
+    //               body: [
+    //                 [
+    //                   { text: 'ID', bold: true, fillColor: '#f0f0f0', alignment: 'center', fontSize: 24 },
+    //                   { text: 'Name', bold: true, fillColor: '#f0f0f0', alignment: 'center', fontSize: 24 },
+    //                   { text: 'Scientific Name', bold: true, fillColor: '#f0f0f0', alignment: 'center', fontSize: 24 },
+    //                   { text: 'No. of Species', bold: true, fillColor: '#f0f0f0', alignment: 'center', fontSize: 24 },
+    //                   { text: 'Provision Sales', bold: true, fillColor: '#f0f0f0', alignment: 'center', fontSize: 24 },
+    //                   { text: 'Confirmed', bold: true, fillColor: '#f0f0f0', alignment: 'center', fontSize: 24 },
+    //                   { text: 'Canceled', bold: true, fillColor: '#f0f0f0', alignment: 'center', fontSize: 24 },
+    //                   { text: 'Taken', bold: true, fillColor: '#f0f0f0', alignment: 'center', fontSize: 24 },
+    //                 ],
+    //                 ...data.map((item: any) => [
+    //                   { text: item?.id || 'N/A', alignment: 'center', fontSize: 18 },
+    //                   { text: item?.name || 'N/A', alignment: 'left', fontSize: 18, minWidth: 150 },
+    //                   { text: item?.scientific_name || 'N/A', alignment: 'left', fontSize: 18, minWidth: 200 },
+    //                   { text: item?.no_of_species || 0, alignment: 'center', fontSize: 18 },
+    //                   { text: item?.provision_sales || 0, alignment: 'center', fontSize: 18 },
+    //                   { text: item?.confirmed || 0, alignment: 'center', fontSize: 18 },
+    //                   { text: item?.canceled || 0, alignment: 'center', fontSize: 18 },
+    //                   { text: item?.taken || 0, alignment: 'center', fontSize: 18 },
+    //                 ]),
+    //               ],
+    //             },
+    //             layout: {
+    //               hLineColor: (i: any) => (i === 0 ? 'black' : '#cccccc'),
+    //               vLineColor: (i: any) => (i === 0 ? 'black' : '#cccccc'),
+    //               hLineWidth: (i: any) => (i === 0 ? 1 : 0.5),
+    //               vLineWidth: (i: any) => (i === 0 ? 1 : 0.5),
+    //             },
+    //           },
+    //         ],
+    //         footer: (currentPage: any, pageCount: any) => {
+    //           return {
+    //             columns: [
+    //               {
+    //                 text: `Created on: ${currentDateTime}`, // Display current date/time on the left
+    //                 fontSize: 12,
+    //                 alignment: 'left',
+    //                 margin: [60, 10, 0, 0],
+    //               },
+    //               {
+    //                 text: `Page ${currentPage} of ${pageCount}`, // Page numbers on the right
+    //                 fontSize: 12,
+    //                 alignment: 'right',
+    //                 margin: [0, 10, 60, 0],
+    //               },
+    //             ],
+    //             margin: [0, 0, 0, 10], // Margin for the footer
+    //           }
+    //         },
+    //         styles: {
+    //           header: {
+    //             fontSize: 48,
+    //             bold: true,
+    //             margin: [0, 20, 0, 10],
+    //           },
+    //         },
+    //       }
 
-          pdfMake.createPdf(docDefinition).download('species-list.pdf')
-        })
-        .catch((error) => {
-          console.error('Error converting logo to Base64:', error)
-          this.init({ message: 'Error generating PDF', color: 'danger' })
-        })
-    },
+    //       pdfMake.createPdf(docDefinition).download('species-list.pdf')
+    //     })
+    //     .catch((error) => {
+    //       console.error('Error converting logo to Base64:', error)
+    //       this.init({ message: 'Error generating PDF', color: 'danger' })
+    //     })
+    // },
   },
 }
 </script>

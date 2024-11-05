@@ -53,6 +53,14 @@ export default {
       },
       children: [
         {
+          name: 'area-settings',
+          displayName: 'menu.settings-area',
+        },
+        {
+          name: 'species-settings',
+          displayName: 'menu.settings-species',
+        },
+        {
           name: 'qoutas-settings',
           displayName: 'menu.settings-qoutas',
         },
@@ -61,15 +69,11 @@ export default {
           name: 'regulatory-package',
           displayName: 'menu.regulatory-package',
         },
-        {
-          name: 'area-settings',
-          displayName: 'menu.settings-area',
-        },
 
-        // species-settings
+        // sales-package
         {
-          name: 'species-settings',
-          displayName: 'menu.settings-species',
+          name: 'sales-package',
+          displayName: 'menu.sales-package',
         },
 
         // price-list

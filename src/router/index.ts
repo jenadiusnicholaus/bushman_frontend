@@ -128,6 +128,12 @@ const routes: Array<RouteRecordRaw> = [
             component: () => import('../pages/module-settings/ManageSpecies.vue'),
           },
 
+          {
+            name: 'sales-package',
+            path: 'sales-package',
+            component: () => import('../pages/module-settings/ManageSalesPackage.vue'),
+          },
+
           // PriceList
           {
             name: 'price-list',

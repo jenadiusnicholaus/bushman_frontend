@@ -33,7 +33,7 @@
               label="Sales Quota"
               :rules="[(v: any) => !!v || 'Sales Quota is required']"
               placeholder="Select Sales Quota"
-              @update:modelValue="getLicencePackageSpecies"
+              @update:modelValue="getSpeciesItems"
             >
               <template #appendInner>
                 <VaIcon name="av_timer" size="small" color="primary" />
@@ -260,7 +260,7 @@ export default defineComponent({
 
   mounted() {
     this.getQs()
-    this.getLicencePackageSpecies()
+    this.getSpeciesItems()
     this.getAreas()
   },
 
@@ -296,7 +296,7 @@ export default defineComponent({
         value: e.id,
         text: this.generateQuotaYear(e.start_date, e.end_date) + ` - ${e.name}`,
       }
-      this.getLicencePackageSpecies()
+      this.getSpeciesItems()
     },
 
     updateQuantitySelectedSpecies(species: any) {
@@ -342,27 +342,27 @@ export default defineComponent({
       console.log('Species item deleted:', index)
     },
 
-    async getLicencePackageSpecies() {
-      console.log('Getting species items for the selected sales quota', this.sform.salesQuota.value)
+    // async getLicencePackageSpecies() {
+    //   console.log('Getting species items for the selected sales quota', this.sform.salesQuota.value)
 
-      try {
-        const response = await this.getLicenceRegulatoryHuntingPackageSpecies({
-          quotaId: this.sform.salesQuota.value,
-        })
-        const speciesItems = response.data.map((item: any) => {
-          //  update the selected species quantity
-          this.sform.quantity = item.quantity
-          return {
-            value: item.species.id,
-            text: item.species.name,
-            quantity: item.quantity,
-          }
-        })
-        this.speciesOptions = speciesItems
-      } catch (error) {
-        console.log(error)
-      }
-    },
+    //   try {
+    //     const response = await this.getLicenceRegulatoryHuntingPackageSpecies({
+    //       quotaId: this.sform.salesQuota.value,
+    //     })
+    //     const speciesItems = response.data.map((item: any) => {
+    //       //  update the selected species quantity
+    //       this.sform.quantity = item.quantity
+    //       return {
+    //         value: item.species.id,
+    //         text: item.species.name,
+    //         quantity: item.quantity,
+    //       }
+    //     })
+    //     this.speciesOptions = speciesItems
+    //   } catch (error) {
+    //     console.log(error)
+    //   }
+    // },
 
     async addNewSpeciesToQuota() {
       if (this.speciesObjects.length === 0) {
@@ -482,24 +482,24 @@ export default defineComponent({
       }
     },
 
-    // async getSpeciesItems() {
-    //   try {
-    //     const response = await this.getSpeciesList()
+    async getSpeciesItems() {
+      try {
+        const response = await this.getSpeciesList()
 
-    //     // Add the species items from the response
-    //     const speciesItems = response.data.map((item: { id: any; name: any }) => {
-    //       return {
-    //         value: item.id,
-    //         text: item.name,
-    //       }
-    //     })
+        // Add the species items from the response
+        const speciesItems = response.data.map((item: { id: any; name: any }) => {
+          return {
+            value: item.id,
+            text: item.name,
+          }
+        })
 
-    //     // Combine default option with species items
-    //     this.speciesOptions = this.speciesOptions.concat(speciesItems)
-    //   } catch (error) {
-    //     console.log(error)
-    //   }
-    // },
+        // Combine default option with species items
+        this.speciesOptions = this.speciesOptions.concat(speciesItems)
+      } catch (error) {
+        console.log(error)
+      }
+    },
 
     async getAreas() {
       try {

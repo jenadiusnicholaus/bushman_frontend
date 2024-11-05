@@ -9,7 +9,7 @@ import { createGtm } from '@gtm-support/vue-gtm'
 import stores from './stores'
 import router from './router'
 import vuesticGlobalConfig from './services/vuestic-ui/global-config'
-import './pages/auth/interceptors/token_interceptors'
+import './services/interceptors/token_interceptors'
 import '@vuestic/ag-grid-theme'
 // import '@vuestic/ag-grid-theme/scss'
 

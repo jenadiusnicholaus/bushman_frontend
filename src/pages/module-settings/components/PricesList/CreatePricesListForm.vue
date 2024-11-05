@@ -2,14 +2,14 @@
   <VaForm ref="formRef">
     <div class="p-1">
       <!-- <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4"> -->
-      <h3 class="font-bold text-lg mb-2">Price list/Package Infos</h3>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-        <VaInput
-          v-model="form.package_name"
-          type="text"
-          placeholder="Enter Package Name"
-          :rules="[(value: any) => (value && value.length > 0) || 'Package name is required']"
-          label="Package name"
+      <h3 class="font-bold text-lg mb-2">Price list Infos</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <VaSelect
+          v-model="form.package"
+          :options="packageOptions"
+          placeholder="Select Package"
+          :rules="[(v: any) => v || 'Package is required']"
+          label="Package"
           required-mark
         />
         <!-- <VaInput v-model="form.nick_name" placeholder="Nick name" label="Nick name" /> -->
@@ -34,37 +34,11 @@
           required-mark
           @update:modelValue="getAllSpieces()"
         />
-        <VaSelect
-          v-model="form.sales_quota_id"
-          placeholder="Select Sales Quota"
-          label="Sales Quota"
-          :rules="[(v: any) => v || 'Sales Quota is required']"
-          :options="salesQuotasOptions"
-          searchable
-          highlight-matched-text
-          required-mark
-          @update:modelValue="getAllSpieces()"
-        />
-      </div>
-      <h3 class="font-bold text-lg mb-2">Description</h3>
-      <div class="grid grid-cols-1 md:grid-cols gap-4 mb-4">
-        <VaTextarea
-          v-model="form.description"
-          max-length="120"
-          heigth="100"
-          label="Description"
-          counter
-          required-mark
-          :rules="[
-            (v: any) => (v && v.length > 0) || 'Required',
-            (v: any) => (v && v.length < 60) || 'Maximum 120 characters',
-          ]"
-        />
       </div>
 
       <!-- Experience and Date Group -->
       <h3 class="font-bold text-lg mb-2">Charges per days</h3>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <VaInput
           v-model="form.amount"
           type="text"
@@ -97,56 +71,33 @@
       </div>
 
       <!-- companion group -->
-      <h3 class="font-bold text-lg mb-2">Companion Charges</h3>
+      <h3 class="font-bold text-lg mb-2">Companion and Observer Charges</h3>
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-        <VaInput
-          v-model="form.companion_days"
-          type="text"
-          placeholder="Enter Companion Days"
-          :rules="[(value: any) => (value && value.length > 0) || 'Companion Days is required']"
-          label=" Days"
-          required-mark
-        />
-
         <VaInput
           v-model="form.companion_amount"
           type="text"
           placeholder="Enter Companion Amount"
           :rules="[(value: any) => (value && value.length > 0) || 'Companion Amount is required']"
-          label=" Amount"
+          label="Companion Amount"
           required-mark
         />
-      </div>
-
-      <!-- companion group -->
-      <h3 class="font-bold text-lg mb-2">Oberver Charges</h3>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-        <VaInput
-          v-model="form.observer_days"
-          type="text"
-          placeholder="Enter oberver Days"
-          :rules="[(value: any) => (value && value.length > 0) || 'Companion Days is required']"
-          label=" Days"
-          required-mark
-        />
-
         <VaInput
           v-model="form.observer_amount"
           type="text"
-          placeholder="Enter oberver Amount"
+          placeholder="Enter observer Amount"
           :rules="[(value: any) => (value && value.length > 0) || 'Companion Amount is required']"
-          label=" Amount"
+          label="Observer Amount"
           required-mark
         />
       </div>
 
-      <h3 class="font-bold text-lg mb-2">Price List/Package Life span</h3>
+      <h3 class="font-bold text-lg mb-2">Price List Life span</h3>
       <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
         <VaDateInput v-model="form.start_date" required-mark label="Start Date" manual-input />
         <VaDateInput v-model="form.end_date" required-mark label="End Date" manual-input />
       </div>
 
-      <h3 class="font-bold text-lg mb-2">Species</h3>
+      <!-- <h3 class="font-bold text-lg mb-2">Species</h3>
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
         <VaSelect
           v-model="form.species"
@@ -175,7 +126,7 @@
           :max="100"
           :rules="[(v: any) => v || 'Quantity is required']"
         />
-        <!-- </div> -->
+       
         <VaButtonGroup>
           <VaButton
             class="px-0 py-0"
@@ -204,7 +155,7 @@
             </VaListItemSection>
           </VaListItem>
         </VaList>
-      </div>
+      </div> -->
     </div>
 
     <div class="mt-4 d-flex p-2">
@@ -269,9 +220,9 @@ export default defineComponent({
     const form = reactive({
       id: null as any,
       hunting_type_id: null as any,
-      package_name: '',
-      description: '',
-      sales_quota_id: null as any,
+      package: null as any,
+      // description: '',
+      // sales_quota_id: null as any,
       amount: 0,
       samount: 0,
       currency: null as any,
@@ -281,9 +232,9 @@ export default defineComponent({
       species: null as any,
       quantity: 0,
       area: null as any,
-      companion_days: 0,
+      // companion_days: 0,
       companion_amount: 0,
-      observer_days: 0,
+      // observer_days: 0,
       observer_amount: 0,
     })
 
@@ -339,6 +290,7 @@ export default defineComponent({
       salesQuotasOptions: [] as any,
       speciesItemOptions: [] as any,
       currencyOptions: [] as any,
+      packageOptions: [] as any,
     }
   },
   mounted() {
@@ -347,6 +299,7 @@ export default defineComponent({
     this.getHuntingTypes()
     this.getQuotaList()
     this.getCurrencyList()
+    this.getSalesPackages()
   },
   methods: {
     ...mapActions(useQuotaStore, ['getSpeciesList']),
@@ -355,7 +308,8 @@ export default defineComponent({
     ...mapActions(useSettingsStore, ['getHuntingsTypes']),
     ...mapActions(useSettingsStore, ['getCurrencies']),
     ...mapActions(useQuotaStore, ['getQuotas']),
-    ...mapActions(usePriceListStore, ['CreatePriceList']),
+    ...mapActions(usePriceListStore, ['createPriceList']),
+    ...mapActions(usePriceListStore, ['getSalesPackageList']),
 
     // addNewSpeciesItemToStorage() {},
     // CreateSalesInquiry
@@ -368,34 +322,34 @@ export default defineComponent({
     },
 
     async submit() {
-      if (this.speciesObjects.length === 0) {
-        this.init({
-          message: 'Please select at least one species.',
-          color: 'warning',
-        })
-        return
-      }
+      // if (this.speciesObjects.length === 0) {
+      //   this.init({
+      //     message: 'Please select at least one species.',
+      //     color: 'warning',
+      //   })
+      //   return
+      // }
 
       const requestdata = {
         area: this.form.area.value,
         huntingTypeId: this.form.hunting_type_id.value,
-        name: this.form.package_name,
-        description: this.form.description,
-        salesQuotaId: this.form.sales_quota_id.value,
+        sales_package_id: this.form.package.value,
+        // description: this.form.description,
+        // salesQuotaId: this.form.sales_quota_id.value,
         amount: this.form.amount,
         currency: this.form.currency.value,
         duration: this.form.duration,
         startDate: this.form.start_date,
         endDate: this.form.end_date,
-        speciesObjectList: this.speciesObjects,
-        companionDays: this.form.companion_days,
+        // speciesObjectList: this.speciesObjects,
+        // companionDays: this.form.companion_days,
         companionAmount: this.form.companion_amount,
-        observerDays: this.form.observer_days,
+        // observerDays: this.form.observer_days,
         observerAmount: this.form.observer_amount,
       }
 
       try {
-        const response: any = await this.CreatePriceList(requestdata)
+        const response: any = await this.createPriceList(requestdata)
 
         if (response.status === 201) {
           this.init({ message: response.data.message, color: 'success' })
@@ -427,6 +381,20 @@ export default defineComponent({
 
         // Combine default option with species items
         // this.speciesOptions = this.speciesOptions.concat(speciesItems)
+      } catch (error) {
+        console.log(error)
+      }
+    },
+
+    async getSalesPackages() {
+      try {
+        const response = await this.getSalesPackageList()
+        this.packageOptions = response.data.map((item: { id: any; name: any }) => {
+          return {
+            value: item.id,
+            text: item.name,
+          }
+        })
       } catch (error) {
         console.log(error)
       }
@@ -522,12 +490,7 @@ export default defineComponent({
 
     async getAllSpieces() {
       try {
-        // if (this.form.sales_quota_id?.value || this.form?.area?.value) {
-        const response = await this.getAllSpeciesPerQuotaPerArea(
-          this.form.sales_quota_id?.value ?? null,
-          this.form.area?.value ?? null,
-          null,
-        )
+        const response = await this.getAllSpeciesPerQuotaPerArea(null, this.form.area?.value ?? null, null)
         this.speciesItemOptions = response.data.map((item: any) => {
           return {
             value: item.species.id,
