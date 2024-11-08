@@ -98,6 +98,7 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
               arrival: formatDateTime(item.itinerary.arrival),
               status: item?.status?.status ?? 'No Status',
               selfitem: item,
+
               // total_sales_amount: item.total_sales_amount,
               // total_sales_amount_usd: item.total_sales_amount_usd,
             }

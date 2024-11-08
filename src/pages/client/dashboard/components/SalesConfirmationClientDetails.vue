@@ -11,7 +11,7 @@
         icon="file_download"
         size="small"
         border-color="primary"
-        @click="downloadConfirmation"
+        @click="downloadPdf(salesData.pdf)"
         >Download</VaButton
       >
 
@@ -415,6 +415,7 @@ import handleErrors from '../../../../utils/errorHandler'
 import getStatusColor from '../../../../utils/status_color'
 import { useAccountsStore } from '../../../../stores/account-store'
 import { format } from 'date-fns'
+import downloadPdf from '../../../../utils/pdfDownloader'
 
 export default defineComponent({
   props: {
@@ -454,6 +455,7 @@ export default defineComponent({
       buttonColor: 'primary',
       createDRTransaction: false,
       createCRTransaction: false,
+      downloadPdf,
 
       statusOptions: [
         { value: 'provision_sales', text: 'Confirmed, but no disposit yet' },
@@ -475,6 +477,10 @@ export default defineComponent({
         {
           value: 'BANK',
           text: 'Bank trasfer',
+        },
+        {
+          value: 'DEBTOR_ACCOUNT',
+          text: 'Debtor Account',
         },
       ] as any,
       currencyOptions: [
@@ -498,7 +504,7 @@ export default defineComponent({
   methods: {
     ...mapActions(useSettingsStore, ['getDocTypes']),
     ...mapActions(useSalesInquiriesStore, ['updatesalesConfirmationStatus']),
-    ...mapActions(useAccountsStore, ['createTransaction']),
+    ...mapActions(useAccountsStore, ['createCRDRTransaction', 'createDRCRTransaction']),
     getContactByType(type: any) {
       return this.salesData.sales_inquiry.entity.contacts.find((contact: any) => contact.contact_type === type)
     },
@@ -511,16 +517,55 @@ export default defineComponent({
       this.$emit('download-confirmation', this.salesData)
     },
 
-    complete() {
+    async complete() {
       this.status = 'completed'
-      this.submit()
+
+      await this.completeOrCancel('Sales Confirmation Completed.')
+    },
+
+    async completeOrCancel(displayMessage: any) {
+      // this.submit()
+      // this.handleTransactionTypeStatus(this.selection, this.file, this.payfile)
+      const payload = {
+        entityId: this.salesData.sales_inquiry.entity.id,
+        contractDoc: this.file[0],
+        paymentDoc: this.payfile[0],
+        salesConfirmationProposalId: this.salesData.id,
+        statusId: this.status,
+        quotaId: this.salesData.proposed_package.sales_package.sales_quota.id,
+        areaId: this.salesData.sales_inquiry.area[0].area.id,
+      }
+      try {
+        const response = await this.updatesalesConfirmationStatus(payload)
+        if (response.status === 200) {
+          this.isOpened = false
+          this.loading = false
+          this.$vaToast.init({
+            message: displayMessage,
+            color: 'success',
+          })
+        } else {
+          this.$vaToast.init({
+            message: 'Failed to process the request',
+            color: 'danger',
+          })
+        }
+      } catch (error: any) {
+        const errors = handleErrors(error.response)
+        if (errors.length > 0) {
+          this.$vaToast.init({
+            message: '\n' + errors.map((error, index) => `${index + 1}. ${error}`).join('\n'),
+            color: 'danger',
+          })
+        }
+      }
     },
 
     async cancel() {
       const confirm = await this.$vaModal.confirm('Are you sure you want to cancel this sales?')
       if (confirm) {
         this.status = 'cancelled'
-        this.submit()
+        await this.completeOrCancel('Sales Confirmation Cancelled.')
       }
     },
 
@@ -616,7 +661,7 @@ export default defineComponent({
         paymentDoc: this.payfile[0],
         salesConfirmationProposalId: this.salesData.id,
         statusId: this.status,
-        quotaId: this.salesData.proposed_package.sales_package.sales_quota.id,
+        // quotaId: this.salesData.proposed_package.sales_package.sales_quota?.id,
         areaId: this.salesData.sales_inquiry.area[0].area.id,
       }
 
@@ -624,12 +669,12 @@ export default defineComponent({
       console.log(transactionPayload)
 
       try {
-        const transactionResponse = await this.createTransaction(transactionPayload)
+        if (this.createCRTransaction) {
+          const transactionResponse = await this.createCRDRTransaction(transactionPayload)
 
-        if (transactionResponse.status === 201) {
-          await this.delay(1000) // Optional delay before creating transaction if needed
+          if (transactionResponse.status === 201) {
+            await this.delay(1000) // Optional delay before creating transaction if needed
 
-          if (this.createCRTransaction) {
             // Wait for this API call to finish
             const response = await this.updatesalesConfirmationStatus(payload)
 
@@ -650,18 +695,43 @@ export default defineComponent({
                 color: 'danger',
               })
             }
-          } else if (this.createDRTransaction) {
-            // Similar logic for DR transaction creation
-            // const transactionResponse = await this.createTransaction(transactionPayload);
+          } else {
+            this.$vaToast.init({
+              message: 'Failed to update Sales',
+              color: 'danger',
+            })
           }
-        } else {
-          this.$vaToast.init({
-            message: 'Failed to update Sales',
-            color: 'danger',
-          })
+        } else if (this.createDRTransaction) {
+          // Similar logic for DR transaction creation
+          const drcrResponse = await this.createDRCRTransaction(transactionPayload)
+          if (drcrResponse.status === 201) {
+            await this.delay(1000) // Optional delay before creating transaction if needed
+            const response = await this.updatesalesConfirmationStatus(payload)
+            if (response.status === 200) {
+              this.isOpened = false
+              this.loading = false
+              this.$vaToast.init({
+                message: drcrResponse.data.message,
+                color: 'success',
+              })
+              // Optional additional API call here if needed
+              // e.g. await this.callAnotherAPI();
+            } else {
+              this.$vaToast.init({
+                message: 'Failed to create transaction',
+                color: 'danger',
+              })
+            }
+          } else {
+            this.$vaToast.init({
+              message: 'Failed to update Sales',
+              color: 'danger',
+            })
+          }
         }
       } catch (error: any) {
         const errors = handleErrors(error.response)
+        this.loading = false
         if (errors.length > 0) {
           this.$vaToast.init({
             message: '\n' + errors.map((error, index) => `${index + 1}. ${error}`).join('\n'),

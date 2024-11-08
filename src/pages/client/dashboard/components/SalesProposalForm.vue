@@ -240,9 +240,9 @@ export default defineComponent({
   },
 
   mounted() {
-    // this.getPL()
+    this.getPL()
     this.getLicencePackages()
-    this.getSalesPackages()
+    // this.getSalesPackages()
   },
 
   methods: {
@@ -251,18 +251,18 @@ export default defineComponent({
     ...mapActions(useSalesInquiriesStore, ['getSalesPriceBreakdown']),
     ...mapActions(useRegulatoryPackageStore, ['getRegulatoryPackages']),
 
-    // async getPL() {
-    //   const response = await this.getPriceList()
+    async getPL() {
+      const response = await this.getPriceList()
 
-    //   if (response.status === 200) {
-    //     this.packages = response.data.map((item: any) => ({
-    //       value: item.sales_package.id,
-    //       text: item?.sales_package.name,
-    //     }))
-    //   } else {
-    //     console.log('Error getting price list')
-    //   }
-    // },
+      if (response.status === 200) {
+        this.packages = response.data.data.map((item: any) => ({
+          value: item.id,
+          text: item?.sales_package.name + ' - ' + item.price_list_type.hunting_type.name,
+        }))
+      } else {
+        console.log('Error getting price list')
+      }
+    },
 
     createInstallmentList() {
       if (this.form.installment_desc && this.form.installment_due_amount) {
@@ -340,19 +340,19 @@ export default defineComponent({
       }
     },
 
-    async getSalesPackages() {
-      try {
-        const response = await this.getSalesPackageList()
-        this.packages = response.data.map((item: { id: any; name: any }) => {
-          return {
-            value: item.id,
-            text: item.name,
-          }
-        })
-      } catch (error) {
-        console.log(error)
-      }
-    },
+    // async getSalesPackages() {
+    //   try {
+    //     const response = await this.getSalesPackageList()
+    //     this.packages = response.data.map((item: { id: any; name: any }) => {
+    //       return {
+    //         value: item.id,
+    //         text: item.name,
+    //       }
+    //     })
+    //   } catch (error) {
+    //     console.log(error)
+    //   }
+    // },
   },
 })
 </script>

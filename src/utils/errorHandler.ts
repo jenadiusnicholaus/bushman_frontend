@@ -23,14 +23,7 @@ const handleErrors = (errorResponse: any) => {
     } else {
       errors.push('Unexpected server response format.')
     }
-  } else if (errorResponse.request) {
-    // Handle cases where request was made but no response received
-    errors.push('No response received from the server. Please check your network connection.')
-  } else {
-    // Handle other errors
-    errors.push(`Error: ${errorResponse.message || 'An unknown error occurred.'}`)
   }
-
   return errors
 }
 
