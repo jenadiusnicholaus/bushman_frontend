@@ -270,11 +270,11 @@ import { useQuotaStore } from '../../../stores/quota-store'
 import { useSalesInquiriesStore } from '../../../stores/sales-store'
 import { useSettingsStore } from '../../../stores/settings-store'
 import SalesInquiryDetails from './components/SalesInquiryDetails.vue'
-import pdfMake from 'pdfmake/build/pdfmake'
-import * as pdfFonts from 'pdfmake/build/vfs_fonts'
+// import pdfMake from 'pdfmake/build/pdfmake'
+// import * as pdfFonts from 'pdfmake/build/vfs_fonts'
 import downloadPdf from '../../../utils/pdfDownloader'
 
-pdfMake.vfs = pdfFonts?.pdfMake?.vfs
+// pdfMake.vfs = pdfFonts?.pdfMake?.vfs
 // pdfMake.vfs = pdfFonts.pdfMake.vfs
 export default defineComponent({
   components: {
