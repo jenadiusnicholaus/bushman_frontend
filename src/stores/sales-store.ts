@@ -104,6 +104,10 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
             }
           })
           return response
+        } else {
+          this.loadingresults = false
+          this.results = []
+          return response
         }
       } catch (error) {
         console.log(error)

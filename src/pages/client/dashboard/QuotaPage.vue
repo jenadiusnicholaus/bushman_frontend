@@ -115,6 +115,7 @@ export default defineComponent({
       height: 100,
       loading: false,
       base64Pdf: '' as any,
+      loadingQuota: false,
       downloadPdf,
     }
   },
@@ -140,36 +141,44 @@ export default defineComponent({
     // },
 
     async getAllSpeces() {
+      this.loading = true
       try {
         this.currentQuota = this.yearOptions.find((item: any) => item.value === this.quota)
-        const response = await this.getAllSpeciesPerQuotaPerArea(this.quota, this.area, this.species)
+        const response: any = await this.getAllSpeciesPerQuotaPerArea(this.quota, this.area, this.species)
         this.base64Pdf = response.data.pdf
-        this.speciesItems = response.data.data.map((item: any) => {
-          return {
-            id: item.id,
-            name: item.species.name,
-            area: item.area.name,
-            scientific_name: item.species.scientific_name,
-            no_of_species: item.quantity,
-            provision_sales: item.provision_quantity,
-            confirmed: item.confirmed_quantity,
-            canceled: item.declined_quantity || item.cancelled_quantity,
-            taken: item.completed_quantity, // New column
-          }
-        })
+        if (response.status === 200) {
+          this.speciesItems = response.data.data.map((item: any) => {
+            this.loading = false
+            return {
+              id: item.id,
+              name: item.species.name,
+              area: item.area.name,
+              scientific_name: item.species.scientific_name,
+              no_of_species: item.quantity,
+              provision_sales: item.provision_quantity,
+              confirmed: item.confirmed_quantity,
+              canceled: item.declined_quantity || item.cancelled_quantity,
+              taken: item.completed_quantity, // New column
+            }
+          })
+        } else {
+          this.init({ message: response.message, color: 'danger' })
+          this.loading = false
+        }
       } catch (error) {
+        this.loading = false
         console.log(error)
       }
     },
 
     async getQuota() {
-      this.loading = true
+      this.loadingQuota = true
       try {
         const response = await this.getQuotas(null)
 
         // current select quota
         if (response.status === 200) {
-          this.loading = false
+          this.loadingQuota = false
           const currentQuota = response.data[0]
 
           this.quota = currentQuota.id
@@ -187,7 +196,7 @@ export default defineComponent({
           })
         }
       } catch (error) {
-        this.loading = false
+        this.loadingQuota = false
         console.log(error)
       }
     },
