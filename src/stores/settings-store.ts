@@ -107,5 +107,21 @@ export const useSettingsStore = defineStore('settings-store', {
       const response = await axios.request(config)
       return response
     },
+
+    // get ph
+    // VITE_APP_PH_VSET_URL
+    async getPhVset() {
+      const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_PH_VSET_URL
+      const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+      const response = await axios.request(config)
+      return response
+    },
   },
 })

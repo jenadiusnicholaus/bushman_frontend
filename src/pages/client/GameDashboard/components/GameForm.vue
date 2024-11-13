@@ -1,21 +1,16 @@
 <template>
   <VaInnerLoading :loading="loadingSales">
     <VaForm ref="iformRef">
-      <h3 class="font-bold text-lg mb-2">Sales Confirmation</h3>
-      <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4">
+      <h3 class="font-bold text-lg mb-2">Hunting Game Information</h3>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
         <VaSelect
-          v-model="form.proposal"
-          :options="proposalOptions"
+          v-model="form.entity_contract_permit"
+          :options="contractPermitOptions"
           :rules="[(value: any) => value || 'Sales is required']"
           placeholder="Select confirmation "
           label="Choose sales confirmation"
           @update:modelValue="onValueChange"
         />
-      </div>
-      <h3 class="font-bold text-lg mb-2">Contract Details</h3>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <!-- arrival -->
         <VaDateInput
           v-model="form.start_date"
           placeholder="Choose start date"
@@ -28,21 +23,148 @@
           :rules="[(value: any) => value || 'Arrival Date is required']"
           label="Charter In Date"
         />
-      </div>
-      <!-- description -->
-      <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4">
-        <VaTextarea
-          v-model="form.description"
-          max-length="125"
-          label="Short text about something"
-          counter
-          required-mark
-          :rules="[(v) => (v && v.length > 0) || 'Required', (v) => v && v.length < 125]"
+        <VaSelect
+          v-model="form.professional_hunters_ids"
+          label="PH"
+          :options="phOptions"
+          multiple
+          max-selections="2"
+          :rules="[(value: any) => value || 'PH is required']"
+          placeholder="Select PH"
         />
       </div>
+      <VaDivider />
+
+      <h3 class="font-bold text-lg mb-2">Add Game Activities</h3>
+
+      <VaAlert color="info" outline class="mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+          <!-- lat -->
+          <VaInput
+            v-model="form.lat"
+            type="number"
+            placeholder="Enter Latitude"
+            :rules="[(value: any) => value || 'Latitude is required']"
+            label="Latitude"
+          />
+          <!-- long -->
+          <VaInput
+            v-model="form.lng"
+            type="number"
+            placeholder="Enter Longitude"
+            :rules="[(value: any) => value || 'Longitude is required']"
+            label="Longitude"
+          />
+          <!-- area -->
+          <VaSelect
+            v-model="form.area_id"
+            :options="areaOptions"
+            :rules="[(value: any) => value || 'Area is required']"
+            placeholder="Select Area"
+            label="Area"
+          />
+
+          <!-- time -->
+          <VaDateInput
+            v-model="form.date"
+            placeholder="wounded/killed date"
+            :rules="[(value: any) => value || 'Date is required']"
+            label="Start Date"
+          />
+          <VaTimeInput
+            v-model="form.time"
+            clearable
+            label="Time"
+            :rules="[(value: any) => value || 'Time is required']"
+            placeholder="Wounded/Killed Time"
+          />
+          <!-- weapon -->
+          <VaInput
+            v-model="form.weapon_used"
+            type="number"
+            placeholder="weapon used"
+            :rules="[(value: any) => value || 'Weapon is required']"
+            label="Weapon Used"
+          />
+          <!-- spacies -->
+          <VaSelect
+            v-model="form.spacies_gender"
+            :options="genderOptions"
+            :rules="[(value: any) => value || 'Gender is required']"
+            placeholder="Select Gender"
+            label="Gender"
+          />
+          <!-- status -->
+          <VaSelect
+            v-model="form.status"
+            :options="statusOptions"
+            :rules="[(value: any) => value || 'Status is required']"
+            placeholder="Select Status"
+            label="Status"
+          />
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <VaSelect
+            v-model="form.species"
+            label="Species"
+            :options="speciesOptions"
+            placeholder="Select Species"
+            :rules="[(v: any) => !!v || 'Species is required']"
+            required
+          />
+
+          <VaCounter
+            v-model="form.quantity"
+            label="Quantity"
+            manual-input
+            :min="1"
+            :max="1"
+            :rules="[(v: any) => v || 'Quantity is required']"
+          />
+          <VaTextarea
+            v-model="form.description"
+            max-length="125"
+            label="Short text about something"
+            counter
+            required-mark
+            :rules="[(v) => (v && v.length > 0) || 'Required', (v) => v && v.length < 125]"
+          />
+        </div>
+        <div class="flex justify-end">
+          <VaButton class="px-0 py-0" color="primary" icon="add" size="small" @click="createGameListObject()" />
+        </div>
+
+        <div class="mt-1">
+          <VaList>
+            <VaListLabel v-if="games.length > 0" class="text-md mb-2 text-left">Games</VaListLabel>
+            <VaListLabel v-else color="secondary" class="va-text-code mb-2 text-left">No Game Added</VaListLabel>
+
+            <!-- <VaListItem v-for="(s, index) in games" :key="index" class="list__item">
+              <VaListItemSection>
+                <VaListItemLabel>
+                  Name: {{ s.name }}
+                  <VaIcon name="delete" size="small" color="primary" @click="deleteFromStorage(index)" />
+                </VaListItemLabel>
+                <VaListItemLabel caption>Quantity: {{ s.quantity }}</VaListItemLabel>
+              </VaListItemSection>
+            </VaListItem> -->
+
+            <VaDataTable :items="games" :columns="columns">
+              <template #cell(status)="{ value }">
+                <strong>{{ value }}</strong>
+              </template>
+              <template #cell(actions)="{ rowData }">
+                <VaButton size="small" color="error" icon="delete" @click="deleteFromStorage(games.indexOf(rowData))" />
+              </template>
+            </VaDataTable>
+          </VaList>
+        </div>
+      </VaAlert>
 
       <div class="flex justify-end">
-        <VaButton :disabled="!isValidForm" @click="validateForm() && onSubmit()"> Submit</VaButton>
+        <VaButton :disabled="!isValidForm || games.length === 0 || sendingData" @click="validateForm() && onSubmit()">
+          Submit</VaButton
+        >
       </div>
     </VaForm>
   </VaInnerLoading>
@@ -53,8 +175,12 @@ import { useForm, useToast } from 'vuestic-ui'
 import { defineComponent, ref, reactive } from 'vue'
 import { mapActions } from 'pinia'
 import handleErrors from '../../../../utils/errorHandler'
-import { useContractsStore } from '../../../../stores/contracts-store'
 import { useSalesInquiriesStore } from '../../../../stores/sales-store'
+import { useGameStore } from '../../../../stores/game-store'
+import { useQuotaStore } from '../../../../stores/quota-store'
+import { useContractsStore } from '../../../../stores/contracts-store'
+import { format } from 'date-fns'
+import { useSettingsStore } from '../../../../stores/settings-store'
 
 export default defineComponent({
   setup() {
@@ -78,10 +204,21 @@ export default defineComponent({
     }
 
     const form = reactive({
-      proposal: null as any,
+      entity_contract_permit: null as any,
       start_date: null as any,
       end_date: null as any,
       description: '',
+      professional_hunters_ids: [] as any,
+      lat: null as any,
+      lng: null as any,
+      species: null as any,
+      quantity: 1,
+      area_id: null as any,
+      time: null as any,
+      date: null as any,
+      weapon_used: null as any,
+      spacies_gender: null as any,
+      status: null as any,
     })
 
     return {
@@ -98,44 +235,88 @@ export default defineComponent({
   },
 
   data() {
+    const columns = [
+      { key: 'species_id' },
+      { key: 'quantity' },
+      { key: 'time' },
+      { key: 'date' },
+      { key: 'weapon_used', label: 'weapon used' },
+      { key: 'spacies_gender' },
+      { key: 'status' },
+      { key: 'actions', width: 80 },
+    ]
     const packages = [] as any
     return {
       packages,
       installments: [] as any,
       regulatoryPackages: [] as any,
-      proposalOptions: [] as any,
+      contractPermitOptions: [] as any,
       loadingSales: false,
       salesItem: null as any,
+      games: [] as any,
+      client_id: null as any,
+
+      areaOptions: [] as any,
+      speciesOptions: [] as any,
+      columns,
+      statusOptions: [
+        { text: 'WOUNDED', value: 'WOUNDED' },
+        { text: 'KILLED', value: 'KILLED' },
+      ],
+
+      // ['M', 'F']
+      genderOptions: [
+        { text: 'M', value: 'M' },
+        { text: 'F', value: 'F' },
+      ],
+
+      phOptions: [] as any,
+      sendingData: false,
     }
   },
   computed: {},
 
   mounted() {
-    this.getSalesProposalOptions()
+    this.getPermitOptions()
+    this.getSpeciesListOptions()
+    this.getAreaListOptions()
+    this.getPhVsetOptions()
   },
 
   methods: {
-    ...mapActions(useContractsStore, ['createContract']),
+    ...mapActions(useGameStore, ['createGameActivity']),
+    ...mapActions(useContractsStore, ['getContractPermits']),
     ...mapActions(useSalesInquiriesStore, ['getallSalesConfirmation']),
+    ...mapActions(useQuotaStore, ['getSpeciesList', 'getAreaList']),
+    ...mapActions(useSettingsStore, ['getPhVset']),
     onValueChange(value: any) {
-      console.log(value)
-      this.salesItem = value.selfitem
+      if (value) {
+        this.client_id = value.selfitem.entity_contract.sales_confirmation_proposal.sales_inquiry.entity.id
+      }
     },
     async onSubmit() {
+      this.sendingData = true
+      const professional_hunters_ids = this.form.professional_hunters_ids.map((item: any) => item.value)
+
       const data = {
-        sales_confirmation_proposal_id: this.form.proposal.value,
-        entity_id: this?.salesItem?.sales_inquiry?.entity.id,
+        entity_contract_permit_id: this.form.entity_contract_permit?.value,
+        client_id: this.client_id,
         start_date: this.form.start_date,
         end_date: this.form.end_date,
-        description: this.form.description,
+        // i want
+        professional_hunters_ids: professional_hunters_ids,
+        games: this.games,
       }
+
       console.log(data)
       try {
-        const response: any = await this.createContract(data)
+        const response: any = await this.createGameActivity(data)
         if (response.status === 201) {
           this.init({ message: 'Contract created successfully', color: 'success' })
+          this.sendingData = false
         }
       } catch (error: any) {
+        this.sendingData = false
         const errors = handleErrors(error.response)
         this.init({
           message: '\n' + errors.map((error, index) => `${index + 1}. ${error}`).join('\n'),
@@ -144,21 +325,88 @@ export default defineComponent({
       }
     },
 
-    async getSalesProposalOptions() {
+    createGameListObject() {
+      const gameObj = {
+        coordinates_type: 'Point',
+        coordinates: [
+          {
+            lat: this.form.lat,
+            lng: this.form.lng,
+          },
+        ],
+        species_id: this.form.species?.value,
+        quantity: this.form.quantity,
+        area_id: this.form.area_id?.value,
+        time: format(this.form.time, 'HH:mm'),
+        date: format(this.form.date, 'yyyy-MM-dd'),
+        weapon_used: this.form.weapon_used,
+        description: this.form.description,
+        spacies_gender: this.form.spacies_gender.value,
+        status: this.form.status.value,
+      }
+
+      this.games.push(gameObj)
+    },
+    deleteFromStorage(index: any) {
+      this.games.splice(index, 1)
+    },
+
+    async getPermitOptions() {
       this.loadingSales = true
-      const response: any = await this.getallSalesConfirmation()
+      const response: any = await this.getContractPermits()
       if (response.status === 200) {
         this.loadingSales = false
-        this.proposalOptions = response.data.map((item: any) => {
-          // Corrected: added arrow function
-          //   this.salesItem = item.selfitem
+        this.contractPermitOptions = response.data.map((item: any) => {
           return {
-            text: `sales confirmation for ${item.sales_inquiry.entity.full_name}`,
+            text: `PN0: ${item.permit_number} - C: ${item.entity_contract.sales_confirmation_proposal.sales_inquiry.entity.full_name}`,
             value: item.id,
+            selfitem: item,
           }
         })
       } else {
         this.loadingSales = false // Handle case when response status is not 200
+      }
+    },
+
+    // species options
+    async getSpeciesListOptions() {
+      const response: any = await this.getSpeciesList()
+      if (response.status === 200) {
+        this.speciesOptions = response.data.map((item: any) => {
+          return {
+            text: item.name,
+            value: item.id,
+          }
+        })
+      } else {
+        this.speciesOptions = [] // Handle case when response status is not 200
+      }
+    },
+    // area options
+    async getAreaListOptions() {
+      const response: any = await this.getAreaList()
+      if (response.status === 200) {
+        this.areaOptions = response.data.map((item: any) => {
+          return {
+            text: item.name,
+            value: item.id,
+          }
+        })
+      } else {
+        this.areaOptions = [] // Handle case when response status is not 200
+      }
+    },
+    async getPhVsetOptions() {
+      const response: any = await this.getPhVset()
+      if (response.status === 200) {
+        this.phOptions = response.data.map((item: any) => {
+          return {
+            text: item.full_name,
+            value: item.id,
+          }
+        })
+      } else {
+        this.phOptions = [] // Handle case when response status is not 200
       }
     },
   },
