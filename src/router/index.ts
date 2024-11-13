@@ -55,6 +55,35 @@ const routes: Array<RouteRecordRaw> = [
             path: 'sales-confirmation',
             component: () => import('../pages/client/dashboard/SalesConfirmation.vue'),
           },
+          // Contracts
+          {
+            name: 'sales-contracts',
+            path: 'sales-contracts',
+            component: () => import('../pages/client/dashboard/Contracts.vue'),
+          },
+
+          // SalesContractPermit
+          {
+            name: 'sales-contract-permit',
+            path: 'sales-contract-permit',
+            component: () => import('../pages/client/dashboard/SalesContractPermit.vue'),
+          },
+
+          // Game
+        ],
+      },
+
+      {
+        // Game
+        name: 'game-dashboard',
+        path: '/game-dashboard',
+        component: RouteViewComponent,
+        children: [
+          {
+            name: 'game',
+            path: 'game',
+            component: () => import('../pages/client/GameDashboard/Game.vue'),
+          },
         ],
       },
       {

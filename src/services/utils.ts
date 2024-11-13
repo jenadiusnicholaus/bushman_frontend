@@ -37,7 +37,7 @@ export const formatDateTime = (datetimeStr: string): string => {
     return 'Error parsing date'
   }
 
-  // Define options for formatting
+  // Define options for formatting to include only date components
   const options: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'long',
@@ -45,5 +45,5 @@ export const formatDateTime = (datetimeStr: string): string => {
   }
 
   // Format the date to a human-readable string
-  return date.toLocaleString('en-US', options)
+  return date.toLocaleDateString('en-US', options) // Use toLocaleDateString to avoid time info
 }

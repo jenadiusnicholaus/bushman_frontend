@@ -42,6 +42,31 @@ export default {
           name: 'sales-calendar',
           displayName: 'menu.sales-calendar',
         },
+        {
+          name: 'sales-contracts',
+          displayName: 'menu.sales-contracts',
+        },
+
+        // sales-contract-permit
+        {
+          name: 'sales-contract-permit',
+          displayName: 'menu.sales-contract-permit',
+        },
+      ],
+    },
+    {
+      name: 'Games',
+      displayName: 'menu.game',
+      meta: {
+        icon: 'pets',
+      },
+      children: [
+        {
+          name: 'game',
+          displayName: 'menu.game-killed',
+        },
+
+        // sales-contract-permit
       ],
     },
 
