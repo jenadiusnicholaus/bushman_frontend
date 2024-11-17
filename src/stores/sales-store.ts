@@ -42,7 +42,7 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
       const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_SALES_INQUIRIES_URL
       const formattedDate = payload?.preferredDate ? format(new Date(payload.preferredDate), 'yyyy-MM-dd') : null
       const data = JSON.stringify({
-        categories: ['Hunter'],
+        categories: 'Hunter',
         full_name: payload?.fullName,
         contacts: payload?.contacts,
         nationality: payload?.nationality,
@@ -55,6 +55,7 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
         area_id: payload?.areaId,
         season: payload?.season.value,
         preferred_date: formattedDate,
+        identity_number: payload?.identityNumber,
       })
 
       const config = {

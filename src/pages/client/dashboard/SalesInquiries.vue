@@ -74,11 +74,19 @@
                 searchable
                 highlight-matched-text
               />
+              <!-- id_number -->
+              <VaInput
+                v-model="form.id_number"
+                type="text"
+                placeholder="passport/ID number"
+                :rules="[(value: any) => (value && value.length > 0) || 'passport number/id number is required']"
+                label="passport/ID number"
+              />
             </div>
 
             <!-- Experience and Date Group -->
             <h3 class="font-bold text-lg mb-2">Contacts</h3>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <VaInput
                 v-model="form.email"
                 type="email"
@@ -107,7 +115,7 @@
             </div>
 
             <h3 class="font-bold text-lg mb-2">Participants and hunting days</h3>
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
               <!-- <VaInput
                 v-model="form.no_of_hunters"
                 label="Number of Hunters"
@@ -328,6 +336,7 @@ export default defineComponent({
       area: null as any,
       season: null as any,
       preferred_date: null as any,
+      id_number: '',
     })
 
     const contactForm = reactive({
@@ -559,6 +568,7 @@ export default defineComponent({
         areaId: this.form.area.value,
         season: this.form.season,
         preferredDate: this.form.preferred_date,
+        identityNumber: this.form.id_number,
       }
       try {
         const response: any = await this.createSalesInquiry(requestdata)

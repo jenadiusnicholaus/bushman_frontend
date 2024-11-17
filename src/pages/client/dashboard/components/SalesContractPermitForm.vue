@@ -62,7 +62,7 @@
           label="Short text about something"
           counter
           required-mark
-          :rules="[(v) => (v && v.length > 0) || 'Required', (v) => v && v.length < 125]"
+          :rules="[(v: any) => (v && v.length > 0) || 'Required', (v: any) => v && v.length < 125]"
         />
       </div>
 
