@@ -1,103 +1,107 @@
 <template>
-  <VaForm ref="formRef">
-    <div class="p-1">
-      <!-- <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4"> -->
-      <h3 class="font-bold text-lg mb-2">Price list Infos</h3>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-        <VaSelect
-          v-model="form.package"
-          :options="packageOptions"
-          placeholder="Select Package"
-          :rules="[(v: any) => v || 'Package is required']"
-          label="Package"
-          required-mark
-        />
-        <!-- <VaInput v-model="form.nick_name" placeholder="Nick name" label="Nick name" /> -->
-        <VaSelect
-          v-model="form.hunting_type_id"
-          placeholder="Select Hunting Type"
-          label="Hunting Type"
-          :rules="[(v: any) => v || 'Hunting type is required']"
-          :options="huntingTypesOptions"
-          searchable
-          required-mark
-          highlight-matched-text
-        />
-        <VaSelect
-          v-model="form.area"
-          placeholder="Select Area"
-          label="Hunting area"
-          :rules="[(v: any) => v || 'Hunting area is required']"
-          :options="areasOptions"
-          searchable
-          highlight-matched-text
-          required-mark
-          @update:modelValue="getAllSpieces()"
-        />
-      </div>
+  <VaInnerLoading :loading="savingPriceList" :size="60">
+    <VaForm ref="formRef">
+      <div class="p-1">
+        <!-- <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4"> -->
+        <h3 class="font-bold text-lg mb-2">Price list Infos</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <VaSelect
+            v-model="form.package"
+            :options="packageOptions"
+            multiple
+            clearable
+            placeholder="Select Package list here"
+            :rules="[(v: any) => v || 'Package is required']"
+            label="Packages"
+            required-mark
+            @update:modelValue="onChangPackage"
+          />
+          <!-- <VaInput v-model="form.nick_name" placeholder="Nick name" label="Nick name" /> -->
+          <VaSelect
+            v-model="form.hunting_type_id"
+            placeholder="Select Hunting Type"
+            label="Hunting Type"
+            :rules="[(v: any) => v || 'Hunting type is required']"
+            :options="huntingTypesOptions"
+            searchable
+            required-mark
+            highlight-matched-text
+          />
+          <VaSelect
+            v-model="form.area"
+            placeholder="Select Area"
+            label="Hunting area"
+            :rules="[(v: any) => v || 'Hunting area is required']"
+            :options="areasOptions"
+            searchable
+            highlight-matched-text
+            required-mark
+            @update:modelValue="getAllSpieces()"
+          />
+        </div>
 
-      <!-- Experience and Date Group -->
-      <h3 class="font-bold text-lg mb-2">Charges per days</h3>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-        <VaInput
-          v-model="form.amount"
-          type="text"
-          placeholder="Enter Amount"
-          :rules="[(value: any) => (value && value.length > 0) || 'Amount is required']"
-          label="Amount"
-          required-mark
-        />
+        <!-- Experience and Date Group -->
+        <h3 class="font-bold text-lg mb-2">Charges per days</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <VaInput
+            v-model="form.amount"
+            type="text"
+            placeholder="Enter Amount"
+            :rules="[(value: any) => (value && value.length > 0) || 'Amount is required']"
+            label="Amount"
+            required-mark
+          />
 
-        <VaSelect
-          v-model="form.currency"
-          placeholder="Select Currency"
-          label="Currency"
-          :rules="[(v: any) => v || 'Currency is required']"
-          :options="currencyOptions"
-          searchable
-          highlight-matched-text
-          required-mark
-        />
-        <!-- <vue-tel-input v-model="form.phone" mode="international" required></vue-tel-input> -->
+          <VaSelect
+            v-model="form.currency"
+            placeholder="Select Currency"
+            label="Currency"
+            :rules="[(v: any) => v || 'Currency is required']"
+            :options="currencyOptions"
+            searchable
+            highlight-matched-text
+            required-mark
+          />
+          <!-- <vue-tel-input v-model="form.phone" mode="international" required></vue-tel-input> -->
 
-        <VaInput
-          v-model="form.duration"
-          type="text"
-          required-mark
-          placeholder="Enter Duration"
-          :rules="[(value: any) => (value && value.length > 0) || 'Duration is required']"
-          label="Duration"
-        />
-      </div>
+          <VaInput
+            v-model="form.duration"
+            type="text"
+            required-mark
+            placeholder="Enter Duration"
+            :rules="[(value: any) => (value && value.length > 0) || 'Duration is required']"
+            label="Duration"
+          />
+        </div>
 
-      <!-- companion group -->
-      <h3 class="font-bold text-lg mb-2">Companion and Observer Charges</h3>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-        <VaInput
-          v-model="form.companion_amount"
-          type="text"
-          placeholder="Enter Companion Amount"
-          :rules="[(value: any) => (value && value.length > 0) || 'Companion Amount is required']"
-          label="Companion Amount"
-          required-mark
-        />
-        <VaInput
-          v-model="form.observer_amount"
-          type="text"
-          placeholder="Enter observer Amount"
-          :rules="[(value: any) => (value && value.length > 0) || 'Companion Amount is required']"
-          label="Observer Amount"
-          required-mark
-        />
-      </div>
+        <!-- companion group -->
+        <h3 class="font-bold text-lg mb-2">Companion and Observer Charges</h3>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+          <VaInput
+            v-model="form.companion_amount"
+            type="text"
+            placeholder="Enter Companion Amount"
+            :rules="[(value: any) => (value && value.length > 0) || 'Companion Amount is required']"
+            label="Companion Cost(Per Person)"
+            required-mark
+          />
+          <VaInput
+            v-model="form.observer_amount"
+            type="text"
+            placeholder="Enter observer Amount"
+            :rules="[(value: any) => (value && value.length > 0) || 'Companion Amount is required']"
+            label="Observer Cost(Per Person)"
+            required-mark
+          />
+        </div>
 
-      <h3 class="font-bold text-lg mb-2">Price List Life span</h3>
-      <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
-        <VaDateInput v-model="form.start_date" required-mark label="Start Date" manual-input />
-        <VaDateInput v-model="form.end_date" required-mark label="End Date" manual-input />
-      </div>
+        <h3 class="font-bold text-lg mb-2">Price List Life span</h3>
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+          <VaDateInput v-model="form.start_date" required-mark label="Start Date" manual-input />
+          <VaDateInput v-model="form.end_date" required-mark label="End Date" manual-input />
+        </div>
 
-      <!-- <h3 class="font-bold text-lg mb-2">Species</h3>
+        <!-- <h3 class="font-bold text-lg mb-2">Species</h3>
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
         <VaSelect
           v-model="form.species"
@@ -156,26 +160,21 @@
           </VaListItem>
         </VaList>
       </div> -->
-    </div>
+      </div>
 
-    <div class="mt-4 d-flex p-2">
-      <VaButton
-        v-if="!showEditForm"
-        icon="save"
-        class="mr-3 mb-2"
-        :disabled="!isValidForm"
-        @click="validateForm() && submit()"
-      >
-        Save
-      </VaButton>
-    </div>
-  </VaForm>
-
-  <div class="p-6">
-    <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4">
-      <!-- <SalesAllInfos /> -->
-    </div>
-  </div>
+      <div class="mt-4 d-flex p-2">
+        <VaButton
+          v-if="!showEditForm"
+          icon="save"
+          class="mr-3 mb-2"
+          :disabled="!isValidForm"
+          @click="validateForm() && submit()"
+        >
+          Save
+        </VaButton>
+      </div>
+    </VaForm>
+  </VaInnerLoading>
 </template>
 
 <script lang="ts">
@@ -272,12 +271,6 @@ export default defineComponent({
       resetForm,
 
       validators,
-      // getCountries,
-      // // deleteSalesInquireItem,
-      // getCategories,
-      // getNationalities,
-      // getContactTypes,
-      // contactFieldType,
     }
   },
   data() {
@@ -291,6 +284,7 @@ export default defineComponent({
       speciesItemOptions: [] as any,
       currencyOptions: [] as any,
       packageOptions: [] as any,
+      savingPriceList: false,
     }
   },
   mounted() {
@@ -322,18 +316,11 @@ export default defineComponent({
     },
 
     async submit() {
-      // if (this.speciesObjects.length === 0) {
-      //   this.init({
-      //     message: 'Please select at least one species.',
-      //     color: 'warning',
-      //   })
-      //   return
-      // }
-
+      this.savingPriceList = true
       const requestdata = {
         area: this.form.area.value,
         huntingTypeId: this.form.hunting_type_id.value,
-        sales_package_id: this.form.package.value,
+        sales_package_ids: this.form.package.filter((v: any) => v?.value !== undefined).map((v: any) => v?.value),
         // description: this.form.description,
         // salesQuotaId: this.form.sales_quota_id.value,
         amount: this.form.amount,
@@ -356,10 +343,11 @@ export default defineComponent({
           this.resetForm()
           this.resetValidationForm()
           this.speciesObjects = []
+          this.savingPriceList = false
         }
       } catch (error: any) {
+        this.savingPriceList = false
         const errors = handleErrors(error.response)
-        console.log(errors)
         this.init({
           message: '\n' + errors.map((error, index) => `${index + 1}. ${error}`).join('\n'),
           color: 'danger',
@@ -486,6 +474,9 @@ export default defineComponent({
       } catch (error) {
         console.log(error)
       }
+    },
+    onChangPackage(value: any) {
+      console.log(value.filter((v: any) => v?.value !== undefined).map((v: any) => v?.value))
     },
 
     async getAllSpieces() {

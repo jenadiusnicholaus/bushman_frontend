@@ -103,7 +103,7 @@ export const usePriceListStore = defineStore('price-list', {
       const data = JSON.stringify({
         area: payload.area,
         hunting_type_id: payload.huntingTypeId,
-        sales_package_id: payload.sales_package_id,
+        sales_package_ids: payload.sales_package_ids,
         description: payload.description,
         sales_quota_id: payload.salesQuotaId,
         amount: payload.amount,
