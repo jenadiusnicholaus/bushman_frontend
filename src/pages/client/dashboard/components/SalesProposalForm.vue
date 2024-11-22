@@ -51,56 +51,67 @@
       />
     </div>
 
-    <!-- "total_amount": {
-        "amount": 9400.0,
-        "currency": {
-            "code": "USD",
-            "symbol": "$"
-        }
-    }, -->
-
     <h3 class="font-bold text-lg mb-2">
       Create Client Installment plan
-      <span v-if="priceBreakDown">
+      <!-- <span v-if="priceBreakDown">
         - <b>{{ priceBreakDown.total_amount.currency.symbol }}{{ priceBreakDown.total_amount.amount }}</b>
-      </span>
+      </span> -->
     </h3>
-
-    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
-      <VaInput
-        v-model="form.installment_desc"
+    <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4">
+      <VaTextarea
+        v-model="form.installment_narration"
         type="text"
         placeholder="Description"
         :rules="[(value: any) => (value && value.length > 0) || ' Installment Description is required']"
       />
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
       <VaInput
         v-model="form.installment_due_amount"
         type="number"
+        label="Amount"
         placeholder="Amount"
         :rules="[(value: any) => (value && value > 0) || ' Installment Amount is required']"
       />
-      <!-- days  -->
 
-      <!-- limit -->
       <VaSelect
-        v-model="form.installment_due_limit"
+        v-model="form.installment_amount_type"
         :options="[
           // up on Booking
-          { value: 'none', text: '25% Upon Booking' },
-          { value: 'prior', text: `days Prior ` },
-          { value: 'after', text: `days After ` },
+          { value: 'PERCENT', text: 'PERCENT' },
+          { value: 'LAPS', text: `LAPS ` },
         ]"
-        :rules="[(value: any) => value || 'Due Limit is required']"
-        placeholder="Select Due Limit"
+        label="Amount type"
+        :rules="[(value: any) => value || 'Due amoun type is required']"
+        placeholder="Select Due amount type"
         @update:modelValue="onInputChange"
       />
+
+      <!-- limit -->
 
       <VaInput
         v-model="form.installment_due_days"
         type="number"
-        :disabled="isNotUpBookingSelected"
+        label="Days"
+        :rules="[(value: any) => (value && value > 0) || ' Installment Days is required']"
         placeholder="Days"
       />
+
+      <VaSelect
+        v-model="form.due_days_type"
+        label="Due days type"
+        :options="[
+          // up on Booking
+          { value: 'UPON_SALES_CONFIRMATION', text: 'UPON_SALES_CONFIRMATION' },
+          { value: 'PRIOR_SAFARI', text: `PRIOR_SAFARI ` },
+        ]"
+        :rules="[(value: any) => value || 'Due days type is required']"
+        placeholder="Select Due days type"
+        @update:modelValue="onInputChange"
+      />
+
+      <!-- installment_amount_type -->
 
       <VaButton icon="add" @click="createInstallmentList()"> </VaButton>
     </div>
@@ -115,17 +126,21 @@
                 <tr>
                   <th>Description</th>
                   <th>Amount</th>
+                  <th>installment In (PERCENT/LAPS)</th>
                   <th>Days</th>
-                  <th>Deposit Limit</th>
+                  <th>Due Days Limit</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="i in installments" :key="i.id">
-                  <td>{{ i.description }}</td>
+                  <td>{{ i.narration }}</td>
                   <td>{{ i.amount }}</td>
+                  <td>{{ i.amount_type }}</td>
+
                   <td>{{ i.days }}</td>
-                  <td>{{ i.text }}</td>
+                  <td>{{ i.due_days_type }}</td>
+
                   <td><VaButton plain icon="delete" @click="deleteInstallment(i.id)"> </VaButton></td>
                 </tr>
               </tbody>
@@ -207,10 +222,12 @@ export default defineComponent({
       charter_in: null as any,
       charter_out: null as any,
       arrival: null as any,
-      installment_desc: null as any,
+      installment_narration: null as any,
       installment_due_amount: null as any,
+      installment_amount_type: null as any,
       installment_due_days: 0,
-      installment_due_limit: null as any,
+      due_days_type: null as any,
+      // installment_due_limit: null as any,
       regulatory_package_id: null as any,
     })
 
@@ -256,7 +273,7 @@ export default defineComponent({
 
       if (response.status === 200) {
         this.packages = response.data.data.map((item: any) => ({
-          value: item.id,
+          value: item.sales_package.id,
           text: item?.sales_package.name + ' - ' + item.price_list_type.hunting_type.name,
         }))
       } else {
@@ -265,13 +282,13 @@ export default defineComponent({
     },
 
     createInstallmentList() {
-      if (this.form.installment_desc && this.form.installment_due_amount) {
+      if (this.form.installment_narration && this.form.installment_due_amount) {
         this.installments.push({
-          description: this.form.installment_desc,
+          narration: this.form.installment_narration,
           amount: this.form.installment_due_amount,
+          amount_type: this.form.installment_amount_type.value,
           days: this.form.installment_due_days,
-          due_limit: this.form.installment_due_limit.value,
-          text: this.form.installment_due_limit.text,
+          due_days_type: this.form.due_days_type.value,
         })
       } else {
         this.init({ message: 'Add at least one installment plan', color: 'warning' })
@@ -314,9 +331,6 @@ export default defineComponent({
           this.init({ message: response.data.message, color: 'error' })
         }
       } catch (error: any) {
-        // this.resetForm()
-        // this.resetValidationForm()
-        // this.installments = []
         const errors = handleErrors(error.response)
         this.init({
           message: '\n' + errors.map((error, index) => `${index + 1}. ${error}`).join('\n'),
