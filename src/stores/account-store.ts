@@ -25,7 +25,7 @@ export const useAccountsStore = defineStore('accounts-store', {
       const config = {
         method: 'post',
         maxBodyLength: Infinity,
-        url: import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_ACCOUNTS_VSET_URL,
+        url: import.meta.env.VITE_APP_ACCOUNTS_BASE_URL + import.meta.env.VITE_APP_ACCOUNTS_CR_DR_URL,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -35,7 +35,6 @@ export const useAccountsStore = defineStore('accounts-store', {
       const response = await axios.request(config)
       return response
     },
-    // VITE_APP_ACCOUNT_DR_CR_URL
     async createDRCRTransaction(payload: any) {
       const data = JSON.stringify({
         currency_id: payload.currency_id,
@@ -54,7 +53,7 @@ export const useAccountsStore = defineStore('accounts-store', {
       const config = {
         method: 'post',
         maxBodyLength: Infinity,
-        url: import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_ACCOUNT_DR_CR_URL,
+        url: import.meta.env.VITE_APP_ACCOUNTS_BASE_URL + import.meta.env.VITE_APP_ACCOUNT_DR_CR_URL,
         headers: {
           'Content-Type': 'application/json',
         },
