@@ -64,14 +64,14 @@
             :rules="[(v: any) => !!v || 'Species is required']"
             required
           />
-          <VaInput
+          <!-- <VaInput
             v-model="form.samount"
             type="text"
             placeholder="Species Cost"
             :rules="[(value: any) => (value && value.length > 0) || 'Species cost is required']"
             label="Species Cost"
             required-mark
-          />
+          /> -->
 
           <VaCounter
             v-model="form.quantity"
@@ -107,7 +107,7 @@
                   <VaIcon name="delete" size="small" color="primary" @click="deleteFromStorage(index)" />
                 </VaListItemLabel>
                 <VaListItemLabel caption>Quantity: {{ s.quantity }}</VaListItemLabel>
-                <VaListItemLabel caption>Costs: {{ s.amount }}</VaListItemLabel>
+                <!-- <VaListItemLabel caption>Costs: {{ s.amount }}</VaListItemLabel> -->
               </VaListItemSection>
             </VaListItem>
           </VaList>
@@ -187,13 +187,13 @@ export default defineComponent({
       description: '',
       //   sales_quota_id: null as any,
       //   amount: 0,
-      samount: 0,
+      // samount: 0,
       //   currency: null as any,
       //   duration: 0,
       //   start_date: null as any,
       //   end_date: null as any,
       species: null as any,
-      quantity: 0,
+      quantity: 1,
       //   area: null as any,
       //   companion_days: 0,
       //   companion_amount: 0,
@@ -316,10 +316,12 @@ export default defineComponent({
       }
 
       try {
-        const response: any = await this.createSalesPackage(requestdata)
+        const response = await this.createSalesPackage(requestdata)
 
         if (response.status === 201) {
+          console.log(response)
           this.init({ message: response.data.message, color: 'success' })
+
           this.resetForm()
           this.resetValidationForm()
           this.speciesObjects = []
@@ -381,14 +383,6 @@ export default defineComponent({
         return // Exit the method if any field is null
       }
 
-      if (this.form.samount <= 0) {
-        this.init({
-          message: 'Species cost must be greater than zero.',
-          color: 'warning',
-        })
-        return // Exit the method if species cost is less than zero
-      }
-
       // Ensure quantity is a positive number
       if (Number(this.form.quantity) <= 0) {
         // Uncomment the toast message if needed
@@ -414,7 +408,7 @@ export default defineComponent({
         this.speciesObjects.push({
           id: this.form.species.value,
           name: this.form.species.text,
-          amount: this.form.samount,
+          // amount: this.form.samount,
           quantity: this.form.quantity,
         })
         // console.log('New species item added:', this.speciesObjects)
