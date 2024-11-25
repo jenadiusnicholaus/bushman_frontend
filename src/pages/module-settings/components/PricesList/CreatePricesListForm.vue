@@ -167,6 +167,7 @@
           v-if="!showEditForm"
           icon="save"
           class="mr-3 mb-2"
+          :loading="savingPriceList"
           :disabled="!isValidForm"
           @click="validateForm() && submit()"
         >

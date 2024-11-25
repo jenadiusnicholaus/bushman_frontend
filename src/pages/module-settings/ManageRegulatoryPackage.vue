@@ -21,7 +21,13 @@
       </VaButtonGroup>
     </div>
 
-    <ModuleTable v-if="showpackForm" :items="items" :columns="columns" @onView="showNewPackageForm"></ModuleTable>
+    <ModuleTable
+      v-if="showpackForm"
+      :items="items"
+      :columns="columns"
+      :loading="loading"
+      @onView="showNewPackageForm"
+    ></ModuleTable>
 
     <!-- <Regularorypackagelist v-if="showpackForm" :items="items" @@onView="showNewPackageForm"></Regularorypackagelist> -->
 
@@ -235,6 +241,8 @@ export default defineComponent({
       showpackForm: true,
       quotaItems: [] as any,
       packageNamesOptions,
+      loading: false,
+      saving: false,
     }
   },
 
@@ -362,9 +370,11 @@ export default defineComponent({
     },
 
     async getPackages() {
+      this.loading = true
       try {
         const response = await this.getRegulatoryPackages()
         if (response.status === 200) {
+          this.loading = false
           const data = response.data
           this.items = data.map((item: any) => ({
             id: item.id,
@@ -373,6 +383,7 @@ export default defineComponent({
           }))
         }
       } catch (error) {
+        this.loading = false
         console.log(error)
       }
     },

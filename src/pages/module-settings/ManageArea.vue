@@ -27,7 +27,13 @@
       </VaButtonGroup>
     </div>
 
-    <ModuleTable v-if="showHuntingAreaList" :items="items" :columns="columns" @onView="showHuntingArea"></ModuleTable>
+    <ModuleTable
+      v-if="showHuntingAreaList"
+      :items="items"
+      :columns="columns"
+      :loading="loading"
+      @onView="showHuntingArea"
+    ></ModuleTable>
 
     <div v-else class="p-2">
       <VaForm ref="areaFormRef" class="mb-6">
@@ -77,11 +83,12 @@
         <VaButton
           :disabled="!isValidareaForm"
           color="primary"
-          icon="add"
+          icon="save"
+          :loading="saving"
           icon-color="#fff"
           @click="validateareaForm() && createNewHuntingArea()"
         >
-          Submit New
+          Save
         </VaButton>
       </div>
     </div>
@@ -178,6 +185,8 @@ export default defineComponent({
       quotasOptions,
       showHuntingAreaList: true,
       quotaItems: [] as any,
+      saving: false,
+      loading: false,
     }
   },
 
@@ -193,6 +202,7 @@ export default defineComponent({
 
     toggleFormAndList() {
       this.showHuntingAreaList = !this.showHuntingAreaList
+      this.getAreas()
     },
 
     showHuntingArea(e: any) {
@@ -205,6 +215,7 @@ export default defineComponent({
     },
 
     async createNewHuntingArea() {
+      this.saving = true
       const coordinates = [
         {
           lat: this.areaForm.lat,
@@ -219,6 +230,7 @@ export default defineComponent({
       try {
         const response = await this.createHuntingArea(requestData)
         if (response.status === 201) {
+          this.saving = false
           this.toast.init({
             message: 'Hunting Area created successfully',
             color: 'success',
@@ -226,6 +238,7 @@ export default defineComponent({
           this.resetareaForm()
         }
       } catch (error) {
+        this.saving = false
         const errors = handleErrors(error)
         this.toast.init({
           message: '\n' + errors.map((error, index) => `${index + 1}. ${error}`).join('\n'),
@@ -243,6 +256,7 @@ export default defineComponent({
 
     async getAreas() {
       try {
+        this.loading = true
         const response = await this.getAreaList()
         this.areasOptions = response.data.map((item: { id: any; name: any }) => {
           return {
@@ -251,19 +265,31 @@ export default defineComponent({
           }
         })
 
-        this.items = response.data.map(
-          (item: { id: any; name: any; start_date: any; end_date: any; description: any; location: any }) => {
-            return {
-              id: item?.id,
-              name: item?.name,
-              description: item?.description,
-              lat: item?.location?.geo_coordinates?.coordinates[0]?.lat,
-              lng: item?.location?.geo_coordinates?.coordinates[0]?.lng,
-            }
-          },
-        )
+        if (response.status === 200) {
+          this.items = response.data.map(
+            (item: { id: any; name: any; start_date: any; end_date: any; description: any; location: any }) => {
+              return {
+                id: item?.id,
+                name: item?.name,
+                description: item?.description,
+                lat: item?.location?.geo_coordinates?.coordinates[0]?.lat,
+                lng: item?.location?.geo_coordinates?.coordinates[0]?.lng,
+              }
+            },
+          )
+          this.loading = false
+        } else {
+          this.loading = false
+          this.toast.init({
+            message: 'No hunting areas found',
+            color: 'info',
+          })
+        }
       } catch (error) {
-        console.log(error)
+        this.toast.init({
+          message: 'Error fetching hunting areas',
+          color: 'danger',
+        })
       }
     },
   },

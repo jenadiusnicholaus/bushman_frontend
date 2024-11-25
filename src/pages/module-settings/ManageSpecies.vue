@@ -15,7 +15,13 @@
       </VaButtonGroup>
     </div>
 
-    <ModuleTable v-if="showSpeciesList" :items="items" :columns="columns" @onView="showSpecies"></ModuleTable>
+    <ModuleTable
+      v-if="showSpeciesList"
+      :items="items"
+      :columns="columns"
+      :loading="loading"
+      @onView="showSpecies"
+    ></ModuleTable>
 
     <div v-else class="p-2">
       <VaForm ref="sformRef" class="mb-6">
@@ -146,6 +152,8 @@ export default defineComponent({
       showSpeciesList: true,
       quotaItems: [] as any,
       excellFile: [] as any,
+      loading: false,
+      saving: false,
     }
   },
 
@@ -172,6 +180,7 @@ export default defineComponent({
     },
 
     async addNewSpecies() {
+      this.saving = true
       const requestData = {
         name: this.sform.name,
         scientific_name: this.sform.scientific_name,
@@ -180,6 +189,7 @@ export default defineComponent({
       try {
         const response = await this.createSpecies(requestData)
         if (response.status === 201) {
+          this.saving = false
           this.toast.init({
             message: response.data.message,
             color: 'success',
@@ -188,6 +198,7 @@ export default defineComponent({
           this.getSpeciesItems()
         }
       } catch (error: any) {
+        this.saving = false
         const errors = handleErrors(error.response || error) // Handle any error response
 
         console.log('Caught errors:', errors) // Log caught errors for debugging
@@ -213,15 +224,24 @@ export default defineComponent({
 
     async getSpeciesItems() {
       try {
+        this.loading = true
         const response = await this.getSpeciesList()
 
-        this.items = response?.data?.map((item: any) => ({
-          id: item.id,
-          name: item.name,
-          scientific_name: item.scientific_name,
-        }))
+        if (response.status === 200) {
+          this.items = response?.data?.map((item: any) => ({
+            id: item.id,
+            name: item.name,
+            scientific_name: item.scientific_name,
+          }))
 
-        // Combine default option with species items
+          this.loading = false
+        } else {
+          this.loading = false
+          this.toast.init({
+            message: 'Failed to fetch species items',
+            color: 'danger',
+          })
+        }
       } catch (error) {
         console.log(error)
       }

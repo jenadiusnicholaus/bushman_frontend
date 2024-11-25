@@ -118,6 +118,7 @@
         <VaButton
           v-if="!showEditForm"
           icon="save"
+          :loading="saving"
           class="mr-3 mb-2"
           :disabled="!isValidForm"
           @click="validateForm() && submit()"
@@ -265,6 +266,7 @@ export default defineComponent({
       packages: [] as any,
       columns,
       loading: false,
+      saving: false,
     }
   },
   mounted() {
@@ -301,6 +303,7 @@ export default defineComponent({
     },
 
     async submit() {
+      this.saving = true
       if (this.speciesObjects.length === 0) {
         this.init({
           message: 'Please select at least one species.',
@@ -319,6 +322,7 @@ export default defineComponent({
         const response = await this.createSalesPackage(requestdata)
 
         if (response.status === 201) {
+          this.saving = false
           console.log(response)
           this.init({ message: response.data.message, color: 'success' })
 
@@ -327,6 +331,7 @@ export default defineComponent({
           this.speciesObjects = []
         }
       } catch (error: any) {
+        this.saving = false
         const errors = handleErrors(error.response)
         console.log(errors)
         this.init({

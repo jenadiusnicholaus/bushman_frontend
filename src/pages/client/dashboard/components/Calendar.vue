@@ -5,49 +5,51 @@
   <VaModal v-model="showModal" :overlay="false" no-outside-dismiss close-button>
     <template #header>
       <div style="display: flex; align-items: center">
-        <h3 class="modal-header" style="margin-right: 10px">Sales For {{ event.title }}</h3>
-        <VaBadge :text="event.extendedProps.status" :color="getStatusColorForModal(event.extendedProps.status)" />
+        <h3 class="modal-header" style="margin-right: 10px">Sales For {{ event?.title ?? 'N/A' }}</h3>
+        <VaBadge
+          :text="event?.extendedProps?.status ?? 'N/A'"
+          :color="getStatusColorForModal(event?.extendedProps?.status)"
+        />
       </div>
     </template>
 
     <template #default>
       <div class="modal-body">
         <div class="event-info">
-          <p><strong>Client:</strong> {{ event.title }}</p>
-          <p><strong>Charter in date:</strong> {{ formatDateTime(event.start) }}</p>
-          <p><strong>Charter out date:</strong> {{ formatDateTime(event.end) }}</p>
+          <p><strong>Client:</strong> {{ event?.title ?? 'N/A' }}</p>
+          <p><strong>Charter in date:</strong> {{ event?.start ? formatDateTime(event.start) : 'N/A' }}</p>
+          <p><strong>Charter out date:</strong> {{ event?.end ? formatDateTime(event.end) : 'N/A' }}</p>
         </div>
 
         <VaDivider />
 
         <div class="details-container">
           <h2>Details</h2>
-          <p><strong>Sales Quota</strong></p>
-          <p><strong>Name:</strong> {{ event.extendedProps.sales_quota.name }}</p>
-          <p>
-            <strong>Start Date:</strong> {{ new Date(event.extendedProps.sales_quota.start_date).toLocaleDateString() }}
-          </p>
-          <p>
-            <strong>End Date:</strong> {{ new Date(event.extendedProps.sales_quota.end_date).toLocaleDateString() }}
-          </p>
-
-          <VaDivider />
 
           <h4>Preferences</h4>
           <p>
             <strong>Preferred Date:</strong>
-            {{ new Date(event.extendedProps.preference.preferred_date).toLocaleDateString() }}
+            {{
+              event?.extendedProps?.preference?.preferred_date
+                ? new Date(event.extendedProps.preference.preferred_date).toLocaleDateString()
+                : 'N/A'
+            }}
           </p>
-          <p><strong>Number of Hunters:</strong> {{ event.extendedProps.preference.no_of_hunters }}</p>
-          <p><strong>Number of Observers:</strong> {{ event.extendedProps.preference.no_of_observers }}</p>
-          <p><strong>Number of Days:</strong> {{ event.extendedProps.preference.no_of_days }}</p>
-          <p><strong>Number of Companions:</strong> {{ event.extendedProps.preference.no_of_companions }}</p>
+          <p><strong>Number of Hunters:</strong> {{ event?.extendedProps?.preference?.no_of_hunters ?? 'N/A' }}</p>
+          <p><strong>Number of Observers:</strong> {{ event?.extendedProps?.preference?.no_of_observers ?? 'N/A' }}</p>
+          <p><strong>Number of Days:</strong> {{ event?.extendedProps?.preference?.no_of_days ?? 'N/A' }}</p>
+          <p>
+            <strong>Number of Companions:</strong> {{ event?.extendedProps?.preference?.no_of_companions ?? 'N/A' }}
+          </p>
 
           <VaDivider />
           <h4>Package</h4>
-          <p><strong>Sales Package:</strong> {{ event.extendedProps.proposed_package.sales_package.name }}</p>
           <p>
-            <strong>Hunting Type:</strong> {{ event.extendedProps.proposed_package.price_list_type.hunting_type.name }}
+            <strong>Sales Package:</strong> {{ event?.extendedProps?.proposed_package?.sales_package?.name ?? 'N/A' }}
+          </p>
+          <p>
+            <strong>Hunting Type:</strong>
+            {{ event?.extendedProps?.proposed_package?.price_list_type?.hunting_type?.name ?? 'N/A' }}
           </p>
 
           <h5>Species</h5>
@@ -62,11 +64,11 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="specie in event.extendedProps.species" :key="specie.id">
-                <td>{{ specie.species.name }}</td>
-                <td>{{ specie.species.scientific_name }}</td>
-                <td>{{ specie.species.description }}</td>
-                <td>{{ specie.quantity }}</td>
+              <tr v-for="specie in event?.extendedProps?.species ?? []" :key="specie.id">
+                <td>{{ specie.species?.name ?? 'N/A' }}</td>
+                <td>{{ specie.species?.scientific_name ?? 'N/A' }}</td>
+                <td>{{ specie.species?.description ?? 'N/A' }}</td>
+                <td>{{ specie.quantity ?? 'N/A' }}</td>
                 <!-- <td>${{ parseFloat(specie.amount).toFixed(2) }}</td> -->
               </tr>
             </tbody>
@@ -85,13 +87,13 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="area in event.extendedProps.areas" :key="area.id">
-                <td>{{ area.area.name }}</td>
-                <td>{{ area.area.description }}</td>
-                <td>{{ area.area.location.name || 'N/A' }}</td>
+              <tr v-for="area in event?.extendedProps?.areas ?? []" :key="area.id">
+                <td>{{ area.area?.name ?? 'N/A' }}</td>
+                <td>{{ area.area?.description ?? 'N/A' }}</td>
+                <td>{{ area.area?.location?.name ?? 'N/A' }}</td>
                 <td>
-                  {{ area.area.location.geo_coordinates.coordinates[0].lat }},
-                  {{ area.area.location.geo_coordinates.coordinates[0].lng }}
+                  {{ area.area?.location?.geo_coordinates?.coordinates?.[0]?.lat ?? 'N/A' }},
+                  {{ area.area?.location?.geo_coordinates?.coordinates?.[0]?.lng ?? 'N/A' }}
                 </td>
               </tr>
             </tbody>
@@ -101,8 +103,8 @@
 
           <h4>Contacts</h4>
           <ul>
-            <li v-for="contact in event.extendedProps.contacts" :key="contact.id">
-              <strong>-</strong> {{ contact.contact }}
+            <li v-for="contact in event?.extendedProps?.contacts ?? []" :key="contact.id">
+              <strong>-</strong> {{ contact.contact ?? 'N/A' }}
             </li>
           </ul>
 

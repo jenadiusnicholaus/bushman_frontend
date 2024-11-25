@@ -241,6 +241,7 @@
           <div class="mt-4 d-flex p-2">
             <VaButton
               v-if="!showDetailsPage"
+              :loading="saving"
               icon="save"
               class="mr-3 mb-2"
               :disabled="!isValidForm"
@@ -505,6 +506,7 @@ export default defineComponent({
       seasonsOptions: [] as any,
       selectedInquiryItem: null as any,
       downloadPdf,
+      saving: false,
     }
   },
   computed: {
@@ -524,6 +526,7 @@ export default defineComponent({
     ...mapActions(useSettingsStore, ['getSeasons']),
 
     async submit() {
+      this.saving = true
       if (this.speciesObjects.length === 0) {
         this.init({
           message: 'Please select at least one species.',
@@ -574,12 +577,14 @@ export default defineComponent({
         const response: any = await this.createSalesInquiry(requestdata)
 
         if (response.status === 201) {
+          this.saving = false
           this.init({ message: response.data.message, color: 'success' })
           this.resetForm()
           this.resetValidationContactForm()
           this.speciesObjects = []
         }
       } catch (error: any) {
+        this.saving = false
         const errors = handleErrors(error.response)
         console.log(errors)
         this.init({
@@ -594,181 +599,6 @@ export default defineComponent({
       this.selectedInquiryItem = i.selfitem
     },
 
-    // downloadInquiries(i: any) {
-    //   console.log(i.selfitem)
-    //   const item = i.selfitem
-    //   const logo = useSettingsStore().logo // Assuming the logo is a base64 image.
-
-    //   const formatDate = (dateString: string | undefined) =>
-    //     dateString ? new Date(dateString).toLocaleDateString() : 'Not provided'
-
-    //   const safeArray = (arr: any[] | null | undefined) => arr || []
-
-    //   const safeString = (str: string | null | undefined, fallback: string = 'Not provided') => str || fallback
-
-    //   // Header styles
-    //   const headerStyle = {
-    //     fontSize: 20,
-    //     bold: true,
-    //     color: '#FFFFFF', // Text color (white) for better contrast against brown
-    //     fillColor: '#8B4513', // Brown color
-    //     margin: [0, 10, 0, 10],
-    //     alignment: 'center',
-    //   }
-
-    //   const documentDefinition: any = {
-    //     content: [
-    //       {
-    //         image: logo,
-    //         width: 200, // Increased width of the logo for a larger size
-    //         alignment: 'center',
-    //         margin: [0, 20, 0, 20],
-    //       },
-    //       {
-    //         text: 'Sales Inquiry Details',
-    //         style: headerStyle,
-    //       },
-    //       {
-    //         text: `Inquiry Code: ${safeString(item.code)}`,
-    //         style: 'subheader',
-    //         margin: [0, 0, 0, 10],
-    //       },
-    //       {
-    //         text: `Created on: ${formatDate(item.create_date)}`,
-    //         style: 'subheader',
-    //         margin: [0, 0, 0, 20],
-    //       },
-    //       {
-    //         text: 'Customer Information',
-    //         style: 'sectionHeader',
-    //         decoration: 'underline',
-    //         margin: [0, 20],
-    //       },
-    //       {
-    //         text: `Full Name: ${safeString(item.entity?.full_name)}`,
-    //         margin: [0, 5],
-    //       },
-    //       {
-    //         text: `Nationality: ${safeString(item.entity?.nationality?.name)}`,
-    //         margin: [0, 5],
-    //       },
-    //       {
-    //         text: `Country: ${safeString(item.entity?.country?.name)}`,
-    //         margin: [0, 5],
-    //       },
-    //       {
-    //         text: 'Contacts:',
-    //         margin: [0, 10],
-    //         bold: true,
-    //         decoration: 'underline',
-    //       },
-    //       ...safeArray(item.entity?.contacts).map((contact: any) => ({
-    //         text: `• ${contact.contact}`,
-    //         margin: [0, 3],
-    //         color: '#555555',
-    //       })),
-    //       {
-    //         text: 'Preference Information',
-    //         style: 'sectionHeader',
-    //         decoration: 'underline',
-    //         margin: [0, 20],
-    //       },
-    //       {
-    //         text: `Preferred Date: ${formatDate(item.preference?.preferred_date)}`,
-    //         margin: [0, 5],
-    //       },
-    //       {
-    //         text: `Number of Hunters: ${safeString(item.preference?.no_of_hunters?.toString())}`,
-    //         margin: [0, 5],
-    //       },
-    //       {
-    //         text: `Number of Companions: ${safeString(item.preference?.no_of_companions?.toString())}`,
-    //         margin: [0, 5],
-    //       },
-    //       {
-    //         text: `Number of Days: ${safeString(item.preference?.no_of_days?.toString())}`,
-    //         margin: [0, 5],
-    //       },
-    //       {
-    //         text: 'Preferred Species',
-    //         style: 'sectionHeader',
-    //         decoration: 'underline',
-    //         margin: [0, 20],
-    //       },
-    //       ...(safeArray(item.preferred_species).length > 0
-    //         ? safeArray(item.preferred_species).map((species: any) => ({
-    //             text: `• ${safeString(species.species?.name)} (Quantity: ${safeString(species.quantity?.toString())})`,
-    //             margin: [0, 3],
-    //           }))
-    //         : [{ text: 'No preferred species listed.', margin: [0, 3] }]),
-    //       {
-    //         text: 'Area Information',
-    //         style: 'sectionHeader',
-    //         decoration: 'underline',
-    //         margin: [0, 20],
-    //       },
-    //       ...(safeArray(item.area).length > 0
-    //         ? safeArray(item.area).map((area: any) => ({
-    //             text: `Area ID: ${safeString(area.id.toString())}, Area: ${safeString(area.area?.name || 'Unnamed')}`,
-    //             margin: [0, 3],
-    //           }))
-    //         : [{ text: 'No area information available.', margin: [0, 3] }]),
-    //       {
-    //         text: 'Remarks',
-    //         style: 'sectionHeader',
-    //         decoration: 'underline',
-    //         margin: [0, 20],
-    //       },
-    //       {
-    //         text: safeString(item.remarks, 'No remarks provided.'),
-    //         margin: [0, 5, 0, 20],
-    //         italics: true,
-    //       },
-    //     ],
-    //     styles: {
-    //       header: {
-    //         fontSize: 20,
-    //         bold: true,
-    //         color: '#333333',
-    //       },
-    //       subheader: {
-    //         fontSize: 16,
-    //         bold: true,
-    //         margin: [0, 5],
-    //         color: '#444444',
-    //       },
-    //       sectionHeader: {
-    //         fontSize: 14,
-    //         bold: true,
-    //         margin: [0, 15, 0, 5],
-    //         color: '#333333',
-    //         decoration: 'underline',
-    //       },
-    //     },
-    //     pageSize: 'A4',
-    //     pageMargins: [40, 60, 40, 50],
-    //     footer: (currentPage: any, pageCount: any) => ({
-    //       columns: [
-    //         {
-    //           text: `Created at: ${formatDate(item.create_date)}`,
-    //           alignment: 'left',
-    //           margin: [20, 10],
-    //           italics: true,
-    //         },
-    //         {
-    //           text: `Page ${currentPage} of ${pageCount}`,
-    //           alignment: 'right',
-    //           margin: [20, 10],
-    //           italics: true,
-    //           color: '#777777',
-    //         },
-    //       ],
-    //     }),
-    //   }
-
-    //   // Trigger PDF download
-    //   pdfMake.createPdf(documentDefinition).download('sales_inquiry.pdf')
-    // },
     async getAllSpieces() {
       try {
         // if (this.form.sales_quota_id?.value || this.form?.area?.value) {

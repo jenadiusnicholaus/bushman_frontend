@@ -39,21 +39,29 @@
     </div>
 
     <div class="flex justify-center mt-4">
-      <VaButton class="w-full" @click="submit"> Login</VaButton>
+      <VaButton :loading="loading" :disabled="!isValidForm" class="w-full" @click="validateForm() && submit()">
+        Login</VaButton
+      >
     </div>
   </VaForm>
 </template>
 
 <script lang="ts" setup>
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useForm, useToast } from 'vuestic-ui'
 import { validators } from '../../services/utils'
 import axios from 'axios' // Import Axios
 
-const { validate } = useForm('form')
+const {
+  isValid: isValidForm,
+  validate: validateForm,
+  resetValidation: resetValidationForm,
+  reset: resetForm,
+} = useForm('form')
 const { push } = useRouter()
 const { init } = useToast()
+const loading = ref(false)
 
 const formData = reactive({
   email: '',
@@ -62,10 +70,8 @@ const formData = reactive({
 })
 
 const submit = async () => {
-  if (!validate()) {
-    init({ message: 'Please fill all required fields', color: 'error' })
-    return
-  }
+  loading.value = true
+
   try {
     const loginUrl = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_LOGIN_URL
     const data = JSON.stringify({
@@ -87,11 +93,17 @@ const submit = async () => {
     if (response.status === 200) {
       sessionStorage.setItem('access', JSON.stringify(response.data.access))
       sessionStorage.setItem('refresh', JSON.stringify(response.data.refresh))
-
+      resetForm()
+      resetValidationForm()
+      loading.value = false
       init({ message: "You've successfully logged in", color: 'success' })
       push({ name: 'dashboard' })
     }
   } catch (error: any) {
+    loading.value = false
+
+    resetForm()
+    resetValidationForm()
     init({ message: error.response.data.detail, color: 'danger' })
   }
 }

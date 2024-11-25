@@ -60,14 +60,6 @@
         <div><strong>Code:</strong> {{ salesData?.sales_inquiry?.code ?? 'N/A' }}</div>
         <div><strong>Created Date:</strong> {{ formatDate(salesData?.created_date) ?? 'N/A' }}</div>
         <div><strong>Remarks:</strong> {{ salesData?.sales_inquiry?.remarks ?? 'None' }}</div>
-        <div>
-          <strong>Status:</strong>
-          <VaBadge
-            :text="salesData?.status?.status ?? 'N/A'"
-            :color="getStatusColor(salesData?.status?.status)"
-            class="mr-2"
-          />
-        </div>
       </div>
     </section>
 
@@ -76,7 +68,14 @@
       <h2>Status Information</h2>
       <div class="details-grid">
         <div><strong>Status ID:</strong> {{ salesData?.status?.id ?? 'N/A' }}</div>
-        <div><strong>Status:</strong> {{ salesData?.status?.status ?? 'No status' }}</div>
+        <div>
+          <strong>Status:</strong>
+          <VaBadge
+            :text="salesData?.status?.status ?? 'N/A'"
+            :color="getStatusColor(salesData?.status?.status)"
+            class="mr-2"
+          />
+        </div>
         <div><strong>Created At:</strong> {{ formatDate(salesData?.status?.created_at) ?? 'N/A' }}</div>
         <div><strong>Updated At:</strong> {{ formatDate(salesData?.status?.updated_at) ?? 'N/A' }}</div>
       </div>
@@ -127,7 +126,7 @@
               <th>Name</th>
               <th>Scientific Name</th>
               <th>Quantity</th>
-              <th>Description</th>
+              <!-- <th>Description</th> -->
             </tr>
           </thead>
           <tbody>
@@ -135,7 +134,7 @@
               <td>{{ species.species?.name ?? 'N/A' }}</td>
               <td>{{ species.species?.scientific_name ?? 'N/A' }}</td>
               <td>{{ species.quantity ?? 'N/A' }}</td>
-              <td>{{ species.species?.description ?? 'N/A' }}</td>
+              <!-- <td>{{ species.species?.description ?? 'N/A' }}</td> -->
             </tr>
           </tbody>
         </table>
@@ -198,41 +197,41 @@
       <div class="details-grid">
         <div>
           <strong>Total Amount:</strong>
-          {{ salesData?.price_break_down?.total_amount?.currency?.symbol ?? 'N/A' }}
-          {{ salesData?.price_break_down?.total_amount?.amount ?? 'N/A' }}
+          {{ salesData?.price_break_down?.total_amount?.currency?.symbol || 'N/A' }}
+          {{ salesData?.price_break_down?.total_amount?.amount || 'N/A' }}
         </div>
         <div>
           <strong>Companion Cost:</strong>
           <div>
             Number of Companions:
-            {{ salesData?.price_break_down?.companion_cost_details?.number_of_companions ?? 'N/A' }}
+            {{ salesData?.price_break_down?.companion_cost_details?.number_of_companions || 'N/A' }}
           </div>
           <div>
             Cost per Companion:
-            {{ salesData?.price_break_down?.companion_cost_details?.cost_per_companion?.currency?.symbol ?? 'N/A' }}
-            {{ salesData?.price_break_down?.companion_cost_details?.cost_per_companion?.amount ?? 'N/A' }}
+            {{ salesData?.price_break_down?.companion_cost_details?.cost_per_companion?.currency?.symbol || 'N/A' }}
+            {{ salesData?.price_break_down?.companion_cost_details?.cost_per_companion?.amount || 'N/A' }}
           </div>
           <div>
             Total Companion Cost:
-            {{ salesData?.price_break_down?.companion_cost_details?.total_companion_cost?.currency?.symbol ?? 'N/A' }}
-            {{ salesData?.price_break_down?.companion_cost_details?.total_companion_cost?.amount ?? 'N/A' }}
+            {{ salesData?.price_break_down?.companion_cost_details?.total_companion_cost?.currency?.symbol || 'N/A' }}
+            {{ salesData?.price_break_down?.companion_cost_details?.total_companion_cost?.amount || 'N/A' }}
           </div>
         </div>
         <div>
           <strong>Observer Cost:</strong>
           <div>
             Number of Observers:
-            {{ salesData?.price_break_down?.observer_cost_details?.number_of_observers ?? 'N/A' }}
+            {{ salesData?.price_break_down?.observer_cost_details?.number_of_observers || 'N/A' }}
           </div>
           <div>
             Cost per Observer:
-            {{ salesData?.price_break_down?.observer_cost_details?.cost_per_observer?.currency?.symbol ?? 'N/A' }}
-            {{ salesData?.price_break_down?.observer_cost_details?.cost_per_observer?.amount ?? 'N/A' }}
+            {{ salesData?.price_break_down?.observer_cost_details?.cost_per_observer?.currency?.symbol || 'N/A' }}
+            {{ salesData?.price_break_down?.observer_cost_details?.cost_per_observer?.amount || 'N/A' }}
           </div>
           <div>
             Total Observer Cost:
-            {{ salesData?.price_break_down?.observer_cost_details?.total_observer_cost?.currency?.symbol ?? 'N/A' }}
-            {{ salesData?.price_break_down?.observer_cost_details?.total_observer_cost?.amount ?? 'N/A' }}
+            {{ salesData?.price_break_down?.observer_cost_details?.total_observer_cost?.currency?.symbol || 'N/A' }}
+            {{ salesData?.price_break_down?.observer_cost_details?.total_observer_cost?.amount || 'N/A' }}
           </div>
         </div>
       </div>
@@ -428,10 +427,11 @@ export default defineComponent({
   data() {
     // Description, Amount Due, Days, Due Limit, and Status Columns
     const columns = [
-      { key: 'description', label: 'Description' },
+      { key: 'narration', label: 'Description' },
       { key: 'amount_due', label: 'Amount Due (USD)' },
-      { key: 'days', label: 'Days' }, // Added days
-      { key: 'due_limit', label: 'Due Limit' }, // Added due limit
+      { key: 'due_days', label: 'Days' }, // Added days
+      { key: 'amount_due_type', label: 'Due Type' },
+      { key: 'due_days_type', label: 'Due Type' },
     ]
 
     return {
@@ -449,7 +449,7 @@ export default defineComponent({
         date: null as any,
         accountType: null as any,
         reference_number: null as any,
-        amount: this.salesData.price_break_down.total_amount.amount,
+        amount: null as any,
         narration: '',
       },
       buttonColor: 'primary',
@@ -498,8 +498,6 @@ export default defineComponent({
   mounted() {
     this.getDocTypeOptions()
     this.showConfirmButtonTextByStatus()
-    console.log(this.salesData)
-    console.log(this.salesData.price_break_down.total_amount.account)
   },
   methods: {
     ...mapActions(useSettingsStore, ['getDocTypes']),

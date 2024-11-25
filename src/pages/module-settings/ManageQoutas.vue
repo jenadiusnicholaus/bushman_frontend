@@ -21,7 +21,13 @@
       </VaButtonGroup>
     </div>
 
-    <ModuleTable v-if="showQuotaList" :items="items" :columns="columns" @onView="showQuota"></ModuleTable>
+    <ModuleTable
+      v-if="showQuotaList"
+      :items="items"
+      :columns="columns"
+      :loading="loadingQuotas"
+      @onView="showQuota"
+    ></ModuleTable>
 
     <div v-else class="p-2">
       <VaForm ref="sformRef" class="mb-6">
@@ -104,11 +110,12 @@
         <VaButton
           :disabled="!isValidSForm"
           color="primary"
-          icon="add"
+          :loading="savingQuotaSpecies"
+          icon="save"
           icon-color="#fff"
           @click="validateSForm() && addNewSpeciesToQuota()"
         >
-          Submit New
+          save
         </VaButton>
       </div>
     </div>
@@ -255,6 +262,8 @@ export default defineComponent({
       quotasOptions,
       showQuotaList: true,
       quotaItems: [] as any,
+      savingQuotaSpecies: false,
+      loadingQuotas: false,
     }
   },
 
@@ -365,6 +374,7 @@ export default defineComponent({
     // },
 
     async addNewSpeciesToQuota() {
+      this.savingQuotaSpecies = true
       if (this.speciesObjects.length === 0) {
         this.toast.init({ message: 'Please add at least one species item.', color: 'warning' })
         return
@@ -378,6 +388,7 @@ export default defineComponent({
       try {
         const response = await this.createQuotaAreaSpecies(rdata)
         if (response.status === 201) {
+          this.savingQuotaSpecies = false
           this.toast.init({ message: response.data.message, color: 'success' })
           this.resetSForm()
           this.resetCreatedItem()
@@ -385,6 +396,8 @@ export default defineComponent({
         }
       } catch (error) {
         const errors = handleErrors(error)
+        this.savingQuotaSpecies = false
+
         this.toast.init({
           message: '\n' + errors.map((error, index) => `${index + 1}. ${error}`).join('\n'),
           color: 'danger',
@@ -452,10 +465,12 @@ export default defineComponent({
     },
 
     async getQs(id = null) {
+      this.loadingQuotas = true
       try {
         const response = await this.getQuotas(id)
         if (response.status === 200) {
           const data = response.data
+          this.loadingQuotas = false
 
           this.quotasOptions = data.map((item: any) => {
             const result = this.generateQuotaYear(item.start_date, item.end_date)
@@ -478,6 +493,7 @@ export default defineComponent({
           }))
         }
       } catch (error) {
+        this.loadingQuotas = false
         console.log(error)
       }
     },

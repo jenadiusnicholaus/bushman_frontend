@@ -173,29 +173,6 @@ export default defineComponent({
     },
   },
 
-  // "installments": [
-  //       {
-  //           "sales_confirmation_proposal": 1,
-  //           "description": "First installment payment",
-  //           "amount": 100.00,
-  //           "days": 30,
-  //           "due_limit": "2023-10-15"
-  //       },
-  //       {
-  //           "sales_confirmation_proposal": 1,
-  //           "description": "Second installment payment",
-  //           "amount": 150.00,
-  //           "days": 60,
-  //           "due_limit": "prior"
-  //       },
-  //       {
-  //           "description": "Third installment payment",
-  //           "amount": 200.00,
-  //           "days": 90,
-  //           "due_limit": "prior"
-  //       }
-  //   ]
-
   setup() {
     const { init } = useToast()
 
@@ -250,6 +227,7 @@ export default defineComponent({
       packages,
       installments: [] as any,
       regulatoryPackages: [] as any,
+      saving: false,
     }
   },
   computed: {
@@ -308,6 +286,7 @@ export default defineComponent({
     },
 
     async onSubmit() {
+      this.saving = true
       const requestDate = {
         charterIn: this.form.charter_in,
         charterOut: this.form.charter_out,
@@ -323,6 +302,7 @@ export default defineComponent({
         const response = await this.createSalesConfirmationFinalization(requestDate)
 
         if (response.status === 201) {
+          this.saving = false
           this.init({ message: response.data.message, color: 'success' })
           this.resetForm()
           this.resetValidationForm()
@@ -331,6 +311,7 @@ export default defineComponent({
           this.init({ message: response.data.message, color: 'error' })
         }
       } catch (error: any) {
+        this.saving = false
         const errors = handleErrors(error.response)
         this.init({
           message: '\n' + errors.map((error, index) => `${index + 1}. ${error}`).join('\n'),
