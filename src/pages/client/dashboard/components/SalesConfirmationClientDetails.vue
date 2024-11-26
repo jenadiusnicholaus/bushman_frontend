@@ -293,11 +293,11 @@
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="mb-2">
+            <div v-if="selection.includes('confirm')" class="mb-2">
               <VaDateInput v-model="paymentForm.date" label="Transaction Date" placeholder="Enter Transaction Date" />
             </div>
 
-            <div class="mb-2">
+            <div v-if="selection.includes('confirm')" class="mb-2">
               <VaSelect
                 v-model="paymentForm.accountType"
                 :options="accountsOption"
@@ -306,7 +306,7 @@
               />
             </div>
 
-            <div class="mb-2">
+            <div v-if="selection.includes('confirm')" class="mb-2">
               <VaInput
                 v-model="paymentForm.reference_number"
                 label="Reference Number"
@@ -337,14 +337,22 @@
           />
         </div>
       </template>
+      <!-- 
+      if sales data status is confirmed, show modal with payment details and upload payment document.
+      if sales data status is provision_sales, show modal with provision sales details and upload signed contract.
+      if sales data status is confirmed, show modal with payment details and upload payment document.
+      
+
+
+       -->
 
       <template v-else-if="salesData?.status?.status == 'provision_sales'">
         <VaFileUpload
-          v-model="file"
+          v-model="payfile"
+          upload-button-text="Upload Payment Document"
           dropzone
-          upload-button-text="Upload Signed Contract"
-          drop-zone-text=""
           color="secondary"
+          drop-zone-text=""
           file-types="application/pdf"
           :max-size="1000000"
           :max-files="1"
@@ -353,24 +361,19 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div class="mb-2">
             <VaSelect
-              v-model="paymentForm.currency_id"
-              :options="currencyOptions"
-              label="Currency"
-              placeholder="Select Currency"
-            />
-          </div>
-
-          <div class="mb-2">
-            <VaDateInput v-model="paymentForm.date" label="Transaction Date" placeholder="Enter Transaction Date" />
-          </div>
-
-          <div class="mb-2">
-            <VaSelect
               v-model="paymentForm.accountType"
               :options="accountsOption"
               label="Account"
               placeholder="Select Account"
             />
+          </div>
+
+          <div class="mb-3">
+            <VaInput v-model="paymentForm.amount" label="Amount" type="text" placeholder="Enter Amount" />
+          </div>
+
+          <div class="mb-2">
+            <VaDateInput v-model="paymentForm.date" label="Transaction Date" placeholder="Enter Transaction Date" />
           </div>
 
           <div class="mb-2">
@@ -381,19 +384,14 @@
               placeholder="Enter Reference Number"
             />
           </div>
-
-          <div class="mb-3">
-            <VaInput v-model="paymentForm.amount" label="Amount" type="text" placeholder="Enter Amount" />
-          </div>
+          <VaTextarea
+            v-model="paymentForm.narration"
+            label="Narration"
+            type="text"
+            placeholder="Enter Narration"
+            class="w-full h-full"
+          />
         </div>
-
-        <VaTextarea
-          v-model="paymentForm.narration"
-          label="Narration"
-          type="text"
-          placeholder="Enter Narration"
-          class="w-full h-full"
-        />
       </template>
 
       <div>
@@ -449,7 +447,7 @@ export default defineComponent({
         date: null as any,
         accountType: null as any,
         reference_number: null as any,
-        amount: null as any,
+        amount: this.salesData.price_break_down.total_amount.amount,
         narration: '',
       },
       buttonColor: 'primary',
@@ -478,10 +476,10 @@ export default defineComponent({
           value: 'BANK',
           text: 'Bank trasfer',
         },
-        {
-          value: 'DEBTOR_ACCOUNT',
-          text: 'Debtor Account',
-        },
+        // {
+        //   value: 'DEBTOR_ACCOUNT',
+        //   text: 'Debtor Account',
+        // },
       ] as any,
       currencyOptions: [
         {
@@ -496,7 +494,7 @@ export default defineComponent({
     }
   },
   mounted() {
-    this.getDocTypeOptions()
+    // this.getDocTypeOptions()
     this.showConfirmButtonTextByStatus()
   },
   methods: {
@@ -586,7 +584,7 @@ export default defineComponent({
               color: 'danger',
             })
             this.loading = false
-            return
+            throw new Error('Please upload both Signed Contract and Payment Document')
           }
 
           // Check for only provision sales selection
@@ -595,6 +593,10 @@ export default defineComponent({
           this.transaction_type = 'SALES_INVOICE'
           this.createDRTransaction = true
 
+          //  console all files
+          console.log('File:', file[0])
+          console.log('Payfile:', payfile[0])
+
           if (file[0] === undefined) {
             this.$vaToast.init({
               message: 'Please upload Signed Contract',
@@ -602,7 +604,7 @@ export default defineComponent({
             })
             this.loading = false
 
-            return
+            throw new Error('Please upload Signed Contract')
           }
 
           // Check for only payment confirmation selection
@@ -618,7 +620,7 @@ export default defineComponent({
             })
             this.loading = false
 
-            return
+            throw new Error('Please upload Payment Document')
           }
         }
 
@@ -633,18 +635,30 @@ export default defineComponent({
             message: 'Please upload Payment Document',
             color: 'danger',
           })
+          this.loading = false
+
+          throw new Error('Please upload Payment Document')
         }
       }
     },
 
     async submit() {
-      this.handleTransactionTypeStatus(this.selection, this.file, this.payfile)
+      try {
+        this.handleTransactionTypeStatus(this.selection, this.file, this.payfile)
+      } catch (error: any) {
+        console.error('Error:', error)
+        this.loading = false
+        return
+      }
 
       const transactionPayload = {
+        // optional for  Dr transaction
+        date: format(this.paymentForm.date, 'yyyy-MM-dd') ?? null,
+        account_type: this.paymentForm?.accountType?.value ?? 'SALES_ACCOUNT',
+        reference_number: this.paymentForm.reference_number ?? null,
+        // required for CR transaction
+
         currency_id: this.paymentForm.currency_id.value,
-        date: format(this.paymentForm.date, 'yyyy-MM-dd'),
-        account_type: this.paymentForm.accountType.value,
-        reference_number: this.paymentForm.reference_number,
         transaction_type: this.transaction_type,
         amount: this.paymentForm.amount,
         narration: this.paymentForm.narration,
@@ -662,9 +676,6 @@ export default defineComponent({
         // quotaId: this.salesData.proposed_package.sales_package.sales_quota?.id,
         areaId: this.salesData.sales_inquiry.area[0].area.id,
       }
-
-      console.log(payload)
-      console.log(transactionPayload)
 
       try {
         if (this.createCRTransaction) {

@@ -7,19 +7,6 @@
         </VaButton>
       </div>
     </div>
-    <!-- <div v-if="!viewDetails" class="grid grid-cols-12 gap-6 mb-6 py-4">
-      <div class="col-span-12">
-        <VaInput
-          v-model="searchText"
-          type="search"
-          placeholder="Enter user name or sales code"
-          @input="getOrsearchSalesInquiry"
-        >
-          <template #appendInner> <VaIcon name="manage_search" size="small" color="primary" /> </template
-        ></VaInput>
-      </div> -->
-    <!-- </div> -->
-    <!-- Mode=uleTable -->
 
     <template v-if="viewDetails">
       <SalesConfirmationClientDetails :sales-data="item"> </SalesConfirmationClientDetails>
@@ -141,7 +128,7 @@ export default {
         case 'provision_sales':
           return 'confirm' // Adjust as needed
         case 'confirmed':
-          return 'cancel'
+          return 'complete'
         case 'declined':
           this.buttondisables = true
           return 'View' // Corresponds to VaBadge color

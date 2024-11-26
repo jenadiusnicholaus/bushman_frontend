@@ -8,7 +8,7 @@ axios.interceptors.request.use(
 
     const isToBeIgnored = tobeInoredUrl.some((url) => config.url?.includes(url))
 
-    console.log(config.url)
+    // console.log(config.url)
 
     if (!isToBeIgnored) {
       const token = JSON.parse(sessionStorage.getItem('access') as string)

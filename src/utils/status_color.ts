@@ -2,7 +2,7 @@ const getStatusColor = (status: any) => {
   const statusMapping: any = {
     pending: 'secondary',
     provision_sales: 'warning',
-    Confirmed: 'success',
+    confirmed: 'success',
     declined: 'danger',
     cancelled: 'danger',
     completed: 'success',

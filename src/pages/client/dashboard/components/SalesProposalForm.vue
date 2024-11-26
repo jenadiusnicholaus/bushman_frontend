@@ -15,7 +15,6 @@
         :rules="[(value: any) => value || 'Package is required']"
         placeholder="Select Package"
         label="Sales Package"
-        @update:modelValue="getSalesPriceBreakdownForClient"
       />
       <!-- regulatory_package_id -->
     </div>

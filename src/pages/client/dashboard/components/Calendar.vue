@@ -177,8 +177,9 @@ export default {
       // clickInfo.event.remove()
       this.showModal = true
       this.event = clickInfo.event
-      console.log(clickInfo.event)
-      //   }/
+      console.log(clickInfo.event.start)
+      console.log(clickInfo.event.end)
+      //   }
     },
 
     getStatusColor(status: any) {
@@ -244,10 +245,12 @@ export default {
           const end = format(event.itinerary.charter_out, 'yyyy-MM-dd')
           const from_date = formatDateTime(event.itinerary.charter_in)
           const to_date = formatDateTime(event.itinerary.charter_out)
+          console.log(start)
+          console.log(end)
 
           return {
             id: event.id,
-            title: `${event?.sales_inquiry?.entity?.full_name} - from ${event?.sales_inquiry?.entity?.country?.name}`,
+            title: `${event?.sales_inquiry?.entity?.full_name} - from ${formatDateTime(start)}-${formatDateTime(end)}`,
             start: start,
             end: end,
             backgroundColor: this.getStatusColor(event.status.status),
