@@ -38,7 +38,7 @@
           <VaDivider />
 
           <VaTitle style="font-weight: bold">Preferred Species</VaTitle>
-          <table class="table-auto w-full mb-4">
+          <table class="table-auto w-full mb-4 va-table">
             <thead>
               <tr>
                 <th class="px-4 py-2">Species Name</th>
@@ -57,7 +57,7 @@
           </table>
 
           <VaTitle style="font-weight: bold">Area Information</VaTitle>
-          <table class="table-auto w-full">
+          <table class="table-auto w-full va-table">
             <thead>
               <tr>
                 <th class="px-4 py-2">Area ID</th>
@@ -76,9 +76,11 @@
           </table>
 
           <VaDivider />
+          <VaTitle style="font-weight: bold">Observers</VaTitle>
+          <VaDataTable :items="observers" />
+          <VaTitle style="font-weight: bold">Companions</VaTitle>
 
-          <VaTitle style="font-weight: bold">Remarks</VaTitle>
-          <p>{{ safeString(item?.remarks, 'No remarks provided.') }}</p>
+          <VaDataTable :items="companions" />
         </div>
       </div>
     </template>
@@ -91,6 +93,34 @@
       <div class="p-6">
         <SalesProposalForm :item="item"> </SalesProposalForm>
       </div>
+      <div class="flex justify-end">
+        <VaButton
+          preset="primary"
+          class="mr-6 mb-2"
+          round
+          icon="arrow_downward"
+          size="small"
+          border-color="primary"
+          @click="scrollTo(observerScollRef)"
+          >Add Observers</VaButton
+        >
+        <VaButton
+          preset="primary"
+          class="mr-6 mb-2"
+          round
+          icon="arrow_downward"
+          border-color="primary"
+          size="small"
+          @click="scrollTo(companionsScollRef)"
+          >Companions</VaButton
+        >
+      </div>
+      <section ref="observerScollRef">
+        <ObserversForm :sales-inquiry-id="item.id"> </ObserversForm>
+      </section>
+      <section ref="companionsScollRef">
+        <CompanionForm :sales-inquiry-id="item.id"> </CompanionForm>
+      </section>
     </template>
   </VaSplit>
 </template>
@@ -100,11 +130,17 @@ import { useForm } from 'vuestic-ui'
 import { defineComponent, ref, reactive } from 'vue'
 import { useSettingsStore } from '../../../../stores/settings-store'
 import SalesProposalForm from './SalesProposalForm.vue'
+import ObserversForm from './ObserversForm.vue'
+import CompanionForm from './CompanionForm.vue'
+import { useSalesInquiriesStore } from '../../../../stores/sales-store'
+import { mapState, mapActions } from 'pinia'
 
 export default defineComponent({
   name: 'SalesConfirmationClientDetails',
   components: {
     SalesProposalForm,
+    ObserversForm,
+    CompanionForm,
   },
   props: {
     item: {
@@ -113,8 +149,30 @@ export default defineComponent({
     },
   },
 
+  setup() {
+    const observerScollRef = ref<HTMLDivElement | null>(null)
+    const companionsScollRef = ref<HTMLDivElement | null>(null)
+
+    const scrollTo = (view: any) => {
+      console.log('Scroll View:', view) // For debugging
+      console.log('Section Ref El:', observerScollRef.value) // For debugging
+      if (view) {
+        view.scrollIntoView({ behavior: 'smooth' })
+      } else {
+        console.error('View is null or undefined')
+      }
+    }
+
+    return {
+      observerScollRef,
+      companionsScollRef,
+      scrollTo,
+    }
+  },
+
   data() {
     const formRef = ref()
+
     const {
       isValid: isValidForm,
       validate: validateForm,
@@ -143,11 +201,17 @@ export default defineComponent({
     }
   },
   computed: {
+    ...mapState(useSalesInquiriesStore, ['observers', 'companions']),
     logo() {
       return useSettingsStore().logo // Get the logo from the store
     },
   },
+  mounted() {
+    this.getObservers(this.item.id)
+    this.getCompanions(this.item.id)
+  },
   methods: {
+    ...mapActions(useSalesInquiriesStore, ['getObservers', 'getCompanions']),
     formatDate(dateString: string | number | Date) {
       return dateString ? new Date(dateString).toLocaleDateString() : 'Not provided'
     },

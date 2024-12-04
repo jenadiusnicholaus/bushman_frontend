@@ -16,20 +16,12 @@
       <!-- <div v-if="results?.length > 0"> -->
 
       <VaDataTable :items="results" :columns="columns" :loading="loadingresults" @onView="onRowClick">
-        <!-- <template #header(status)="{ label }">
-          <VaChip size="small">
-            {{ label }}
-          </VaChip>
-        </template> -->
         <template #cell(status)="{ value }">
           <VaChip :color="getStatusColorForModal(value)" size="small">
             {{ value }}
           </VaChip>
         </template>
-        <!-- <template #cell(username)="{ value }">
-          <strong>{{ value }}</strong>
-        </template> -->
-        <!-- actions -->
+
         <template #cell(actions)="{ rowData }">
           <div class="flex justify-center items-center">
             <VaButton plain color="primary" class="mr-2" @click="onRowClick(rowData)">
@@ -59,8 +51,9 @@ export default {
       items: [] as Array<any>,
       searchText: null as any,
       columns: [
-        { key: 'sales_inquiry_code', label: 'Sales Inquiry ID', width: 80 },
-        { key: 'name', label: 'package', width: 120 },
+        { key: 'code', label: 'Code', width: 80 },
+        { key: 'name', label: 'Client', width: 120 },
+        { key: 'area', label: 'Area', width: 120 },
         { key: 'airport_name', label: 'Airport', width: 50 },
         { key: 'arrival', label: 'Arrival', width: 120 },
         { key: 'charter_in', label: 'Charter In', width: 120 },
@@ -77,15 +70,14 @@ export default {
   },
   computed: {
     ...mapState(useSalesInquiriesStore, ['results', 'loadingresults']),
-    // ...mapState(useSalesInquiriesStore, ['loadingresults']),
   },
   mounted() {
-    this.getOrsearchSalesInquiry()
+    this.getSalesConfirmations()
   },
   methods: {
     ...mapActions(useSalesInquiriesStore, ['getallSalesConfirmation']),
 
-    async getOrsearchSalesInquiry() {
+    async getSalesConfirmations() {
       await this.getallSalesConfirmation()
     },
 
@@ -98,7 +90,7 @@ export default {
 
     gotBack() {
       this.viewDetails = false
-      this.getOrsearchSalesInquiry()
+      this.getSalesConfirmations()
       // this.item = null
     },
 

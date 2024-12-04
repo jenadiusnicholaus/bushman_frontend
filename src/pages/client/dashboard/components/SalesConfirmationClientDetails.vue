@@ -44,6 +44,7 @@
           roud
           color="success"
           class="px-2 py-2"
+          :loading="completingSales"
           :disabled="disabledConfirmButton"
           size="small"
           @click="complete()"
@@ -197,45 +198,46 @@
       <div class="details-grid">
         <div>
           <strong>Total Amount:</strong>
-          {{ salesData?.price_break_down?.total_amount?.currency?.symbol || 'N/A' }}
-          {{ salesData?.price_break_down?.total_amount?.amount || 'N/A' }}
+          {{ salesData?.price_break_down?.total_amount?.currency?.symbol ?? 'N/A' }}
+          {{ salesData?.price_break_down?.total_amount?.amount ?? 'N/A' }}
         </div>
         <div>
           <strong>Companion Cost:</strong>
           <div>
             Number of Companions:
-            {{ salesData?.price_break_down?.companion_cost_details?.number_of_companions || 'N/A' }}
+            {{ salesData?.price_break_down?.companion_cost_details?.number_of_companions ?? 'N/A' }}
           </div>
           <div>
             Cost per Companion:
-            {{ salesData?.price_break_down?.companion_cost_details?.cost_per_companion?.currency?.symbol || 'N/A' }}
-            {{ salesData?.price_break_down?.companion_cost_details?.cost_per_companion?.amount || 'N/A' }}
+            {{ salesData?.price_break_down?.companion_cost_details?.cost_per_companion?.currency?.symbol ?? 'N/A' }}
+            {{ salesData?.price_break_down?.companion_cost_details?.cost_per_companion?.amount ?? 'N/A' }}
           </div>
           <div>
             Total Companion Cost:
-            {{ salesData?.price_break_down?.companion_cost_details?.total_companion_cost?.currency?.symbol || 'N/A' }}
-            {{ salesData?.price_break_down?.companion_cost_details?.total_companion_cost?.amount || 'N/A' }}
+            {{ salesData?.price_break_down?.companion_cost_details?.total_companion_cost?.currency?.symbol ?? 'N/A' }}
+            {{ salesData?.price_break_down?.companion_cost_details?.total_companion_cost?.amount ?? 'N/A' }}
           </div>
         </div>
         <div>
           <strong>Observer Cost:</strong>
           <div>
             Number of Observers:
-            {{ salesData?.price_break_down?.observer_cost_details?.number_of_observers || 'N/A' }}
+            {{ salesData?.price_break_down?.observer_cost_details?.number_of_observers ?? 'N/A' }}
           </div>
           <div>
             Cost per Observer:
-            {{ salesData?.price_break_down?.observer_cost_details?.cost_per_observer?.currency?.symbol || 'N/A' }}
-            {{ salesData?.price_break_down?.observer_cost_details?.cost_per_observer?.amount || 'N/A' }}
+            {{ salesData?.price_break_down?.observer_cost_details?.cost_per_observer?.currency?.symbol ?? 'N/A' }}
+            {{ salesData?.price_break_down?.observer_cost_details?.cost_per_observer?.amount ?? 'N/A' }}
           </div>
           <div>
             Total Observer Cost:
-            {{ salesData?.price_break_down?.observer_cost_details?.total_observer_cost?.currency?.symbol || 'N/A' }}
-            {{ salesData?.price_break_down?.observer_cost_details?.total_observer_cost?.amount || 'N/A' }}
+            {{ salesData?.price_break_down?.observer_cost_details?.total_observer_cost?.currency?.symbol ?? 'N/A' }}
+            {{ salesData?.price_break_down?.observer_cost_details?.total_observer_cost?.amount ?? 'N/A' }}
           </div>
         </div>
       </div>
     </section>
+
     <!-- <VaInnerLoading :loading="loading"> -->
     <VaModal
       v-model="isOpened"
@@ -371,6 +373,14 @@
           <div class="mb-3">
             <VaInput v-model="paymentForm.amount" label="Amount" type="text" placeholder="Enter Amount" />
           </div>
+          <div class="mb-2">
+            <VaSelect
+              v-model="paymentForm.currency_id"
+              :options="currencyOptions"
+              label="Currency"
+              placeholder="Select Currency"
+            />
+          </div>
 
           <div class="mb-2">
             <VaDateInput v-model="paymentForm.date" label="Transaction Date" placeholder="Enter Transaction Date" />
@@ -447,12 +457,13 @@ export default defineComponent({
         date: null as any,
         accountType: null as any,
         reference_number: null as any,
-        amount: this.salesData.price_break_down.total_amount.amount,
+        amount: this.salesData?.price_break_down?.total_amount?.amount,
         narration: '',
       },
       buttonColor: 'primary',
       createDRTransaction: false,
       createCRTransaction: false,
+      completingSales: false,
       downloadPdf,
 
       statusOptions: [
@@ -515,20 +526,18 @@ export default defineComponent({
 
     async complete() {
       this.status = 'completed'
-
+      this.completingSales = true
       await this.completeOrCancel('Sales Confirmation Completed.')
     },
 
     async completeOrCancel(displayMessage: any) {
-      // this.submit()
-      // this.handleTransactionTypeStatus(this.selection, this.file, this.payfile)
       const payload = {
         entityId: this.salesData.sales_inquiry.entity.id,
         contractDoc: this.file[0],
         paymentDoc: this.payfile[0],
         salesConfirmationProposalId: this.salesData.id,
         statusId: this.status,
-        quotaId: this.salesData.proposed_package.sales_package.sales_quota.id,
+        quotaId: this.salesData?.proposed_package?.sales_package?.sales_quota?.id,
         areaId: this.salesData.sales_inquiry.area[0].area.id,
       }
       try {
@@ -540,6 +549,7 @@ export default defineComponent({
             message: displayMessage,
             color: 'success',
           })
+          this.completingSales = false
         } else {
           this.$vaToast.init({
             message: 'Failed to process the request',
@@ -549,6 +559,9 @@ export default defineComponent({
       } catch (error: any) {
         const errors = handleErrors(error.response)
         if (errors.length > 0) {
+          this.loading = false
+          this.completingSales = true
+
           this.$vaToast.init({
             message: '\n' + errors.map((error, index) => `${index + 1}. ${error}`).join('\n'),
             color: 'danger',
@@ -746,6 +759,12 @@ export default defineComponent({
             message: '\n' + errors.map((error, index) => `${index + 1}. ${error}`).join('\n'),
             color: 'danger',
           })
+        } else {
+          error.message &&
+            this.$vaToast.init({
+              message: error.message,
+              color: 'danger',
+            })
         }
       }
     },

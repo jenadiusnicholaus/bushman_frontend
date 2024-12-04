@@ -92,12 +92,13 @@ export default defineComponent({
     this.getRegisteredGames()
   },
   methods: {
-    ...mapActions(useGameStore, ['getRegisteredGames']),
+    ...mapActions(useGameStore, ['getRegisteredGames', 'getActiviteActivites']),
 
     viewgame(game: any) {
       this.item = game
       this.showDetails = true
       this.showAddgameForm = false
+      this.getActiviteActivites(game.id)
     },
 
     gotBack() {

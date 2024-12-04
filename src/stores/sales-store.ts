@@ -10,6 +10,9 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
       results: [] as any,
       loadingresults: false,
       priceBreakDown: null as any,
+      addCompanions: false,
+      observers: [] as any,
+      companions: [] as any,
     }
   },
 
@@ -91,17 +94,15 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
           this.loadingresults = false
           this.results = response.data.map((item: any) => {
             return {
-              sales_inquiry_code: item.sales_inquiry.id,
-              name: item.proposed_package?.package.name,
-              airport_name: item.itinerary.airport_name,
+              code: item.sales_inquiry.code,
+              name: item?.sales_inquiry?.entity?.full_name,
+              area: item?.sales_inquiry?.area[0]?.area?.name,
+              airport_name: item?.itinerary?.airport_name,
               charter_in: formatDateTime(item.itinerary.charter_in),
               charter_out: formatDateTime(item.itinerary.charter_out),
               arrival: formatDateTime(item.itinerary.arrival),
               status: item?.status?.status ?? 'No Status',
               selfitem: item,
-
-              // total_sales_amount: item.total_sales_amount,
-              // total_sales_amount_usd: item.total_sales_amount_usd,
             }
           })
           return response
@@ -200,6 +201,149 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
 
       const response = await axios.request(config)
       return response
+    },
+
+    // # http://localhost:8000/api/v1.0/sales-confirmation/sales-confirmation-proposal-observers-vset/?entity_id=44&sales_confirmation_id=27
+    // VITE_APP_SALES_CONFIRMATION_PROPOSAL_OBSERVERS_VSET_URL=sales-confirmation/sales-confirmation-proposal-observers-vset/
+    async createSalesConfirmationProposalObservers(payload: any) {
+      const url =
+        import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_SALES_CONFIRMATION_PROPOSAL_OBSERVERS_VSET_URL
+      // [
+      //   {
+      //     contact_type: 'email',
+      //     contact: 'john.doe@example.com',
+      //   },
+      //   {
+      //     contact_type: 'phone',
+      //     contact: '+1234567890',
+      //   },
+      // ],
+      const request_data = {
+        full_name: payload.fullName,
+        nationality_id: payload.nationalityId,
+        country_id: payload.countryId,
+        identity_number: payload.identityNumber,
+        sales_inquiry_id: payload.salesInquiryId,
+        contacts: payload.contacts,
+      }
+
+      const json_data = JSON.stringify(request_data)
+      const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data: json_data,
+      }
+
+      const response = await axios.request(config)
+
+      if (response.status === 201) {
+        this.addCompanions = true
+      }
+      return response
+    },
+    async getObservers(salesInquiryId: any) {
+      const url =
+        import.meta.env.VITE_APP_BASE_URL +
+        import.meta.env.VITE_APP_SALES_CONFIRMATION_PROPOSAL_OBSERVERS_VSET_URL +
+        '?sales_inquiry_id=' +
+        salesInquiryId
+
+      const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+      try {
+        const response = await axios.request(config)
+        if (response.status === 200) {
+          this.observers = response.data.map((item: any) => {
+            return {
+              id: item.id,
+              full_name: item.observer.full_name,
+              nationality: item.observer.nationality.name,
+            }
+          })
+          return response
+        } else {
+          return response
+        }
+      } catch (error) {
+        console.log(error)
+        return error
+      }
+    },
+
+    // # http://localhost:8000/api/v1.0/sales-confirmation/sales-confirmation-companion-vset/?entity_id=42&sales_confirmation_id=27
+    // VITE_APP_SALES_CONFIRMATION_COMPANION_VSET_URL=sales-confirmation/sales-confirmation-companion-vset/
+    async createSalesConfirmationCompanion(payload: any) {
+      const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_SALES_CONFIRMATION_COMPANION_VSET_URL
+      const request_data = {
+        full_name: payload.fullName,
+        nationality_id: payload.nationalityId,
+        identity_number: payload.identityNumber,
+        sales_inquiry_id: payload.salesInquiryId,
+        regulatory_package_id: payload.regulatoryPackageId,
+        contacts: payload.contacts,
+      }
+
+      const json_data = JSON.stringify(request_data)
+      const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data: json_data,
+      }
+
+      const response = await axios.request(config)
+
+      if (response.status === 201) {
+        this.addCompanions = true
+      }
+      return response
+    },
+
+    async getCompanions(salesInquiryId: any) {
+      const url =
+        import.meta.env.VITE_APP_BASE_URL +
+        import.meta.env.VITE_APP_SALES_CONFIRMATION_COMPANION_VSET_URL +
+        '?sales_inquiry_id=' +
+        salesInquiryId
+      const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+      try {
+        const response = await axios.request(config)
+        if (response.status === 200) {
+          this.companions = response.data.map((item: any) => {
+            return {
+              id: item.id,
+              full_name: item.companion.full_name,
+              nationality: item.companion.nationality.name,
+            }
+          })
+          return response
+        } else {
+          return response
+        }
+      } catch (error) {
+        console.log(error)
+        return error
+      }
     },
   },
 })

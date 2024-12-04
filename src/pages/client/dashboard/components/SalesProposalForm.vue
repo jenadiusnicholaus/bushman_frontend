@@ -150,7 +150,9 @@
     </div>
 
     <div class="flex justify-end">
-      <VaButton :disabled="!isValidForm" @click="validateForm() && onSubmit()"> Submit</VaButton>
+      <VaButton save icon="save" :loading="saving" :disabled="!isValidForm" @click="validateForm() && onSubmit()">
+        save</VaButton
+      >
     </div>
   </VaForm>
 </template>
@@ -242,7 +244,7 @@ export default defineComponent({
   methods: {
     ...mapActions(useSalesInquiriesStore, ['createSalesConfirmationFinalization']),
     ...mapActions(usePriceListStore, ['getPriceList', 'getSalesPackageList']),
-    ...mapActions(useSalesInquiriesStore, ['getSalesPriceBreakdown']),
+    ...mapActions(useSalesInquiriesStore, ['getSalesPriceBreakdown', 'getObservers']),
     ...mapActions(useRegulatoryPackageStore, ['getRegulatoryPackages']),
 
     async getPL() {

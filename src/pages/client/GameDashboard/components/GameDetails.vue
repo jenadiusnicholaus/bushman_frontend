@@ -16,8 +16,27 @@
       <VaCardTitle><b>PH license:</b> N/A</VaCardTitle>
     </div>
     <VaCard tag="b">
-      <VaCardTitle>Killed Species</VaCardTitle>
-      <VaCardContent> <VaDataTable :items="gameActivies" /> </VaCardContent>
+      <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between px-4 py-2">
+        <div class="flex flex-col md:flex-row gap-2">
+          <template v-if="showAddActiviteForm">
+            <VaButton size="small" color="primary" @click="goBack">Cancel</VaButton>
+          </template>
+          <template v-else>
+            <VaCardTitle>Killed Species</VaCardTitle>
+          </template>
+          <!-- button to add new activity -->
+        </div>
+        <div class="flex flex-col md:flex-row gap-2">
+          <VaButton size="small" color="primary" @click="showAddActiviteForm = true">Add Activity</VaButton>
+        </div>
+      </div>
+
+      <VaCardContent>
+        <template v-if="showAddActiviteForm"> <ActivitesForm :activity-data="item" /> </template>
+        <template v-else>
+          <VaDataTable :items="activities" :loading="loadingActivities" />
+        </template>
+      </VaCardContent>
     </VaCard>
   </div>
 </template>
@@ -25,8 +44,14 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
 import { formatDateTime } from '../../../../services/utils'
+import { mapState, mapActions } from 'pinia'
+import { useGameStore } from '../../../../stores/game-store'
+import ActivitesForm from './ActivitesForm.vue'
 
 export default defineComponent({
+  components: {
+    ActivitesForm,
+  },
   props: {
     item: {
       type: Object as PropType<any>, // Specify the correct type of the item based on your data structure
@@ -38,21 +63,23 @@ export default defineComponent({
       formatDateTime,
     }
   },
+  data() {
+    return {
+      showAddActiviteForm: false,
+    }
+  },
   computed: {
-    gameActivies() {
-      return this.item.game_killed_activity.map((activity: any) => {
-        return {
-          species: activity.species.name,
-          quantity: activity.quantity,
-          area: activity.area.name,
-          weapon_used: activity.weapon_used,
-          date: activity.date,
-          time: activity.time,
-          gender: activity.spacies_gender,
-          coordinates: ` ${activity.location.geo_coordinates.coordinates[0].lat}, ${activity.location.geo_coordinates.coordinates[0].lng} `,
-          status: activity.status,
-        }
-      })
+    ...mapState(useGameStore, ['activities', 'loadingActivities']),
+  },
+  mounted() {
+    this.getActiviteActivites(this.item.id)
+  },
+
+  methods: {
+    ...mapActions(useGameStore, ['getActiviteActivites']),
+    goBack() {
+      this.showAddActiviteForm = false
+      this.getActiviteActivites(this.item.id)
     },
   },
 })

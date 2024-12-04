@@ -1,7 +1,7 @@
 <template>
   <VaInnerLoading :loading="loadingSales">
     <VaForm ref="iformRef">
-      <h3 class="font-bold text-lg mb-2">Hunting Game Information</h3>
+      <!-- <h3 class="font-bold text-lg mb-2">Hunting Game Information</h3>
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
         <VaSelect
           v-model="form.entity_contract_permit"
@@ -33,32 +33,79 @@
           placeholder="Select PH"
         />
       </div>
-      <VaDivider />
+      <VaDivider /> -->
       <!-- isAddGameActivities: false, 
-        -->
+          -->
 
-      <VaCheckbox v-model="isAddGameActivities" label="Add Game Activities" @input="addGameActivities" />
+      <!-- <VaCheckbox v-model="isAddGameActivities" label="Add Game Activities" @input="addGameActivities" /> -->
 
-      <VaAlert v-if="isAddGameActivities" color="info" outline class="mb-6">
+      <VaAlert color="info" outline class="mb-6">
         <h3 class="font-bold text-lg mb-2">Add Game Activities</h3>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
           <!-- lat -->
-          <VaInput v-model="form.lat" type="number" placeholder="Enter Latitude" label="Latitude" />
+          <VaInput
+            v-model="form.lat"
+            :rules="[(value: any) => value || 'Latitude is required']"
+            type="number"
+            placeholder="Enter Latitude"
+            label="Latitude"
+          />
           <!-- long -->
-          <VaInput v-model="form.lng" type="number" placeholder="Enter Longitude" label="Longitude" />
+          <VaInput
+            v-model="form.lng"
+            :rules="[(value: any) => value || 'Longitude is required']"
+            type="number"
+            placeholder="Enter Longitude"
+            label="Longitude"
+          />
           <!-- area -->
-          <VaSelect v-model="form.area_id" :options="areaOptions" placeholder="Select Area" label="Area" />
+          <VaSelect
+            v-model="form.area_id"
+            :rules="[(value: any) => value || 'Area is required']"
+            :options="areaOptions"
+            placeholder="Select Area"
+            label="Area"
+          />
 
           <!-- time -->
-          <VaDateInput v-model="form.date" placeholder="wounded/killed date" label="Start Date" />
-          <VaTimeInput v-model="form.time" clearable label="Time" placeholder="Wounded/Killed Time" />
+          <VaDateInput
+            v-model="form.date"
+            :rules="[(value: any) => value || 'Date is required']"
+            placeholder="wounded/killed date"
+            label="Start Date"
+          />
+          <VaTimeInput
+            v-model="form.time"
+            :rules="[(value: any) => value || 'Time is required']"
+            clearable
+            label="Time"
+            placeholder="Wounded/Killed Time"
+          />
           <!-- weapon -->
-          <VaInput v-model="form.weapon_used" type="number" placeholder="weapon used" label="Weapon Used" />
+          <VaInput
+            v-model="form.weapon_used"
+            :rules="[(value: any) => value || 'Weapon is required']"
+            type="number"
+            placeholder="weapon used"
+            label="Weapon Used"
+          />
           <!-- spacies -->
-          <VaSelect v-model="form.spacies_gender" :options="genderOptions" placeholder="Select Gender" label="Gender" />
+          <VaSelect
+            v-model="form.spacies_gender"
+            :rules="[(value: any) => value || 'Gender is required']"
+            :options="genderOptions"
+            placeholder="Select Gender"
+            label="Gender"
+          />
           <!-- status -->
-          <VaSelect v-model="form.status" :options="statusOptions" placeholder="Select Status" label="Status" />
+          <VaSelect
+            v-model="form.status"
+            :rules="[(value: any) => value || 'Status is required']"
+            :options="statusOptions"
+            placeholder="Select Status"
+            label="Status"
+          />
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <VaSelect
@@ -89,14 +136,14 @@
             <VaListLabel v-else color="secondary" class="va-text-code mb-2 text-left">No Game Added</VaListLabel>
 
             <!-- <VaListItem v-for="(s, index) in games" :key="index" class="list__item">
-              <VaListItemSection>
-                <VaListItemLabel>
-                  Name: {{ s.name }}
-                  <VaIcon name="delete" size="small" color="primary" @click="deleteFromStorage(index)" />
-                </VaListItemLabel>
-                <VaListItemLabel caption>Quantity: {{ s.quantity }}</VaListItemLabel>
-              </VaListItemSection>
-            </VaListItem> -->
+                <VaListItemSection>
+                  <VaListItemLabel>
+                    Name: {{ s.name }}
+                    <VaIcon name="delete" size="small" color="primary" @click="deleteFromStorage(index)" />
+                  </VaListItemLabel>
+                  <VaListItemLabel caption>Quantity: {{ s.quantity }}</VaListItemLabel>
+                </VaListItemSection>
+              </VaListItem> -->
 
             <VaDataTable :items="games" :columns="columns">
               <template #cell(status)="{ value }">
@@ -111,7 +158,11 @@
       </VaAlert>
 
       <div class="flex justify-end">
-        <VaButton :loading="sendingData" :disabled="!isValidForm" @click="validateForm() && onSubmit()">
+        <VaButton
+          :loading="sendingData"
+          :disabled="!isValidForm || sendingData || games.length == 0"
+          @click="validateForm() && onSubmit()"
+        >
           Submit</VaButton
         >
       </div>
@@ -132,6 +183,13 @@ import { format } from 'date-fns'
 import { useSettingsStore } from '../../../../stores/settings-store'
 
 export default defineComponent({
+  props: {
+    activityData: {
+      type: Object,
+      required: true,
+    },
+  },
+
   setup() {
     const { init } = useToast()
 
@@ -153,11 +211,11 @@ export default defineComponent({
     }
 
     const form = reactive({
-      entity_contract_permit: null as any,
-      start_date: null as any,
-      end_date: null as any,
+      // entity_contract_permit: null as any,
+      // start_date: null as any,
+      // end_date: null as any,
       description: '',
-      professional_hunters_ids: [] as any,
+      // professional_hunters_ids: [] as any,
       lat: null as any,
       lng: null as any,
       species: null as any,
@@ -253,28 +311,24 @@ export default defineComponent({
     },
     async onSubmit() {
       this.sendingData = true
-      const professional_hunters_ids = this.form.professional_hunters_ids.map((item: any) => item.value)
-
+      const professional_hunters_ids: any = []
       const data = {
-        entity_contract_permit_id: this.form.entity_contract_permit?.value,
-        client_id: this.client_id,
-        start_date: this.form.start_date,
-        end_date: this.form.end_date,
-        // i want
+        entity_contract_permit_id: this.activityData.entity_contract_permit.id,
+        client_id: this.activityData.client.id,
         professional_hunters_ids: professional_hunters_ids,
         games: this.games,
       }
 
-      console.log(data)
       try {
         const response: any = await this.createGameActivity(data)
         if (response.status === 201) {
-          this.init({ message: 'Contract created successfully', color: 'success' })
+          this.init({ message: response.data.message, color: 'success' })
           this.sendingData = false
         }
       } catch (error: any) {
         this.sendingData = false
         const errors = handleErrors(error.response)
+        console.log(error)
         this.init({
           message: '\n' + errors.map((error, index) => `${index + 1}. ${error}`).join('\n'),
           color: 'danger',

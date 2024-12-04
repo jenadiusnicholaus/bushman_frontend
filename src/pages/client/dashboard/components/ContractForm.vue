@@ -24,9 +24,9 @@
         />
         <VaDateInput
           v-model="form.end_date"
-          placeholder="Choose charter in date"
-          :rules="[(value: any) => value || 'Arrival Date is required']"
-          label="Charter In Date"
+          placeholder="Choose End date"
+          :rules="[(value: any) => value || 'End date is required']"
+          label="End  Date"
         />
       </div>
       <!-- description -->
