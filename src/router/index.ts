@@ -64,8 +64,8 @@ const routes: Array<RouteRecordRaw> = [
 
           // SalesContractPermit
           {
-            name: 'sales-contract-permit',
-            path: 'sales-contract-permit',
+            name: 'hunting-license',
+            path: 'hunting-license',
             component: () => import('../pages/client/dashboard/SalesContractPermit.vue'),
           },
 

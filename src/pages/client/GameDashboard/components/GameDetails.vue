@@ -13,7 +13,7 @@
         ><b>PH NAME:</b>
         {{ Array.isArray(item?.ph) ? item.ph.map((ph: any) => ph.ph.full_name).join(', ') : 'N/A' }}</VaCardTitle
       >
-      <VaCardTitle><b>PH license:</b> N/A</VaCardTitle>
+      <!-- <VaCardTitle><b>PH license:</b> N/A</VaCardTitle> -->
     </div>
     <VaCard tag="b">
       <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between px-4 py-2">
@@ -27,7 +27,13 @@
           <!-- button to add new activity -->
         </div>
         <div class="flex flex-col md:flex-row gap-2">
-          <VaButton size="small" color="primary" @click="showAddActiviteForm = true">Add Activity</VaButton>
+          <VaButton
+            v-if="!showAddActiviteForm && item.status !== 'CLOSED'"
+            size="small"
+            color="primary"
+            @click="showAddActiviteForm = true"
+            >Add Activity</VaButton
+          >
         </div>
       </div>
 

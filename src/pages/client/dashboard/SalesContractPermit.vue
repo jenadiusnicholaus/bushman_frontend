@@ -66,8 +66,8 @@ export default defineComponent({
     const columns = [
       { key: 'permit_number', sortable: true },
       { key: 'issued_date', sortable: true },
-
-      { key: 'created_at', sortable: true },
+      { key: 'start_date', sortable: true },
+      { key: 'expiry_date', sortable: true },
       { key: 'actions', label: 'Actions' },
     ]
 

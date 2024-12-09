@@ -73,7 +73,7 @@
             v-model="form.date"
             :rules="[(value: any) => value || 'Date is required']"
             placeholder="wounded/killed date"
-            label="Start Date"
+            label="Date"
           />
           <VaTimeInput
             v-model="form.time"
@@ -160,10 +160,21 @@
       <div class="flex justify-end">
         <VaButton
           :loading="sendingData"
+          class="p-2 m-2"
           :disabled="!isValidForm || sendingData || games.length == 0"
-          @click="validateForm() && onSubmit()"
+          icon="save"
+          @click="validateForm() && onSubmit('IN_PROGRESS')"
+          >Save</VaButton
         >
-          Submit</VaButton
+        <VaButton
+          :loading="sendingData"
+          class="p-2 m-2"
+          :disabled="!isValidForm || sendingData || games.length == 0"
+          icon="save"
+          color="warning"
+          @click="validateForm() && saveAndClose()"
+        >
+          Save and close the game activities</VaButton
         >
       </div>
     </VaForm>
@@ -280,6 +291,7 @@ export default defineComponent({
 
       phOptions: [] as any,
       sendingData: false,
+      sendingSaveClose: false,
     }
   },
   computed: {},
@@ -289,6 +301,7 @@ export default defineComponent({
     this.getSpeciesListOptions()
     this.getAreaListOptions()
     this.getPhVsetOptions()
+    console.log(this.activityData)
   },
 
   methods: {
@@ -309,14 +322,16 @@ export default defineComponent({
         this.games = []
       }
     },
-    async onSubmit() {
+    async onSubmit(gameState: any) {
       this.sendingData = true
+      // pass empty ph b'cause already added them on the main tables
       const professional_hunters_ids: any = []
       const data = {
         entity_contract_permit_id: this.activityData.entity_contract_permit.id,
         client_id: this.activityData.client.id,
         professional_hunters_ids: professional_hunters_ids,
         games: this.games,
+        game_state: gameState,
       }
 
       try {
@@ -324,9 +339,12 @@ export default defineComponent({
         if (response.status === 201) {
           this.init({ message: response.data.message, color: 'success' })
           this.sendingData = false
+          this.sendingSaveClose = false
         }
       } catch (error: any) {
         this.sendingData = false
+        this.sendingSaveClose = false
+
         const errors = handleErrors(error.response)
         console.log(error)
         this.init({
@@ -334,6 +352,10 @@ export default defineComponent({
           color: 'danger',
         })
       }
+    },
+    saveAndClose() {
+      this.sendingSaveClose = true
+      this.onSubmit('CLOSED')
     },
 
     createGameListObject() {

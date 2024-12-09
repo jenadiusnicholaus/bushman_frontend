@@ -5,7 +5,7 @@ const getStatusColor = (status: any) => {
     confirmed: 'success',
     declined: 'danger',
     cancelled: 'danger',
-    completed: 'success',
+    completed: 'primary',
   }
   return statusMapping[status] || 'default'
 }

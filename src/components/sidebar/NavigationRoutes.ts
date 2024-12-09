@@ -26,47 +26,177 @@ export default {
       },
       children: [
         {
+          name: 'price-list',
+          meta: {
+            icon: 'sell',
+          },
+          displayName: 'menu.price-list',
+        },
+        {
           name: 'quotas',
+          meta: {
+            icon: 'star_half',
+          },
+
           displayName: 'menu.sales-quotas',
         },
         {
           name: 'sales-inquiry',
+          meta: {
+            icon: 'live_help',
+          },
+
           displayName: 'menu.sales-inquiry',
         },
         {
           name: 'sales-confirmation',
+          meta: {
+            icon: 'check_circle',
+          },
+
           displayName: 'menu.sales-confirmation',
         },
 
         {
           name: 'sales-calendar',
+          meta: {
+            icon: 'calendar_month',
+          },
+
           displayName: 'menu.sales-calendar',
         },
         {
           name: 'sales-contracts',
+          meta: {
+            icon: 'verified',
+          },
+
           displayName: 'menu.sales-contracts',
         },
 
         // sales-contract-permit
-        {
-          name: 'sales-contract-permit',
-          displayName: 'menu.sales-contract-permit',
-        },
       ],
     },
     {
-      name: 'Games',
-      displayName: 'menu.game',
+      name: 'operations',
+      displayName: 'menu.operations',
       meta: {
-        icon: 'pets',
+        icon: 'group_work',
       },
       children: [
         {
-          name: 'game',
-          displayName: 'menu.game-killed',
+          name: 'hunting-license',
+          meta: {
+            icon: 'workspace_premium',
+          },
+
+          displayName: 'menu.hunting-license',
         },
 
-        // sales-contract-permit
+        {
+          name: 'game',
+          meta: {
+            icon: 'pets',
+          },
+
+          displayName: 'menu.game-killed',
+        },
+      ],
+    },
+
+    {
+      name: 'accounts',
+      displayName: 'menu.accounts',
+      meta: {
+        icon: 'monetization_on',
+      },
+      children: [
+        // {
+        //   name: 'hunting-license',
+        //   meta: {
+        //     icon: 'list_alt',
+        //   },
+        //   displayName: 'menu.hunting-license',
+        // },
+        // {
+        //   name: 'game',
+        //   meta: {
+        //     icon: 'list_alt',
+        //   },
+        //   displayName: 'menu.game-killed',
+        // },
+      ],
+    },
+
+    {
+      name: 'procurements',
+      displayName: 'menu.procurements',
+      meta: {
+        icon: 'storefront',
+      },
+      children: [
+        // {
+        //   name: 'hunting-license',
+        //   meta: {
+        //     icon: 'list_alt',
+        //   },
+        //   displayName: 'menu.hunting-license',
+        // },
+        // {
+        //   name: 'game',
+        //   meta: {
+        //     icon: 'list_alt',
+        //   },
+        //   displayName: 'menu.game-killed',
+        // },
+      ],
+    },
+
+    {
+      name: 'accounts',
+      displayName: 'menu.accounts',
+      meta: {
+        icon: 'monetization_on',
+      },
+      children: [
+        // {
+        //   name: 'hunting-license',
+        //   meta: {
+        //     icon: 'list_alt',
+        //   },
+        //   displayName: 'menu.hunting-license',
+        // },
+        // {
+        //   name: 'game',
+        //   meta: {
+        //     icon: 'list_alt',
+        //   },
+        //   displayName: 'menu.game-killed',
+        // },
+      ],
+    },
+
+    {
+      name: 'hr',
+      displayName: 'menu.hr',
+      meta: {
+        icon: 'supervisor_account',
+      },
+      children: [
+        // {
+        //   name: 'hunting-license',
+        //   meta: {
+        //     icon: 'list_alt',
+        //   },
+        //   displayName: 'menu.hunting-license',
+        // },
+        // {
+        //   name: 'game',
+        //   meta: {
+        //     icon: 'list_alt',
+        //   },
+        //   displayName: 'menu.game-killed',
+        // },
       ],
     },
 
@@ -79,33 +209,49 @@ export default {
       children: [
         {
           name: 'area-settings',
+          meta: {
+            icon: 'area_chart',
+          },
+
           displayName: 'menu.settings-area',
         },
         {
           name: 'species-settings',
+          meta: {
+            icon: 'pets',
+          },
+
           displayName: 'menu.settings-species',
         },
         {
           name: 'qoutas-settings',
+          meta: {
+            icon: 'star_half',
+          },
+
           displayName: 'menu.settings-qoutas',
         },
         // regulatory-package
         {
           name: 'regulatory-package',
+          meta: {
+            icon: 'local_police',
+          },
+
           displayName: 'menu.regulatory-package',
         },
 
         // sales-package
         {
           name: 'sales-package',
+          meta: {
+            icon: 'check_box',
+          },
+
           displayName: 'menu.sales-package',
         },
 
         // price-list
-        {
-          name: 'price-list',
-          displayName: 'menu.price-list',
-        },
       ],
     },
     // {

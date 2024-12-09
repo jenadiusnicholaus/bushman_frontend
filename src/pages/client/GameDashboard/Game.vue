@@ -32,6 +32,11 @@
       <template v-if="!showDetails">
         <template v-if="!showAddgameForm">
           <VaDataTable :items="games" :columns="columns" :loading="loadinggames">
+            <template #cell(status)="{ value }">
+              <VaChip :color="getStatusColor(value)" size="small">
+                {{ getStatsText(value) }}
+              </VaChip>
+            </template>
             <template #cell(actions)="{ rowData }">
               <VaButton preset="plain" icon="download" @click="downloadPdf(rowData.pdf)"></VaButton>
               <VaButton preset="plain" icon="visibility" @click="viewgame(rowData.selfitem)"></VaButton>
@@ -74,6 +79,7 @@ export default defineComponent({
       { key: 'client_name', sortable: true },
       { key: 'start_date', sortable: true },
       { key: 'end_date', sortable: true },
+      { key: 'status', label: 'status' },
       { key: 'actions', label: 'Actions' },
     ]
 
@@ -99,6 +105,37 @@ export default defineComponent({
       this.showDetails = true
       this.showAddgameForm = false
       this.getActiviteActivites(game.id)
+    },
+    getStatusColor(status: string) {
+      switch (status) {
+        case 'NOT_STARTED':
+          return 'default'
+        case 'INITIATED':
+          return 'warning'
+        case 'CLOSED':
+          return 'success' // Adjust as needed
+        case 'IN_PROGRESS':
+          return 'info'
+
+        default:
+          return 'default' // fallback color
+      }
+    },
+
+    getStatsText(status: string) {
+      switch (status) {
+        case 'NOT_STARTED':
+          return 'Not Started'
+        case 'INITIATED':
+          return 'Initiated'
+        case 'CLOSED':
+          return 'Finished' // Adjust as needed
+        case 'IN_PROGRESS':
+          return 'In Progress'
+
+        default:
+          return 'default' // fallback color
+      }
     },
 
     gotBack() {

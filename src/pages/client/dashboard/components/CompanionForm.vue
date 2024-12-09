@@ -449,7 +449,7 @@ export default defineComponent({
         nationalityId: this.form.nationality.value,
         countryId: this.form.country.value,
         salesInquiryId: this.salesInquiryId,
-        regulatory_package_id: this.form.regulatory_package_id.value,
+        regulatoryPackageId: this.form.regulatory_package_id.value,
         identityNumber: this.form.id_number,
       }
       try {

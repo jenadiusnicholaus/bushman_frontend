@@ -19,9 +19,9 @@
         />
         <VaDateInput
           v-model="form.end_date"
-          placeholder="Choose charter in date"
+          placeholder="Choose End date"
           :rules="[(value: any) => value || 'Arrival Date is required']"
-          label="Charter In Date"
+          label="End date"
         />
         <VaSelect
           v-model="form.professional_hunters_ids"
@@ -111,10 +111,32 @@
       </VaAlert>
 
       <div class="flex justify-end">
-        <VaButton :loading="sendingData" :disabled="!isValidForm" @click="validateForm() && onSubmit()">
-          Submit</VaButton
+        <VaButton
+          :loading="sendingData"
+          class="p-2 m-2"
+          :disabled="!isValidForm"
+          icon="save"
+          @click="validateForm() && onSubmit('IN_PROGRESS')"
+          >Save</VaButton
+        >
+        <VaButton
+          v-if="isAddGameActivities"
+          :loading="sendingData"
+          class="p-2 m-2"
+          :disabled="!isValidForm"
+          icon="save"
+          color="warning"
+          @click="validateForm() && onSubmit('CLOSED')"
+        >
+          Save and close the game activities</VaButton
         >
       </div>
+
+      <!-- <div class="flex justify-end">
+        <VaButton :loading="sendingData" :disabled="!isValidForm" @click="validateForm() && onSubmit()">
+          Submit</VaButton
+        > -->
+      <!-- </div> -->
     </VaForm>
   </VaInnerLoading>
 </template>
@@ -251,7 +273,7 @@ export default defineComponent({
         this.games = []
       }
     },
-    async onSubmit() {
+    async onSubmit(gameState: any) {
       this.sendingData = true
       const professional_hunters_ids = this.form.professional_hunters_ids.map((item: any) => item.value)
 
@@ -262,6 +284,7 @@ export default defineComponent({
         end_date: this.form.end_date,
         // i want
         professional_hunters_ids: professional_hunters_ids,
+        game_state: gameState,
         games: this.games,
       }
 

@@ -37,6 +37,7 @@ export const useGameStore = defineStore('sales_game', {
           return {
             permit_number: item?.entity_contract_permit?.permit_number ?? '',
             client_name: item?.client.full_name,
+            status: item.status,
             pdf: item.pdf,
             selfitem: item,
             start_date: formatDateTime(item?.start_date),
@@ -65,6 +66,8 @@ export const useGameStore = defineStore('sales_game', {
         coordinates_type: 'Point',
         professional_hunters_ids: payload.professional_hunters_ids,
         games: payload.games,
+        sales_confirmation_proposal_id: payload.sales_confirmation_proposal_id,
+        game_state: payload.game_state,
       })
 
       const config = {
@@ -144,6 +147,8 @@ export const useGameStore = defineStore('sales_game', {
         description: payload.description,
         spacies_gender: payload.gender,
         status: payload.status,
+        sales_confirmation_proposal_id: payload.sales_confirmation_proposal_id,
+        game_state: payload.game_state,
       })
 
       const config = {

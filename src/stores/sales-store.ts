@@ -18,7 +18,6 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
 
   actions: {
     async getSalesInquiries(seasonId: any, preferredDate: any) {
-      // ?season_id=1&preferred_date=2024-10-14
       const formattedDate = preferredDate ? format(new Date(preferredDate), 'yyyy-MM-dd') : ''
 
       const url =
@@ -94,7 +93,7 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
           this.loadingresults = false
           this.results = response.data.map((item: any) => {
             return {
-              code: item.sales_inquiry.code,
+              // code: item.sales_inquiry.code,
               name: item?.sales_inquiry?.entity?.full_name,
               area: item?.sales_inquiry?.area[0]?.area?.name,
               airport_name: item?.itinerary?.airport_name,
@@ -287,6 +286,7 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
       const request_data = {
         full_name: payload.fullName,
         nationality_id: payload.nationalityId,
+        country_id: payload.countryId,
         identity_number: payload.identityNumber,
         sales_inquiry_id: payload.salesInquiryId,
         regulatory_package_id: payload.regulatoryPackageId,

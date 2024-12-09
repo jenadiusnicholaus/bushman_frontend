@@ -31,8 +31,9 @@
 
           <VaTitle style="font-weight: bold">Preference Information</VaTitle>
           <p>Preferred Date: {{ formatDate(item?.preference?.preferred_date) }}</p>
-          <p>Number of Hunters: {{ safeString(item?.preference?.no_of_hunters?.toString()) }}</p>
-          <p>Number of Companions: {{ safeString(item?.preference?.no_of_companions?.toString()) }}</p>
+          <p>No of Companions: {{ safeString(item?.preference?.no_of_companions?.toString()) }}</p>
+          <p>No of Observers: {{ safeString(item?.preference?.no_of_observers?.toString()) }}</p>
+
           <p>Number of Days: {{ safeString(item?.preference?.no_of_days?.toString()) }}</p>
 
           <VaDivider />

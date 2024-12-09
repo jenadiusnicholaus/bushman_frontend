@@ -40,7 +40,7 @@
           >{{ confirmText }}</VaButton
         >
 
-        <VaButton
+        <!-- <VaButton
           roud
           color="success"
           class="px-2 py-2"
@@ -49,7 +49,7 @@
           size="small"
           @click="complete()"
           >Complete</VaButton
-        >
+        > -->
       </template>
     </div>
 
@@ -339,14 +339,6 @@
           />
         </div>
       </template>
-      <!-- 
-      if sales data status is confirmed, show modal with payment details and upload payment document.
-      if sales data status is provision_sales, show modal with provision sales details and upload signed contract.
-      if sales data status is confirmed, show modal with payment details and upload payment document.
-      
-
-
-       -->
 
       <template v-else-if="salesData?.status?.status == 'provision_sales'">
         <VaFileUpload
@@ -669,7 +661,6 @@ export default defineComponent({
         date: format(this.paymentForm.date, 'yyyy-MM-dd') ?? null,
         account_type: this.paymentForm?.accountType?.value ?? 'SALES_ACCOUNT',
         reference_number: this.paymentForm.reference_number ?? null,
-        // required for CR transaction
 
         currency_id: this.paymentForm.currency_id.value,
         transaction_type: this.transaction_type,
@@ -692,16 +683,15 @@ export default defineComponent({
 
       try {
         if (this.createCRTransaction) {
-          const transactionResponse = await this.createCRDRTransaction(transactionPayload)
+          const response = await this.updatesalesConfirmationStatus(payload)
 
-          if (transactionResponse.status === 201) {
-            await this.delay(1000) // Optional delay before creating transaction if needed
-
+          if (response.status === 200) {
+            // Create the transaction
+            const transactionResponse = await this.createCRDRTransaction(transactionPayload)
             // Wait for this API call to finish
-            const response = await this.updatesalesConfirmationStatus(payload)
 
             // Now check if the transaction was successful
-            if (response.status === 200) {
+            if (transactionResponse.status === 201) {
               this.isOpened = false
               this.loading = false
               this.$vaToast.init({
@@ -725,11 +715,13 @@ export default defineComponent({
           }
         } else if (this.createDRTransaction) {
           // Similar logic for DR transaction creation
-          const drcrResponse = await this.createDRCRTransaction(transactionPayload)
-          if (drcrResponse.status === 201) {
+          const response = await this.updatesalesConfirmationStatus(payload)
+
+          if (response.status === 200) {
+            const drcrResponse = await this.createDRCRTransaction(transactionPayload)
+
             await this.delay(1000) // Optional delay before creating transaction if needed
-            const response = await this.updatesalesConfirmationStatus(payload)
-            if (response.status === 200) {
+            if (drcrResponse.status === 201) {
               this.isOpened = false
               this.loading = false
               this.$vaToast.init({

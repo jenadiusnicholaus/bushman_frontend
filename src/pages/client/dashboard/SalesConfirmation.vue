@@ -51,7 +51,7 @@ export default {
       items: [] as Array<any>,
       searchText: null as any,
       columns: [
-        { key: 'code', label: 'Code', width: 80 },
+        // { key: 'code', label: 'Code', width: 80 },
         { key: 'name', label: 'Client', width: 120 },
         { key: 'area', label: 'Area', width: 120 },
         { key: 'airport_name', label: 'Airport', width: 50 },
@@ -120,7 +120,7 @@ export default {
         case 'provision_sales':
           return 'confirm' // Adjust as needed
         case 'confirmed':
-          return 'complete'
+          return 'view'
         case 'declined':
           this.buttondisables = true
           return 'View' // Corresponds to VaBadge color
