@@ -150,7 +150,13 @@
     </div>
 
     <div class="flex justify-end">
-      <VaButton save icon="save" :loading="saving" :disabled="!isValidForm" @click="validateForm() && onSubmit()">
+      <VaButton
+        save
+        icon="save"
+        :loading="saving"
+        :disabled="!isValidForm || saving || installments.length < 0"
+        @click="validateForm() && onSubmit()"
+      >
         save</VaButton
       >
     </div>

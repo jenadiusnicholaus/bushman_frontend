@@ -102,10 +102,16 @@
         <div><strong>No. of Hunters:</strong> {{ salesData?.sales_inquiry?.preference?.no_of_hunters ?? 'N/A' }}</div>
         <div>
           <strong>No. of Observers:</strong> {{ salesData?.sales_inquiry?.preference?.no_of_observers ?? 'N/A' }}
+          <VaButton size="small" round preset="secondary" border-color="primary" @click="showObModal = !showObModal">
+            Add observers
+          </VaButton>
         </div>
         <div><strong>No. of Days:</strong> {{ salesData?.sales_inquiry?.preference?.no_of_days ?? 'N/A' }}</div>
         <div>
           <strong>No. of Companions:</strong> {{ salesData?.sales_inquiry?.preference?.no_of_companions ?? 'N/A' }}
+          <VaButton size="small" preset="secondary" round border-color="primary" @click="showComModal = !showComModal">
+            Add companions
+          </VaButton>
         </div>
         <div>
           <strong>Preferred Date:</strong>
@@ -401,7 +407,16 @@
       </div>
     </VaModal>
 
-    <!-- </VaInnerLoading> -->
+    <VaModal v-model="showComModal" :close-button="true" :hide-default-actions="true">
+      <!-- <ObserversForm :sales-inquiry-id="item.id"> </ObserversForm>
+      </section> -->
+
+      <CompanionForm :sales-inquiry-id="salesData?.sales_inquiry.id"> </CompanionForm>
+    </VaModal>
+
+    <VaModal v-model="showObModal" :close-button="true" :hide-default-actions="true">
+      <ObserversForm :sales-inquiry-id="salesData?.sales_inquiry.id"> </ObserversForm>
+    </VaModal>
   </div>
 </template>
 
@@ -415,8 +430,15 @@ import getStatusColor from '../../../../utils/status_color'
 import { useAccountsStore } from '../../../../stores/account-store'
 import { format } from 'date-fns'
 import downloadPdf from '../../../../utils/pdfDownloader'
+import CompanionForm from './CompanionForm.vue'
+import ObserversForm from './ObserversForm.vue'
 
 export default defineComponent({
+  components: {
+    CompanionForm,
+    ObserversForm,
+  },
+
   props: {
     salesData: {
       type: Object,
@@ -456,6 +478,9 @@ export default defineComponent({
       createDRTransaction: false,
       createCRTransaction: false,
       completingSales: false,
+      showComModal: false,
+      showObModal: false,
+
       downloadPdf,
 
       statusOptions: [

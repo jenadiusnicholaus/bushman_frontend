@@ -17,8 +17,8 @@
       <div class="modal-body">
         <div class="event-info">
           <p><strong>Client:</strong> {{ event?.title ?? 'N/A' }}</p>
-          <p><strong>Charter in date:</strong> {{ event?.start ? formatDateTime(event.start) : 'N/A' }}</p>
-          <p><strong>Charter out date:</strong> {{ event?.end ? formatDateTime(event.end) : 'N/A' }}</p>
+          <p><strong>Start date:</strong> {{ event?.start ? formatDateTime(event.start) : 'N/A' }}</p>
+          <p><strong>End date:</strong> {{ event?.end ? formatDateTime(event.end) : 'N/A' }}</p>
         </div>
 
         <VaDivider />
@@ -35,7 +35,7 @@
                 : 'N/A'
             }}
           </p>
-          <p><strong>Number of Hunters:</strong> {{ event?.extendedProps?.preference?.no_of_hunters ?? 'N/A' }}</p>
+          <!-- <p><strong>Number of Hunters:</strong> {{ event?.extendedProps?.preference?.no_of_hunters ?? 'N/A' }}</p> -->
           <p><strong>Number of Observers:</strong> {{ event?.extendedProps?.preference?.no_of_observers ?? 'N/A' }}</p>
           <p><strong>Number of Days:</strong> {{ event?.extendedProps?.preference?.no_of_days ?? 'N/A' }}</p>
           <p>
@@ -241,12 +241,10 @@ export default {
       const response = await this.getCalendarStats()
       if (response.status === 200) {
         this.calendarOptions.events = response.data.map((event: any) => {
-          const start = format(event.itinerary.charter_in, 'yyyy-MM-dd')
-          const end = format(event.itinerary.charter_out, 'yyyy-MM-dd')
-          const from_date = formatDateTime(event.itinerary.charter_in)
-          const to_date = formatDateTime(event.itinerary.charter_out)
-          console.log(start)
-          console.log(end)
+          const start = format(event.sales_inquiry.preference.start_date, 'yyyy-MM-dd')
+          const end = format(event.sales_inquiry.preference.end_date, 'yyyy-MM-dd')
+          const from_date = formatDateTime(event.sales_inquiry.preference.start_date)
+          const to_date = formatDateTime(event.sales_inquiry.preference.end_date)
 
           return {
             id: event.id,

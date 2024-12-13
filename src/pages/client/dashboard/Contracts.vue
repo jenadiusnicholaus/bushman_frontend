@@ -31,12 +31,46 @@
 
       <template v-if="!showDetails">
         <template v-if="!showAddContractForm">
-          <VaDataTable :items="contracts" :columns="columns" :loading="loadingContracts">
-            <template #cell(actions)="{ rowData }">
-              <VaButton preset="plain" icon="download" @click="downloadPdf(rowData.pdf)"></VaButton>
-              <VaButton preset="plain" icon="visibility" @click="viewContract(rowData.selfitem)"></VaButton>
+          <VaTabs v-model="value" vertical grow>
+            <template #tabs>
+              <VaTab
+                v-for="tab in tabs"
+                :key="tab.title"
+                :name="tab.title"
+                class="px-4 py-2"
+                @click="
+                  getContracts(currentTab.content === 'componions_contracts' ? 'COMPANION_HUNTER' : 'MAIN_HUNTER')
+                "
+              >
+                <VaIcon :name="tab.icon" size="small" class="mr-2" />
+                {{ tab.title }}
+              </VaTab>
             </template>
-          </VaDataTable>
+            <VaCard square outlined :stripe="false">
+              <VaCardTitle>
+                <VaIcon :name="currentTab.icon" size="small" class="mr-2" color="background-element" />
+                {{ currentTab.title }}
+              </VaCardTitle>
+              <VaCardContent>
+                <template v-if="currentTab.content === 'main_hunters_contracts'">
+                  <VaDataTable :items="contracts" :columns="columns" :loading="loadingContracts">
+                    <template #cell(actions)="{ rowData }">
+                      <VaButton preset="plain" icon="download" @click="downloadPdf(rowData.pdf)"></VaButton>
+                      <VaButton preset="plain" icon="visibility" @click="viewContract(rowData.selfitem)"></VaButton>
+                    </template>
+                  </VaDataTable>
+                </template>
+                <template v-if="currentTab.content === 'componions_contracts'">
+                  <VaDataTable :items="contracts" :columns="columns" :loading="loadingContracts">
+                    <template #cell(actions)="{ rowData }">
+                      <VaButton preset="plain" icon="download" @click="downloadPdf(rowData.pdf)"></VaButton>
+                      <VaButton preset="plain" icon="visibility" @click="viewContract(rowData.selfitem)"></VaButton>
+                    </template>
+                  </VaDataTable>
+                </template>
+              </VaCardContent>
+            </VaCard>
+          </VaTabs>
         </template>
         <template v-else>
           <ContractForm> </ContractForm>
@@ -63,6 +97,10 @@ export default defineComponent({
     ContractForm,
   },
   data() {
+    const TABS = [
+      { icon: 'feed', title: "Main Hunter's ", content: 'main_hunters_contracts' },
+      { icon: 'feed', title: 'Componions ', content: 'componions_contracts' },
+    ]
     const columns = [
       { key: 'contract_number', sortable: true },
       { key: 'client_name', sortable: true },
@@ -78,10 +116,15 @@ export default defineComponent({
       item: null as any,
       showDetails: false,
       showAddContractForm: false,
+      tabs: TABS,
+      value: TABS[0].title,
     }
   },
   computed: {
     ...mapState(useContractsStore, ['contracts', 'loadingContracts']),
+    currentTab(): any {
+      return this.tabs.find(({ title }) => title === this.value)
+    },
   },
   mounted() {
     this.getContracts()

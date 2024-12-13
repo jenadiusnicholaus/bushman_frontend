@@ -64,6 +64,10 @@ export default defineComponent({
         { key: 'nationality' },
 
         { key: 'preference.preferred_date', label: 'Preferred date', width: 80 },
+
+        { key: 'preference.start_date', label: 'Start date', width: 80 },
+        { key: 'preference.end_date', label: 'End date', width: 80 },
+
         { key: 'actions', width: 80 },
       ],
       salesInquiryItems: [],
@@ -120,6 +124,8 @@ export default defineComponent({
               no_of_days: item?.preference?.no_of_days,
               no_of_companions: item?.preference?.no_of_companions,
               special_requests: item?.preference?.special_requests,
+              start_date: item?.preference?.start_date !== null ? formatDateTime(item?.preference?.start_date) : '',
+              end_date: item?.preference?.end_date !== null ? formatDateTime(item?.preference?.end_date) : '',
               budget_estimation: item?.preference?.budget_estimation,
               prev_experience: item?.preference?.prev_experience,
               preferred_date: formatDateTime(item?.preference?.preferred_date),

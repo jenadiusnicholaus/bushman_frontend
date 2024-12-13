@@ -1,5 +1,5 @@
 <template>
-  <VaCard>
+  <VaCard square outlined>
     <VaCardContent>
       <section>
         <header class="flex items-center justify-between">

@@ -182,6 +182,20 @@
                 :rules="[(v: any) => v || 'Preferred Date is required']"
                 required
               />
+              <VaDateInput
+                v-model="form.start_date"
+                label="Start Date"
+                placeholder="Select Start Date"
+                :rules="[(v: any) => v || 'Start Date is required']"
+                required
+              />
+              <VaDateInput
+                v-model="form.end_date"
+                label="End Date"
+                placeholder="Select End Date"
+                :rules="[(v: any) => v || 'End Date is required']"
+                required
+              />
             </div>
 
             <h3 class="font-bold text-lg mb-2">Preferred Species</h3>
@@ -338,6 +352,8 @@ export default defineComponent({
       season: null as any,
       preferred_date: null as any,
       id_number: '',
+      start_date: null as any,
+      end_date: null as any,
     })
 
     const contactForm = reactive({
@@ -570,6 +586,8 @@ export default defineComponent({
         species: this.speciesObjects,
         areaId: this.form.area.value,
         season: this.form.season,
+        startDate: this.form.start_date,
+        endDate: this.form.end_date,
         preferredDate: this.form.preferred_date,
         identityNumber: this.form.id_number,
       }

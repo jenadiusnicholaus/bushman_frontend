@@ -16,9 +16,13 @@ export const useContractsStore = defineStore('sales_contracts', {
   },
 
   actions: {
-    async getContracts() {
+    async getContracts(contractorType: string = 'MAIN_HUNTER') {
       this.loadingContracts = true
-      const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_SALES_CONFIRMATION_CONTRACT_VSET_URL
+      const url =
+        import.meta.env.VITE_APP_BASE_URL +
+        import.meta.env.VITE_APP_SALES_CONFIRMATION_CONTRACT_VSET_URL +
+        '?contractor_type=' +
+        contractorType
 
       const config = {
         method: 'get',
@@ -60,6 +64,7 @@ export const useContractsStore = defineStore('sales_contracts', {
         },
       }
       const response = await axios.request(config)
+
       if (response.status === 200) {
         this.permits = response.data.map((permit: any) => {
           return {
@@ -114,6 +119,7 @@ export const useContractsStore = defineStore('sales_contracts', {
         sales_confirmation_proposal_id: payload.sales_confirmation_proposal_id,
         entity_id: payload.entity_id,
         start_date: format(payload.start_date, 'yyyy-MM-dd'),
+        contractor_type: payload.contractor_type,
         end_date: format(payload.end_date, 'yyyy-MM-dd'),
         description: 'Updated contract description.',
       })

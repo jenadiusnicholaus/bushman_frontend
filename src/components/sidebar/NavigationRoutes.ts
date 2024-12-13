@@ -153,30 +153,6 @@ export default {
     },
 
     {
-      name: 'accounts',
-      displayName: 'menu.accounts',
-      meta: {
-        icon: 'monetization_on',
-      },
-      children: [
-        // {
-        //   name: 'hunting-license',
-        //   meta: {
-        //     icon: 'list_alt',
-        //   },
-        //   displayName: 'menu.hunting-license',
-        // },
-        // {
-        //   name: 'game',
-        //   meta: {
-        //     icon: 'list_alt',
-        //   },
-        //   displayName: 'menu.game-killed',
-        // },
-      ],
-    },
-
-    {
       name: 'hr',
       displayName: 'menu.hr',
       meta: {

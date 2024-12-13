@@ -1,50 +1,72 @@
 <template>
   <VaInnerLoading :loading="loadingSales">
-    <VaForm ref="iformRef">
-      <h3 class="font-bold text-lg mb-2">Sales Confirmation</h3>
-      <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4">
-        <VaSelect
-          v-model="form.proposal"
-          :options="proposalOptions"
-          :rules="[(value: any) => value || 'Sales is required']"
-          placeholder="Select confirmation "
-          label="Choose sales confirmation"
-          @update:modelValue="onValueChange"
-        />
-      </div>
-      <h3 class="font-bold text-lg mb-2">Contract Details</h3>
+    <VaTabs v-model="value" vertical grow>
+      <template #tabs>
+        <VaTab v-for="tab in tabs" :key="tab.title" :name="tab.title">
+          <VaIcon :name="tab.icon" size="small" class="mr-2" />
+          {{ tab.title }}
+        </VaTab>
+      </template>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <!-- arrival -->
-        <VaDateInput
-          v-model="form.start_date"
-          placeholder="Choose start date"
-          :rules="[(value: any) => value || 'Start date is required']"
-          label="Start Date"
-        />
-        <VaDateInput
-          v-model="form.end_date"
-          placeholder="Choose End date"
-          :rules="[(value: any) => value || 'End date is required']"
-          label="End  Date"
-        />
-      </div>
-      <!-- description -->
-      <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4">
-        <VaTextarea
-          v-model="form.description"
-          max-length="125"
-          label="Short text about something"
-          counter
-          required-mark
-          :rules="[(v: any) => (v && v.length > 0) || 'Required', (v: any) => v && v.length < 125]"
-        />
-      </div>
+      <VaCard square outlined>
+        <VaCardTitle class="mb-4">
+          {{ currentTab.title }}
+        </VaCardTitle>
+        <VaCardContent>
+          <VaForm ref="iformRef">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <VaSelect
+                v-model="form.proposal"
+                :options="proposalOptions"
+                :rules="[(value: any) => value || 'Sales confirmation is required']"
+                placeholder="Select confirmation "
+                label="Choose sales confirmation"
+                @update:modelValue="onValueChange"
+              />
+              <VaSelect
+                v-if="currentTab.content === 'companion_contract'"
+                v-model="form.enity_id"
+                :options="companions"
+                :rules="[(value: any) => value || 'Companion is required']"
+                placeholder="Select companion"
+                label="Choose companion"
+              />
+            </div>
 
-      <div class="flex justify-end">
-        <VaButton :disabled="!isValidForm" @click="validateForm() && onSubmit()"> Submit</VaButton>
-      </div>
-    </VaForm>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <!-- arrival -->
+              <VaDateInput
+                v-model="form.start_date"
+                placeholder="Choose start date"
+                :rules="[(value: any) => value || 'Start date is required']"
+                label="Start Date"
+              />
+              <VaDateInput
+                v-model="form.end_date"
+                placeholder="Choose End date"
+                :rules="[(value: any) => value || 'End date is required']"
+                label="End  Date"
+              />
+            </div>
+            <!-- description -->
+            <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4">
+              <VaTextarea
+                v-model="form.description"
+                max-length="125"
+                label="Short text about something"
+                counter
+                required-mark
+                :rules="[(v: any) => (v && v.length > 0) || 'Required', (v: any) => v && v.length < 125]"
+              />
+            </div>
+
+            <div class="flex justify-end">
+              <VaButton :disabled="!isValidForm" @click="validateForm() && onSubmit()"> Submit</VaButton>
+            </div>
+          </VaForm>
+        </VaCardContent>
+      </VaCard>
+    </VaTabs>
   </VaInnerLoading>
 </template>
 
@@ -52,7 +74,7 @@
 import { useForm, useToast } from 'vuestic-ui'
 import { defineComponent, ref, reactive } from 'vue'
 import { useSalesInquiriesStore } from '../../../../stores/sales-store'
-import { mapActions } from 'pinia'
+import { mapActions, mapState } from 'pinia'
 import { useContractsStore } from '../../../../stores/contracts-store'
 import handleErrors from '../../../../utils/errorHandler'
 
@@ -79,6 +101,7 @@ export default defineComponent({
 
     const form = reactive({
       proposal: null as any,
+      enity_id: null as any,
       start_date: null as any,
       end_date: null as any,
       description: '',
@@ -98,6 +121,10 @@ export default defineComponent({
   },
 
   data() {
+    const TABS = [
+      { icon: 'feed', title: 'Main Hunter ', content: 'main_hunter_contract' },
+      { icon: 'feed', title: 'Companion Hunter ', content: 'companion_contract' },
+    ]
     const packages = [] as any
     return {
       packages,
@@ -106,9 +133,17 @@ export default defineComponent({
       proposalOptions: [] as any,
       loadingSales: false,
       salesItem: null as any,
+      tabs: TABS,
+      value: TABS[0].title,
     }
   },
-  computed: {},
+  computed: {
+    ...mapState(useSalesInquiriesStore, ['companions']),
+
+    currentTab(): any {
+      return this.tabs.find(({ title }) => title === this.value)
+    },
+  },
 
   mounted() {
     this.getSalesProposalOptions()
@@ -117,19 +152,23 @@ export default defineComponent({
   methods: {
     ...mapActions(useContractsStore, ['createContract']),
     ...mapActions(useSalesInquiriesStore, ['getallSalesConfirmation']),
+
+    ...mapActions(useSalesInquiriesStore, ['getCompanions']),
     onValueChange(value: any) {
       console.log(value)
       this.salesItem = value.selfitem
+      console.log(value.selfitem)
+      this.getCompanions(value.selfitem.sales_inquiry.id, true)
     },
     async onSubmit() {
       const data = {
         sales_confirmation_proposal_id: this.form.proposal.value,
-        entity_id: this?.salesItem?.sales_inquiry?.entity.id,
+        entity_id: this.currentTab?.content === 'companion_contract' ? this.form.enity_id.value : null,
         start_date: this.form.start_date,
         end_date: this.form.end_date,
+        contractor_type: this.currentTab?.content === 'companion_contract' ? 'COMPANION_HUNTER' : 'MAIN_HUNTER',
         description: this.form.description,
       }
-      console.log(data)
       try {
         const response: any = await this.createContract(data)
         if (response.status === 201) {
@@ -144,6 +183,11 @@ export default defineComponent({
       }
     },
 
+    // getCompanions(proposalId: any) {
+    //   // TODO: Implement this method
+    //   //
+    // },
+
     async getSalesProposalOptions() {
       this.loadingSales = true
       const response: any = await this.getallSalesConfirmation()
@@ -155,6 +199,7 @@ export default defineComponent({
           return {
             text: `sales confirmation for ${item.sales_inquiry.entity.full_name}`,
             value: item.id,
+            selfitem: item,
           }
         })
       } else {

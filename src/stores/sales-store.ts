@@ -43,6 +43,8 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
     async createSalesInquiry(payload: any) {
       const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_SALES_INQUIRIES_URL
       const formattedDate = payload?.preferredDate ? format(new Date(payload.preferredDate), 'yyyy-MM-dd') : null
+      const start_date = payload.startDate ? format(new Date(payload.startDate), 'yyyy-MM-dd') : null
+      const end_date = payload.endDate ? format(new Date(payload.endDate), 'yyyy-MM-dd') : null
       const data = JSON.stringify({
         categories: 'Hunter',
         full_name: payload?.fullName,
@@ -57,6 +59,8 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
         area_id: payload?.areaId,
         season: payload?.season.value,
         preferred_date: formattedDate,
+        start_date: start_date,
+        end_date: end_date,
         identity_number: payload?.identityNumber,
       })
 
@@ -312,7 +316,7 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
       return response
     },
 
-    async getCompanions(salesInquiryId: any) {
+    async getCompanions(salesInquiryId: any, usedOptionsList: boolean = false) {
       const url =
         import.meta.env.VITE_APP_BASE_URL +
         import.meta.env.VITE_APP_SALES_CONFIRMATION_COMPANION_VSET_URL +
@@ -328,16 +332,26 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
       }
       try {
         const response = await axios.request(config)
-        if (response.status === 200) {
+        if (usedOptionsList === false)
+          if (response.status === 200) {
+            this.companions = response.data.map((item: any) => {
+              return {
+                id: item.id,
+                full_name: item.companion.full_name,
+                nationality: item.companion.nationality.name,
+              }
+            })
+            return response
+          } else {
+            return response
+          }
+        else {
           this.companions = response.data.map((item: any) => {
             return {
-              id: item.id,
-              full_name: item.companion.full_name,
-              nationality: item.companion.nationality.name,
+              text: item.companion.full_name,
+              value: item.companion.id,
             }
           })
-          return response
-        } else {
           return response
         }
       } catch (error) {

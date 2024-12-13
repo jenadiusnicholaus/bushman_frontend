@@ -126,7 +126,7 @@
             :rules="[(v: any) => (v && v.length > 0) || 'Required', (v: any) => v && v.length < 125]"
           />
         </div>
-        <div class="flex justify-end">
+        <!-- <div class="flex justify-end">
           <VaButton class="px-0 py-0" color="primary" icon="add" size="small" @click="createGameListObject()" />
         </div>
 
@@ -134,16 +134,6 @@
           <VaList>
             <VaListLabel v-if="games.length > 0" class="text-md mb-2 text-left">Games</VaListLabel>
             <VaListLabel v-else color="secondary" class="va-text-code mb-2 text-left">No Game Added</VaListLabel>
-
-            <!-- <VaListItem v-for="(s, index) in games" :key="index" class="list__item">
-                <VaListItemSection>
-                  <VaListItemLabel>
-                    Name: {{ s.name }}
-                    <VaIcon name="delete" size="small" color="primary" @click="deleteFromStorage(index)" />
-                  </VaListItemLabel>
-                  <VaListItemLabel caption>Quantity: {{ s.quantity }}</VaListItemLabel>
-                </VaListItemSection>
-              </VaListItem> -->
 
             <VaDataTable :items="games" :columns="columns">
               <template #cell(status)="{ value }">
@@ -154,14 +144,14 @@
               </template>
             </VaDataTable>
           </VaList>
-        </div>
+        </div> -->
       </VaAlert>
 
       <div class="flex justify-end">
         <VaButton
           :loading="sendingData"
           class="p-2 m-2"
-          :disabled="!isValidForm || sendingData || games.length == 0"
+          :disabled="!isValidForm || sendingData"
           icon="save"
           @click="validateForm() && onSubmit('IN_PROGRESS')"
           >Save</VaButton
@@ -169,7 +159,7 @@
         <VaButton
           :loading="sendingData"
           class="p-2 m-2"
-          :disabled="!isValidForm || sendingData || games.length == 0"
+          :disabled="!isValidForm || sendingData"
           icon="save"
           color="warning"
           @click="validateForm() && saveAndClose()"
@@ -330,8 +320,24 @@ export default defineComponent({
         entity_contract_permit_id: this.activityData.entity_contract_permit.id,
         client_id: this.activityData.client.id,
         professional_hunters_ids: professional_hunters_ids,
-        games: this.games,
+        // games: this.games,
         game_state: gameState,
+        coordinates_type: 'Point',
+        coordinates: [
+          {
+            lat: this.form.lat,
+            lng: this.form.lng,
+          },
+        ],
+        species_id: this.form.species?.value,
+        quantity: this.form.quantity,
+        area_id: this.form.area_id?.value,
+        time: format(this.form.time, 'HH:mm'),
+        date: format(this.form.date, 'yyyy-MM-dd'),
+        weapon_used: this.form.weapon_used,
+        description: this.form.description,
+        spacies_gender: this.form.spacies_gender.value,
+        status: this.form.status.value,
       }
 
       try {
