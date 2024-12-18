@@ -266,11 +266,6 @@
           </div>
         </VaForm>
 
-        <div class="p-6">
-          <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4">
-            <!-- <SalesAllInfos /> -->
-          </div>
-        </div>
         <!-- </template> -->
         <!-- </VaStepper> -->
       </template>

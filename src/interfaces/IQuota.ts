@@ -3,7 +3,7 @@ export interface QuotaStats {
   pending: any
   cancelled: any
   taken: any
-  provisoned: any
+  provisioned: any
   tatalQuota: any
   quota: any
 }

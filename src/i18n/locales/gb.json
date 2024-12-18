@@ -40,6 +40,7 @@
     "auth": "Auth",
     "buttons": "Buttons",
     "timelines": "Timelines",
+
     "dashboard": "Dashboard",
     "sales": "Sales",
     "sales-inquiry": "Sales Enquiry",
@@ -60,6 +61,7 @@
     "procurements": "Procurements",
     "accounts": "Accounts",
     "hr": "HR",
+    "game-requitions": "Game Requitions",
     "client-docs": "Client documents",
 
     "billing": "Billing",

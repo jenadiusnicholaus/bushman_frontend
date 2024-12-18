@@ -1,7 +1,9 @@
 <template>
-  <VaCard>
-    <FullCalendar :options="calendarOptions" />
-  </VaCard>
+  <VaInnerLoading :loading="laodingData">
+    <VaCard :disabled="laodingData">
+      <FullCalendar :options="calendarOptions" />
+    </VaCard>
+  </VaInnerLoading>
   <VaModal v-model="showModal" :overlay="false" no-outside-dismiss close-button>
     <template #header>
       <div style="display: flex; align-items: center">
@@ -145,6 +147,7 @@ export default {
       } as any,
       showModal: false,
       event: null as any,
+      laodingData: false,
       formatDateTime,
     }
   },
@@ -238,35 +241,45 @@ export default {
     },
 
     async calendarEvents() {
-      const response = await this.getCalendarStats()
-      if (response.status === 200) {
-        this.calendarOptions.events = response.data.map((event: any) => {
-          const start = format(event.sales_inquiry.preference.start_date, 'yyyy-MM-dd')
-          const end = format(event.sales_inquiry.preference.end_date, 'yyyy-MM-dd')
-          const from_date = formatDateTime(event.sales_inquiry.preference.start_date)
-          const to_date = formatDateTime(event.sales_inquiry.preference.end_date)
+      try {
+        this.laodingData = true
+        const response = await this.getCalendarStats()
+        if (response.status === 200) {
+          this.laodingData = false
+          this.calendarOptions.events = response.data.map((event: any) => {
+            const start = format(event.sales_inquiry.preference.start_date, 'yyyy-MM-dd')
+            const end = format(event.sales_inquiry.preference.end_date, 'yyyy-MM-dd')
+            const from_date = formatDateTime(event.sales_inquiry.preference.start_date)
+            const to_date = formatDateTime(event.sales_inquiry.preference.end_date)
 
-          return {
-            id: event.id,
-            title: `${event?.sales_inquiry?.entity?.full_name} - from ${formatDateTime(start)}-${formatDateTime(end)}`,
-            start: start,
-            end: end,
-            backgroundColor: this.getStatusColor(event.status.status),
-            textColor: this.getTextColor(event.status.status),
-            extendedProps: {
-              species: event?.sales_inquiry?.preferred_species,
-              preference: event?.sales_inquiry?.preference,
-              contacts: event?.sales_inquiry?.entity?.contacts,
-              proposed_package: event?.proposed_package,
-              areas: event.sales_inquiry?.area,
-              status: event.status.status,
-              sales_quota: event?.proposed_package?.sales_package?.sales_quota,
-            },
-            description: `${event?.sales_inquiry?.entity.full_name} - ${from_date} to ${to_date} `,
-          }
-        })
-      } else {
-        console.error('Failed to fetch calendar stats')
+            return {
+              id: event.id,
+              title: `${event?.sales_inquiry?.entity?.full_name} - from ${formatDateTime(start)}-${formatDateTime(
+                end,
+              )}`,
+              start: start,
+              end: end,
+              backgroundColor: this.getStatusColor(event.status.status),
+              textColor: this.getTextColor(event.status.status),
+              extendedProps: {
+                species: event?.sales_inquiry?.preferred_species,
+                preference: event?.sales_inquiry?.preference,
+                contacts: event?.sales_inquiry?.entity?.contacts,
+                proposed_package: event?.proposed_package,
+                areas: event.sales_inquiry?.area,
+                status: event.status.status,
+                sales_quota: event?.proposed_package?.sales_package?.sales_quota,
+              },
+              description: `${event?.sales_inquiry?.entity.full_name} - ${from_date} to ${to_date} `,
+            }
+          })
+        } else {
+          this.laodingData = false
+          console.error('Failed to fetch calendar stats')
+        }
+      } catch (error) {
+        this.laodingData = false
+        console.error(error)
       }
     },
   },

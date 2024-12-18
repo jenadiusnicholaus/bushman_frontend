@@ -24,7 +24,7 @@
             icon="add"
             size="small"
             @click="toggleAddSalesInquiriesForm()"
-            >Create Contract</VaButton
+            >Add add Permit</VaButton
           >
         </VaButtonGroup>
       </div>

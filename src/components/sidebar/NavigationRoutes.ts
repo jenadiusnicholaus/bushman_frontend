@@ -101,6 +101,15 @@ export default {
 
           displayName: 'menu.game-killed',
         },
+
+        // game-requitions
+        {
+          name: 'game-requitions',
+          meta: {
+            icon: 'outgoing_mail',
+          },
+          displayName: 'menu.game-requitions',
+        },
       ],
     },
 

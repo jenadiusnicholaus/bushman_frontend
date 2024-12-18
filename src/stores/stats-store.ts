@@ -36,7 +36,7 @@ export const useStatsStore = defineStore('stats', {
             pending: item.pending,
             cancelled: item.cancelled,
             taken: item.taken,
-            provisoned: item.provisoned,
+            provisioned: item.provisioned,
             tatalQuota: item.total_quota_balance,
             quota: item.name,
           }

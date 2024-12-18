@@ -75,8 +75,8 @@ const routes: Array<RouteRecordRaw> = [
 
       {
         // Game
-        name: 'game-dashboard',
-        path: '/game-dashboard',
+        name: 'operations',
+        path: '/operations',
         component: RouteViewComponent,
         children: [
           {
@@ -84,6 +84,13 @@ const routes: Array<RouteRecordRaw> = [
             path: 'game',
             component: () => import('../pages/client/GameDashboard/Game.vue'),
           },
+          // requitions
+          {
+            name: 'game-requitions',
+            path: 'game-requitions',
+            component: () => import('../pages/client/GameDashboard/Requitions.vue'),
+          },
+          // requisition-details
         ],
       },
       {

@@ -73,9 +73,9 @@ export default defineComponent({
           iconColor: this.getColor('on-info'),
         },
         {
-          id: 'provisoned',
-          title: 'Total Provisoned ',
-          value: this.quotaStats ? this.quotaStats.provisoned : '0',
+          id: 'provisioned',
+          title: 'Total provisioned ',
+          value: this.quotaStats ? this.quotaStats.provisioned : '0',
           icon: 'pets',
           changeText: this.quotaStats ? this.quotaStats.quota : '',
           changeDirection: 'up',
@@ -106,7 +106,7 @@ export default defineComponent({
 
         {
           id: 'taken',
-          title: 'Total Taken ',
+          title: 'Total Taken',
           value: this.quotaStats ? this.quotaStats.taken : '0',
           icon: 'pets',
           changeText: this.quotaStats ? this.quotaStats.quota : '',
