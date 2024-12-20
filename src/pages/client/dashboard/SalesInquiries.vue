@@ -154,7 +154,6 @@
                 :options="areasOptions"
                 searchable
                 highlight-matched-text
-                @update:modelValue="getAllSpieces"
               />
             </div>
             <h3 class="font-bold text-lg mb-2">Season and Tentative Date</h3>
@@ -198,7 +197,55 @@
               />
             </div>
 
-            <h3 class="font-bold text-lg mb-2">Preferred Species</h3>
+            <!-- price list selection -->
+            <h3 class="font-bold text-lg mb-2">Package</h3>
+            <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4">
+              <VaSelect
+                v-model="form.priceListId"
+                placeholder="Select Price List"
+                label="Sales package"
+                :rules="[(v: any) => v || 'Price List is required']"
+                :options="packagesOptions"
+                searchable
+                highlight-matched-text
+                @update:modelValue="populateSpeciesList"
+              />
+            </div>
+
+            <h3 class="font-bold text-lg mb-2">Species</h3>
+            <div class="va-table-responsive">
+              <table class="va-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Quantity</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template v-for="item in salesPackagesSpecies" :key="item.id">
+                    <tr>
+                      <td>{{ item.name }}</td>
+                      <td>
+                        <VaCounter
+                          v-model="item.quantity"
+                          increase-icon="add_circle_outline"
+                          decrease-icon="remove_circle_outline"
+                          class="w-100 p-0"
+                          color="#6938D1"
+                          max="100"
+                          min="0"
+                          max-length="3"
+                          @update:modelValue="(value) => onChange(item.id, value)"
+                        />
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+            <!-- <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+
+             <h3 class="font-bold text-lg mb-2">Preferred Species</h3>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
               <VaSelect
                 v-model="form.species"
@@ -217,7 +264,6 @@
                 :max="100"
                 :rules="[(v: any) => v || 'Quantity is required']"
               />
-              <!-- </div> -->
               <VaButtonGroup>
                 <VaButton
                   class="px-0 py-0"
@@ -250,6 +296,7 @@
                 </VaListItem>
               </VaList>
             </div>
+          </div> -->
           </div>
 
           <div class="mt-4 d-flex p-2">
@@ -291,6 +338,7 @@ import SalesInquiryDetails from './components/SalesInquiryDetails.vue'
 // import pdfMake from 'pdfmake/build/pdfmake'
 // import * as pdfFonts from 'pdfmake/build/vfs_fonts'
 import downloadPdf from '../../../utils/pdfDownloader'
+import { usePriceListStore } from '../../../stores/price-list-store'
 
 // pdfMake.vfs = pdfFonts?.pdfMake?.vfs
 // pdfMake.vfs = pdfFonts.pdfMake.vfs
@@ -339,6 +387,7 @@ export default defineComponent({
       address: '',
       no_of_hunters: 1,
       no_of_observers: 0,
+      priceListId: null as any,
       no_of_days: 0,
       no_of_companions: 0,
       species: null as any,
@@ -510,35 +559,44 @@ export default defineComponent({
   },
   data() {
     return {
-      preferred_species: [] as any,
-      speciesOptions: [] as any,
+      // preferred_species: [] as any,
+
+      // speciesOptions: [] as any,
       speciesObjects: [] as any,
       areasOptions: [] as any,
       seasonsOptions: [] as any,
       selectedInquiryItem: null as any,
+
       downloadPdf,
       saving: false,
+      packagesOptions: [] as any,
+      originalQuantities: reactive({} as any), // to keep track of original quantities
     }
   },
   computed: {
-    ...mapState(useSettingsStore, ['logo']),
+    ...mapState(useSettingsStore, ['logo', 'salesPackagesSpecies']),
+    speciesList() {
+      return this.salesPackagesSpecies
+    },
   },
 
   mounted() {
     // this.getSpeciesItems()
     this.getAreas()
     this.getSeasonList()
+    this.getPL()
   },
   methods: {
     ...mapActions(useQuotaStore, ['getSpeciesList']),
     ...mapActions(useQuotaStore, ['getAreaList']),
     ...mapActions(useQuotaStore, ['getAllSpeciesPerQuotaPerArea']),
     ...mapActions(useSalesInquiriesStore, ['createSalesInquiry']),
-    ...mapActions(useSettingsStore, ['getSeasons']),
+    ...mapActions(useSettingsStore, ['getSeasons', 'getSalespackagesSpecies']),
+    ...mapActions(usePriceListStore, ['getPriceList']),
 
     async submit() {
       this.saving = true
-      if (this.speciesObjects.length === 0) {
+      if (this.salesPackagesSpecies.length === 0) {
         this.init({
           message: 'Please select at least one species.',
           color: 'warning',
@@ -578,13 +636,14 @@ export default defineComponent({
         noOfDays: this.form.no_of_days,
         noOfCompanions: this.form.no_of_companions,
         noOfObservers: this.form.no_of_observers,
-        species: this.speciesObjects,
+        species: this.salesPackagesSpecies,
         areaId: this.form.area.value,
         season: this.form.season,
         startDate: this.form.start_date,
         endDate: this.form.end_date,
         preferredDate: this.form.preferred_date,
         identityNumber: this.form.id_number,
+        priceListId: this.form.priceListId.value,
       }
       try {
         const response: any = await this.createSalesInquiry(requestdata)
@@ -612,21 +671,21 @@ export default defineComponent({
       this.selectedInquiryItem = i.selfitem
     },
 
-    async getAllSpieces() {
-      try {
-        // if (this.form.sales_quota_id?.value || this.form?.area?.value) {
-        const response = await this.getAllSpeciesPerQuotaPerArea(null, this.form.area?.value ?? null, null)
-        this.speciesOptions = response.data.data.map((item: any) => {
-          return {
-            value: item.species.id,
-            text: item.species.name,
-          }
-        })
-        // }
-      } catch (error) {
-        console.log(error)
-      }
-    },
+    // async getAllSpieces() {
+    //   try {
+    //     // if (this.form.sales_quota_id?.value || this.form?.area?.value) {
+    //     const response = await this.getAllSpeciesPerQuotaPerArea(null, this.form.area?.value ?? null, null)
+    //     this.speciesOptions = response.data.data.map((item: any) => {
+    //       return {
+    //         value: item.species.id,
+    //         text: item.species.name,
+    //       }
+    //     })
+    //     // }
+    //   } catch (error) {
+    //     console.log(error)
+    //   }
+    // },
 
     addNewSpeciesItemToStorage() {
       // Check if all required fields in this.sform are not null
@@ -704,7 +763,60 @@ export default defineComponent({
         console.log(error)
       }
     },
+
+    async getPL() {
+      const response = await this.getPriceList()
+
+      if (response.status === 200) {
+        this.packagesOptions = response.data.data.map((item: any) => ({
+          value: item.id,
+          text:
+            item?.sales_package?.regulatory_package?.name +
+            '--->' +
+            item?.sales_package.name +
+            ' ---> ' +
+            item.price_list_type.hunting_type.name +
+            '---> ' +
+            item?.sales_package?.area?.name,
+
+          selfItem: item,
+        }))
+
+        console.log('packagesOptions:', this.packagesOptions)
+      } else {
+        console.log('Error getting price list')
+      }
+    },
+
+    async populateSpeciesList() {
+      const response = await this.getSalespackagesSpecies({ salespackageId: this.form.priceListId.value })
+      console.log('response:', response)
+    },
+
+    onChange(id: any, newValue: any) {
+      console.log('Quantity changed:', id, newValue)
+      // this.isChanged = true
+
+      // Set the original value if it hasn't been set yet
+      if (!(id in this.originalQuantities)) {
+        const item = this.salesPackagesSpecies.find((item: any) => item.id === id)
+        this.originalQuantities[id] = item.quantity // Direct assignment
+      }
+
+      const updatedItem = this.salesPackagesSpecies.find((item: any) => item.id === id)
+      if (updatedItem) {
+        updatedItem.quantity = newValue // Update the quantity with newValue
+        // then update  list
+        this.salesPackagesSpecies = [...this.salesPackagesSpecies]
+      }
+      this.init({
+        message: `Quantity for ${updatedItem.name} has been updated to ${newValue} quantity(s).`,
+        color: 'success',
+        position: 'bottom-right',
+      })
+
+      console.log('updated item list:', this.packagesOptions.selfItem.sales_package?.species)
+    },
   },
 })
 </script>
-s

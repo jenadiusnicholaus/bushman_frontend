@@ -249,7 +249,9 @@ export default defineComponent({
             item: item,
             package_name: item?.sales_package?.name,
             // quota: item?.sales_package?.sales_quota?.name,
-            area: item?.price_list_type?.price_list?.area.name,
+            area: item?.sales_package?.area
+              ? item?.sales_package?.area?.name
+              : item?.price_list_type?.price_list?.area.name,
             hunting_type: item?.price_list_type?.hunting_type?.name,
             amount: `${item?.price_list_type?.currency}${item?.price_list_type.amount}`,
             duration: item?.price_list_type.duration,

@@ -1,10 +1,6 @@
 <template>
-  <VaCard class="mb-6">
-    <VaCardContent>
-      <h2 class="page-sub-title">Species prices</h2>
-      <ModuleTable :items="speciesItems" :columns="columns" />
-    </VaCardContent>
-  </VaCard>
+  <h2 class="page-sub-title">Species prices</h2>
+  <ModuleTable :items="speciesItems" :columns="columns" />
 </template>
 
 <script lang="ts">

@@ -1,5 +1,5 @@
 <template>
-  <VaForm ref="form" @submit.prevent="submit">
+  <VaForm ref="form" @keydown.enter="validateForm() && submit()">
     <h1 class="font-semibold text-4xl mb-4">Log in</h1>
     <p class="text-base mb-4 leading-5">
       Bushman

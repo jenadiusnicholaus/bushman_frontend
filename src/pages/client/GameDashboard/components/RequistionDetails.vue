@@ -22,7 +22,6 @@
 </template>
 
 <script lang="ts">
-import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model'
 import { mapState } from 'pinia'
 import { useRequisitionStore } from '../../../../stores/requistions-store'
 
@@ -41,7 +40,6 @@ export default {
       { key: 'actions', label: 'Actions', sortable: false },
     ]
     return {
-      modules: [ClientSideRowModelModule],
       isStriped: true,
       isHoverable: true,
       columns,

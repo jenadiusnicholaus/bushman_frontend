@@ -7,6 +7,11 @@ export const usePriceListStore = defineStore('price-list', {
     return {
       itemsByHuntingType: [] as any,
       priceList: [] as any,
+      salesPackages: [] as any,
+      packageOptions: [] as any,
+      latestPackage: null as any,
+      showModal: false,
+      loadingpackages: false,
     }
   },
 
@@ -61,7 +66,8 @@ export const usePriceListStore = defineStore('price-list', {
       return response
     },
 
-    async getSalesPackageList() {
+    async getSalesPackageList(usedAsOptions: boolean = false) {
+      this.loadingpackages = true
       const config = {
         method: 'get',
         maxBodyLength: Infinity,
@@ -72,13 +78,40 @@ export const usePriceListStore = defineStore('price-list', {
       }
 
       const response = await axios.request(config)
+      if (response.status === 200) {
+        this.loadingpackages = false
+        if (!usedAsOptions) {
+          this.salesPackages = response.data.map((item: any) => {
+            return {
+              id: item.id,
+              name: item.name,
+              area_name: item?.area?.name ?? 'N/A',
+              regulatory_package_name: item?.regulatory_package?.name ?? 'N/A',
+              selfItem: item,
+            }
+          })
+        } else {
+          this.latestPackage = {
+            value: response.data[0].id,
+            text: response.data[0].name,
+          }
+
+          this.packageOptions = response.data.map((item: { id: any; name: any }) => {
+            return {
+              value: item.id,
+              text: item.name,
+            }
+          })
+        }
+      }
       return response
     },
 
     async createSalesPackage(payload: any) {
-      // VITE_APP_SALES_PACKAGE_VSET_URL=settings/sales-package-vset/
       const data = JSON.stringify({
         name: payload.name,
+        area_id: payload.areaId,
+        regulatory_package_id: payload.licenceId,
         description: payload.description,
         species_object_list: payload.speciesObjectList,
       })
@@ -94,6 +127,10 @@ export const usePriceListStore = defineStore('price-list', {
       }
 
       const response = await axios.request(config)
+      if (response.status === 201) {
+        this.showModal = true
+        this.getSalesPackageList()
+      }
       return response
     },
 

@@ -1,10 +1,6 @@
 <template>
-  <VaCard class="mb-6">
-    <VaCardContent>
-      <h2 class="page-sub-title">{{ title }}</h2>
-      <ModuleTable :items="companionItems" :columns="columns" />
-    </VaCardContent>
-  </VaCard>
+  <h2 class="page-sub-title">{{ title }}</h2>
+  <ModuleTable :items="companionItems" :columns="columns" />
 </template>
 
 <script lang="ts">
@@ -32,8 +28,7 @@ export default defineComponent({
 
   data() {
     const columns = [
-      { key: 'days', label: 'Days', sortable: true },
-      { key: 'amount', label: 'Amount', sortable: true },
+      { key: 'amount', label: 'Amount(per head)', sortable: true },
       //   actions
       // { key: 'actions', label: 'Actions', sortable: false },
     ]

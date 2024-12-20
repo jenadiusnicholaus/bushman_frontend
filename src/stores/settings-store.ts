@@ -8,6 +8,11 @@ export const useSettingsStore = defineStore('settings-store', {
     return {
       itemsByHuntingType: [] as any,
       logo: '',
+      licenceAreaSpecies: [] as any,
+      laodinglicenceAreaSpecies: false,
+      salesPackagesSpecies: [] as any,
+      salesPackages: [] as any,
+      loadingSalesPackages: false,
     }
   },
 
@@ -121,6 +126,69 @@ export const useSettingsStore = defineStore('settings-store', {
         },
       }
       const response = await axios.request(config)
+      return response
+    },
+
+    async getHuntingLicenseAreaSpecies(payload: any) {
+      this.laodinglicenceAreaSpecies = true
+      const url =
+        import.meta.env.VITE_APP_BASE_URL +
+        import.meta.env.VITE_APP_LICENCE_AREA_SPECIES_URL +
+        `?area_id=${payload.areaId}&licence_id=${payload.licenceId}`
+      const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+      const response = await axios.request(config)
+      if (response.data.length > 0) {
+        this.laodinglicenceAreaSpecies = false
+        this.licenceAreaSpecies = response.data.map((item: any) => {
+          return {
+            id: item.species.id,
+            name: item.species.name,
+            scientific_name: item.species.scientific_name,
+            quantity: item.quantity,
+          }
+        })
+      }
+
+      return response
+    },
+
+    // getsalespackagesSpecies
+    async getSalespackagesSpecies(payload: any) {
+      this.loadingSalesPackages = true
+      const url =
+        import.meta.env.VITE_APP_BASE_URL +
+        import.meta.env.VITE_APP_SALES_PACKAGE_SPECIES_URL +
+        `?sales_package_id=${payload.salespackageId}`
+      const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+
+      const response = await axios.request(config)
+
+      if (response.status === 200) {
+        this.salesPackagesSpecies = response.data.map((item: any) => {
+          return {
+            id: item.species.id,
+            name: item.species.name,
+            species_id: item.species.id,
+            scientific_name: item.species.scientific_name,
+            quantity: item.quantity,
+          }
+        })
+        this.loadingSalesPackages = false
+      }
       return response
     },
   },

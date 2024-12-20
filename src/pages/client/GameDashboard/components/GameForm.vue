@@ -31,7 +31,21 @@
           max-selections="2"
           :rules="[(value: any) => value || 'PH is required']"
           placeholder="Select PH"
-        />
+        >
+          <template #content="{ value }">
+            <VaChip
+              v-for="chip in value"
+              :key="chip"
+              size="small"
+              color="info"
+              class="mr-1 my-1"
+              closeable
+              @update:modelValue="deleteChip(chip)"
+            >
+              {{ chip.text }}
+            </VaChip>
+          </template>
+        </VaSelect>
       </div>
       <VaDivider />
       <!-- isAddGameActivities: false, 
@@ -191,6 +205,9 @@ export default defineComponent({
       spacies_gender: null as any,
       status: null as any,
     })
+    const deleteChip = (chip: any) => {
+      form.professional_hunters_ids = form.professional_hunters_ids.filter((v: any) => v !== chip)
+    }
 
     return {
       iformRef,
@@ -202,6 +219,7 @@ export default defineComponent({
       init,
       onInputChange,
       isNotUpBookingSelected,
+      deleteChip,
     }
   },
 

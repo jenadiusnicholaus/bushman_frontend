@@ -1,50 +1,22 @@
 <template>
-  <VaCard class="mb-6">
-    <VaCardContent>
-      <h2 class="page-sub-title">Quota and Area</h2>
+  <h2 class="page-sub-title">Area</h2>
 
-      <div class="flex items-center justify-between md:justify-items-stretch">
-        <div
-          class="flex grow flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-1 justify-between items-start md:items-center"
-        >
-          <div class="md:w-48">
-            <p class="mb-1">Quota</p>
-            <p class="font-bold">{{ item.sales_package.sales_quota.name }}&nbsp;</p>
-          </div>
-        </div>
+  <template v-if="paymentCard">
+    <VaDivider />
 
-        <div class="md:w-48 flex flex-col justify-end items-end">
-          <VaChip flat preset="primary">Start - end </VaChip>
-
-          <div v-if="!paymentPlan.isYearly" class="mt-2 text-regularSmall">
-            <span
-              >{{ item.sales_package.sales_quota.start_date }} <strong>To</strong>
-              {{ item.sales_package.sales_quota.end_date }}</span
-            >
-            <!-- <span class="text-danger ml-1">save 16%</span> -->
-          </div>
+    <div class="flex items-center justify-between md:justify-items-stretch">
+      <div
+        class="flex grow flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-1 justify-between items-start md:items-center"
+      >
+        <div class="md:w-48">
+          <p class="mb-1">Area</p>
+          <p class="font-bold capitalize">
+            {{ item.sales_package?.area?.name ?? item?.price_list_type?.price_list?.area?.name ?? 'No Area' }}
+          </p>
         </div>
       </div>
-
-      <template v-if="paymentCard">
-        <VaDivider />
-
-        <div class="flex items-center justify-between md:justify-items-stretch">
-          <div
-            class="flex grow flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-1 justify-between items-start md:items-center"
-          >
-            <div class="md:w-48">
-              <p class="mb-1">Area</p>
-              <p class="font-bold capitalize">{{ item.price_list_type.price_list.area.name }}</p>
-            </div>
-          </div>
-          <!-- <div class="md:w-48 flex justify-end">
-            <VaButton :to="{ name: 'payment-methods' }" preset="primary">Payment preferences</VaButton>
-          </div> -->
-        </div>
-      </template>
-    </VaCardContent>
-  </VaCard>
+    </div>
+  </template>
 
   <!-- Uncomment the code below if you want to use the ChangeYourPaymentPlan component -->
   <!-- <ChangeYourPaymentPlan

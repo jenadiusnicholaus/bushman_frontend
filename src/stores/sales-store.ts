@@ -51,6 +51,7 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
         contacts: payload?.contacts,
         nationality: payload?.nationality,
         country: payload?.country,
+        price_list_id: payload?.priceListId,
         no_of_hunters: payload?.noOfHunters,
         no_of_days: payload?.noOfDays,
         no_of_companions: payload?.noOfCompanions,

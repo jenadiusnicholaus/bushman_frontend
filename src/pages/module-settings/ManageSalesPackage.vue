@@ -1,168 +1,69 @@
 <template>
-  <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between">
-    <div class="flex flex-col md:flex-row gap-2 justify-start">
-      <VaButton v-if="!showPackageList" class="px-2 py-2" icon="arrow_back" size="small" @click="goBack">
-        Go Back
-      </VaButton>
-    </div>
-    <VaButtonGroup v-if="!showCreateNewPackageForm">
-      <VaButton
-        class="px-2 py-2"
-        color="primary"
-        label="Add New Quota"
-        icon="add"
-        :border-color="'primary'"
-        round
-        preset="secondary"
-        size="small"
-        @click="showCreateNewPackaeListFormMethod"
-      >
-        Add a package
-      </VaButton>
-    </VaButtonGroup>
-  </div>
-  <VaDivider />
-
-  <template v-if="showCreateNewPackageForm">
-    <VaForm ref="formRef">
-      <div class="p-1">
-        <!-- <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4"> -->
-        <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4">
-          <VaInput
-            v-model="form.package_name"
-            type="text"
-            placeholder="Enter Package Name"
-            :rules="[(value: any) => (value && value.length > 0) || 'Package name is required']"
-            label="Package name"
-            required-mark
-          />
+  <VaCard>
+    <VaCardContent>
+      <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between">
+        <div class="flex flex-col md:flex-row gap-2 justify-start">
+          <VaButton
+            v-if="!showPackageList || showDetailsPage"
+            class="px-2 py-2"
+            icon="arrow_back"
+            size="small"
+            @click="goBack"
+          >
+            Go Back
+          </VaButton>
         </div>
-
-        <div class="grid grid-cols-1 md:grid-cols gap-4">
-          <VaTextarea
-            v-model="form.description"
-            max-length="120"
-            label="Description"
-            counter
-            required-mark
-            placeholder="Enter Description"
-            :rules="[
-              (v: any) => (v && v.length > 0) || 'Required',
-              (v: any) => (v && v.length < 60) || 'Maximum 120 characters',
-            ]"
-          />
-        </div>
-
-        <h3 class="font-bold text-lg mb-2">Species</h3>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-          <VaSelect
-            v-model="form.species"
-            label="Species"
-            :options="speciesItemOptions"
-            placeholder="Select Species"
-            required-mark
-            :rules="[(v: any) => !!v || 'Species is required']"
-            required
-          />
-          <!-- <VaInput
-            v-model="form.samount"
-            type="text"
-            placeholder="Species Cost"
-            :rules="[(value: any) => (value && value.length > 0) || 'Species cost is required']"
-            label="Species Cost"
-            required-mark
-          /> -->
-
-          <VaCounter
-            v-model="form.quantity"
-            required-mark
-            label="Quantity"
-            manual-input
-            :min="1"
-            :max="100"
-            :rules="[(v: any) => v || 'Quantity is required']"
-          />
-          <!-- </div> -->
-          <VaButtonGroup>
-            <VaButton
-              class="px-0 py-0"
-              color="primary"
-              icon="add"
-              size="small"
-              round
-              @click="addNewSpeciesItemToStorage()"
-            />
-          </VaButtonGroup>
-        </div>
-
-        <div class="mt-6">
-          <VaList>
-            <VaListLabel v-if="speciesObjects.length > 0" class="text-md mb-2 text-left">Selected Species</VaListLabel>
-            <VaListLabel v-else color="secondary" class="va-text-code mb-2 text-left">No Species Selected</VaListLabel>
-
-            <VaListItem v-for="(s, index) in speciesObjects" :key="index" class="list__item">
-              <VaListItemSection>
-                <VaListItemLabel>
-                  Name: {{ s.name }}
-                  <VaIcon name="delete" size="small" color="primary" @click="deleteFromStorage(index)" />
-                </VaListItemLabel>
-                <VaListItemLabel caption>Quantity: {{ s.quantity }}</VaListItemLabel>
-                <!-- <VaListItemLabel caption>Costs: {{ s.amount }}</VaListItemLabel> -->
-              </VaListItemSection>
-            </VaListItem>
-          </VaList>
-        </div>
+        <VaButtonGroup v-if="!showCreateNewPackageForm && !showDetailsPage">
+          <VaButton
+            class="px-2 py-2"
+            color="primary"
+            label="Add New Quota"
+            icon="add"
+            :border-color="'primary'"
+            round
+            preset="secondary"
+            size="small"
+            @click="showCreateNewPackaeListFormMethod"
+          >
+            Add a package
+          </VaButton>
+        </VaButtonGroup>
       </div>
+      <VaDivider />
 
-      <div class="mt-4 d-flex p-2">
-        <VaButton
-          v-if="!showEditForm"
-          icon="save"
-          :loading="saving"
-          class="mr-3 mb-2"
-          :disabled="!isValidForm"
-          @click="validateForm() && submit()"
-        >
-          Save
-        </VaButton>
-      </div>
-    </VaForm>
-  </template>
-  <template v-else-if="showPackageList">
-    <ModuleTable :items="packages" :columns="columns" :loading="loading"></ModuleTable>
-  </template>
+      <template v-if="showDetailsPage">
+        <SalesPackageDetails :item="selectItem"> </SalesPackageDetails>
+      </template>
 
-  <div class="p-6">
-    <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4">
-      <!-- <SalesAllInfos /> -->
-    </div>
-  </div>
+      <template v-else-if="showCreateNewPackageForm && !showDetailsPage">
+        <SalesPackageForm> </SalesPackageForm>
+      </template>
+      <template v-else-if="showPackageList">
+        <ModuleTable :items="packages" :columns="columns" :loading="loading" @onView="showDetails"> </ModuleTable>
+      </template>
+    </VaCardContent>
+  </VaCard>
 </template>
 
 <script lang="ts">
 import { defineComponent, reactive, ref } from 'vue'
-// import axios from 'axios'/
-import { VaForm, VaInput, VaSelect, VaButton } from 'vuestic-ui'
-// import handleErrors from '../../../../utils/errorHandler'
 import handleErrors from '../../utils/errorHandler'
 import { validators } from '../../services/utils'
-
-// import Sales=inquirieslist from '../../client/dashboard/components/Salesinquirieslist.vue'
 import { useForm, useToast } from 'vuestic-ui'
-import { mapActions } from 'pinia'
+import { mapActions, mapState } from 'pinia'
 import { useQuotaStore } from '../../stores/quota-store'
-// import { useSalesInquiriesStore } from '../../../stores/sales-store'
 import { useSettingsStore } from '../../stores/settings-store'
 import { usePriceListStore } from '../../stores/price-list-store'
 import ModuleTable from './components/ModuleTable.vue'
+import { useRegulatoryPackageStore } from '../../stores/regulatrory-store'
+import SalesPackageDetails from './components/SalesPackageDetails.vue'
+import SalesPackageForm from './components/SalesPackageForm.vue'
 
 export default defineComponent({
   components: {
-    // Salesinquirieslist,
-    VaForm,
-    VaInput,
-    VaSelect,
-    VaButton,
+    SalesPackageDetails,
+    SalesPackageForm,
+
     ModuleTable,
   },
   setup() {
@@ -195,7 +96,8 @@ export default defineComponent({
       //   end_date: null as any,
       species: null as any,
       quantity: 1,
-      //   area: null as any,
+      area: null as any,
+      licence: null as any,
       //   companion_days: 0,
       //   companion_amount: 0,
       //   observer_days: 0,
@@ -242,16 +144,25 @@ export default defineComponent({
       // getNationalities,
       // getContactTypes,
       // contactFieldType,
+      // togel,
+      // toggle,
     }
   },
   data() {
     const columns = [
       { key: 'id', sortable: true, sortingOptions: ['desc', 'asc'] },
       { key: 'name', sortable: true },
-
-      // { key: 'actions', width: 80 },
+      { key: 'area_name', label: 'Area', sortable: true },
+      { key: 'regulatory_package_name', label: 'Licence', sortable: true },
+      { key: 'actions', sortable: true },
     ]
+
     return {
+      // modules: [ClientSideRowModelModule],
+      defaultColDef: {
+        editable: true,
+      },
+      columnDefs: [{ field: 'name' }, { field: 'quantity' }],
       preferred_species: [] as any,
       speciesOptions: [] as any,
       speciesObjects: [] as any,
@@ -267,17 +178,41 @@ export default defineComponent({
       columns,
       loading: false,
       saving: false,
+      regulatoryPackagesOptions: [] as any,
+      loadingLicenceOptions: false,
+      loadingSpeciesOptions: false,
+      isChanged: false,
+      originalQuantities: reactive({} as any), // to keep track of original quantities
+      quntityChangedsaved: false,
+      showDetailsPage: false,
+      selectItem: null as any,
     }
   },
+  computed: {
+    ...mapState(useSettingsStore, ['licenceAreaSpecies', 'laodinglicenceAreaSpecies']),
+    itemChanged(): any {
+      return (id: any) => {
+        const originalValue = this.originalQuantities[id]
+        const currentValue = this.licenceAreaSpecies.find((item: any) => item.id === id).quantity
+        console.log('Original value:', originalValue, 'Current value:', currentValue)
+        return (originalValue && originalValue !== currentValue) || this.isChanged
+      }
+    },
+  },
+
   mounted() {
     // this.getAllSpeciesPerQuotaPerArea()
     // this.getAreas()
     // this.getHuntingTypes()
     // this.getQuotaList()
     // this.getCurrencyList()
+    this.loading = true
     this.getSpeciesItems()
     this.getSalesPackages()
+    this.getLicencePackages()
+    this.getAreas()
   },
+
   methods: {
     ...mapActions(useQuotaStore, ['getSpeciesList']),
     ...mapActions(useQuotaStore, ['getAllSpeciesPerQuotaPerArea']),
@@ -286,6 +221,8 @@ export default defineComponent({
     ...mapActions(useSettingsStore, ['getCurrencies']),
     ...mapActions(useQuotaStore, ['getQuotas']),
     ...mapActions(usePriceListStore, ['createPriceList', 'createSalesPackage', 'getSalesPackageList']),
+    ...mapActions(useRegulatoryPackageStore, ['getRegulatoryPackages']),
+    ...mapActions(useSettingsStore, ['getHuntingLicenseAreaSpecies']),
 
     // addNewSpeciesItemToStorage() {},
     // CreateSalesInquiry
@@ -300,11 +237,13 @@ export default defineComponent({
     goBack() {
       this.showCreateNewPackageForm = false
       this.showPackageList = true
+      this.showDetailsPage = false
+      this.getSalesPackages()
     },
 
     async submit() {
       this.saving = true
-      if (this.speciesObjects.length === 0) {
+      if (this.licenceAreaSpecies.length === 0) {
         this.init({
           message: 'Please select at least one species.',
           color: 'warning',
@@ -315,7 +254,9 @@ export default defineComponent({
       const requestdata = {
         name: this.form.package_name,
         description: this.form.description,
-        speciesObjectList: this.speciesObjects,
+        areaId: this.form.area.value,
+        licenceId: this.form.licence.value,
+        speciesObjectList: this.licenceAreaSpecies,
       }
 
       try {
@@ -326,9 +267,9 @@ export default defineComponent({
           console.log(response)
           this.init({ message: response.data.message, color: 'success' })
 
-          this.resetForm()
-          this.resetValidationForm()
-          this.speciesObjects = []
+          // this.resetForm()
+          // this.resetValidationForm()
+          this.licenceAreaSpecies = []
         }
       } catch (error: any) {
         this.saving = false
@@ -342,16 +283,20 @@ export default defineComponent({
     },
 
     async getSpeciesItems() {
+      this.loadingSpeciesOptions = true
       try {
         const response = await this.getSpeciesList()
 
         // Add the species items from the response
-        this.speciesItemOptions = response.data.map((item: { id: any; name: any }) => {
-          return {
-            value: item.id,
-            text: item.name,
-          }
-        })
+        if (response.status === 200) {
+          this.loadingSpeciesOptions = false
+          this.speciesItemOptions = response.data.map((item: { id: any; name: any }) => {
+            return {
+              value: item.id,
+              text: item.name,
+            }
+          })
+        }
 
         // Combine default option with species items
         // this.speciesOptions = this.speciesOptions.concat(speciesItems)
@@ -360,15 +305,25 @@ export default defineComponent({
       }
     },
 
+    showDetails(data: any) {
+      console.log('Show details for:', data)
+      this.showDetailsPage = true
+      this.selectItem = data.selfItem
+      // this.showEditForm = true
+    },
+
     async getSalesPackages() {
       this.loading = true
       try {
         const response = await this.getSalesPackageList()
         if (response.status === 200) {
-          this.packages = response.data.map((item: { id: any; name: any }) => {
+          this.packages = response.data.map((item: any) => {
             return {
               id: item.id,
               name: item.name,
+              area_name: item?.area?.name ?? 'N/A',
+              regulatory_package_name: item?.regulatory_package?.name ?? 'N/A',
+              selfItem: item,
             }
           })
           this.loading = false
@@ -376,6 +331,87 @@ export default defineComponent({
       } catch (error) {
         console.log(error)
       }
+    },
+
+    async getLicencePackages() {
+      this.loadingLicenceOptions = true
+      try {
+        const response = await this.getRegulatoryPackages()
+        if (response.status === 200) {
+          this.loadingLicenceOptions = false
+          const data = response.data
+          this.regulatoryPackagesOptions = data.map((item: any) => ({
+            value: item.id,
+            text: item.name,
+          }))
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    },
+
+    async getAreas() {
+      try {
+        const response = await this.getAreaList()
+        this.areasOptions = response.data.map((item: { id: any; name: any }) => {
+          return {
+            value: item.id,
+            text: item.name,
+          }
+        })
+      } catch (error) {
+        console.log(error)
+      }
+    },
+
+    async getLicenceAreaSpeciesList() {
+      const payload = {
+        areaId: this.form.area.value,
+        licenceId: this.form.licence.value,
+      }
+
+      try {
+        const response = await this.getHuntingLicenseAreaSpecies(payload)
+        if (response.status === 200) {
+          const data = response.data
+          this.speciesOptions = data.map((item: any) => ({
+            value: item.id,
+            text: item.name,
+          }))
+        }
+      } catch (error: any) {
+        const errors = handleErrors(error.response)
+        console.log(errors)
+        this.init({
+          message: '\n' + errors.map((error, index) => `${index + 1}. ${error}`).join('\n'),
+          color: 'danger',
+        })
+      }
+    },
+
+    onChange(id: any, newValue: any) {
+      console.log('Quantity changed:', id, newValue)
+      // this.isChanged = true
+
+      // Set the original value if it hasn't been set yet
+      if (!(id in this.originalQuantities)) {
+        const item = this.licenceAreaSpecies.find((item: any) => item.id === id)
+        this.originalQuantities[id] = item.quantity // Direct assignment
+      }
+
+      const updatedItem = this.licenceAreaSpecies.find((item: any) => item.id === id)
+      if (updatedItem) {
+        updatedItem.quantity = newValue // Update the quantity with newValue
+        // then update  list
+        this.licenceAreaSpecies = [...this.licenceAreaSpecies]
+      }
+      this.init({
+        message: `Quantity for ${updatedItem.name} has been updated to ${newValue} quantity(s).`,
+        color: 'success',
+        position: 'bottom-right',
+      })
+
+      console.log('updated item list:', this.licenceAreaSpecies)
     },
 
     addNewSpeciesItemToStorage() {
@@ -431,4 +467,7 @@ export default defineComponent({
   },
 })
 </script>
-s
+
+<style lang="scss">
+@import '@vuestic/ag-grid-theme';
+</style>

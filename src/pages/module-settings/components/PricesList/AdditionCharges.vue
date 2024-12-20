@@ -1,10 +1,6 @@
 <template>
-  <VaCard class="mb-6">
-    <VaCardContent>
-      <h2 class="page-sub-title">Additional Costs/Charges</h2>
-      <ModuleTable :items="additionalCharges" :columns="columns" />
-    </VaCardContent>
-  </VaCard>
+  <h2 class="page-sub-title">Additional Costs/Charges</h2>
+  <ModuleTable :items="additionalCharges" :columns="columns" />
 </template>
 
 <script lang="ts">

@@ -4,7 +4,7 @@
       <div class="p-1">
         <!-- <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4"> -->
         <h3 class="font-bold text-lg mb-2">Price list Infos</h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <VaSelect
             v-model="form.package"
             :options="packageOptions"
@@ -14,8 +14,25 @@
             :rules="[(v: any) => v || 'Package is required']"
             label="Packages"
             required-mark
-            @update:modelValue="onChangPackage"
-          />
+            @update:modelValue="onChangePackage"
+          >
+            <template #content="{ value }">
+              <VaChip
+                v-for="chip in value"
+                :key="chip"
+                size="small"
+                color="info"
+                class="mr-1 my-1"
+                closeable
+                @update:modelValue="deleteChip(chip)"
+              >
+                {{ chip.text }}
+              </VaChip>
+            </template>
+            <template #append>
+              <VaIcon name="add" class="ml-2" @click="_showModal()" />
+            </template>
+          </VaSelect>
           <!-- <VaInput v-model="form.nick_name" placeholder="Nick name" label="Nick name" /> -->
           <VaSelect
             v-model="form.hunting_type_id"
@@ -26,17 +43,6 @@
             searchable
             required-mark
             highlight-matched-text
-          />
-          <VaSelect
-            v-model="form.area"
-            placeholder="Select Area"
-            label="Hunting area"
-            :rules="[(v: any) => v || 'Hunting area is required']"
-            :options="areasOptions"
-            searchable
-            highlight-matched-text
-            required-mark
-            @update:modelValue="getAllSpieces()"
           />
         </div>
 
@@ -100,66 +106,6 @@
           <VaDateInput v-model="form.start_date" required-mark label="Start Date" manual-input />
           <VaDateInput v-model="form.end_date" required-mark label="End Date" manual-input />
         </div>
-
-        <!-- <h3 class="font-bold text-lg mb-2">Species</h3>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-        <VaSelect
-          v-model="form.species"
-          label="Species"
-          :options="speciesItemOptions"
-          placeholder="Select Species"
-          required-mark
-          :rules="[(v: any) => !!v || 'Species is required']"
-          required
-        />
-        <VaInput
-          v-model="form.samount"
-          type="text"
-          placeholder="Species Cost"
-          :rules="[(value: any) => (value && value.length > 0) || 'Species cost is required']"
-          label="Species Cost"
-          required-mark
-        />
-
-        <VaCounter
-          v-model="form.quantity"
-          required-mark
-          label="Quantity"
-          manual-input
-          :min="1"
-          :max="100"
-          :rules="[(v: any) => v || 'Quantity is required']"
-        />
-       
-        <VaButtonGroup>
-          <VaButton
-            class="px-0 py-0"
-            color="primary"
-            icon="add"
-            size="small"
-            round
-            @click="addNewSpeciesItemToStorage()"
-          />
-        </VaButtonGroup>
-      </div>
-
-      <div class="mt-6">
-        <VaList>
-          <VaListLabel v-if="speciesObjects.length > 0" class="text-md mb-2 text-left">Selected Species</VaListLabel>
-          <VaListLabel v-else color="secondary" class="va-text-code mb-2 text-left">No Species Selected</VaListLabel>
-
-          <VaListItem v-for="(s, index) in speciesObjects" :key="index" class="list__item">
-            <VaListItemSection>
-              <VaListItemLabel>
-                Name: {{ s.name }}
-                <VaIcon name="delete" size="small" color="primary" @click="deleteFromStorage(index)" />
-              </VaListItemLabel>
-              <VaListItemLabel caption>Quantity: {{ s.quantity }}</VaListItemLabel>
-              <VaListItemLabel caption>Costs: {{ s.amount }}</VaListItemLabel>
-            </VaListItemSection>
-          </VaListItem>
-        </VaList>
-      </div> -->
       </div>
 
       <div class="mt-4 d-flex p-2">
@@ -176,26 +122,28 @@
       </div>
     </VaForm>
   </VaInnerLoading>
+  <VaModal v-model="_shM" ok-text="Apply" close-button size="large" :hide-default-actions="true">
+    <SalesPackageForm> </SalesPackageForm>
+  </VaModal>
 </template>
 
 <script lang="ts">
 import { defineComponent, reactive, ref } from 'vue'
-// import axios from 'axios'/
 import { VaForm, VaInput, VaSelect, VaButton } from 'vuestic-ui'
 import handleErrors from '../../../../utils/errorHandler'
 import { validators } from '../../../../services/utils'
 
-// import Salesinquirieslist from '../../client/dashboard/components/Salesinquirieslist.vue'
 import { useForm, useToast } from 'vuestic-ui'
-import { mapActions } from 'pinia'
+import { mapActions, mapState, mapWritableState } from 'pinia'
 import { useQuotaStore } from '../../../../stores/quota-store'
-// import { useSalesInquiriesStore } from '../../../stores/sales-store'
 import { useSettingsStore } from '../../../../stores/settings-store'
 import { usePriceListStore } from '../../../../stores/price-list-store'
+import SalesPackageForm from '../SalesPackageForm.vue'
 
 export default defineComponent({
   components: {
     // Salesinquirieslist,
+    SalesPackageForm,
     VaForm,
     VaInput,
     VaSelect,
@@ -216,12 +164,18 @@ export default defineComponent({
 
     const { init } = useToast()
     const showEditForm = ref(false)
+    // const _usePriceListStore: any = usePriceListStore()
+
+    // const pkg: any = computed(() => {
+    //   return _usePriceListStore.latestPackage
+    // })
 
     const form = reactive({
       id: null as any,
       hunting_type_id: null as any,
-      package: null as any,
-      // description: '',
+      // is list
+      package: [] as any,
+      // description: '',s
       // sales_quota_id: null as any,
       amount: 0,
       samount: 0,
@@ -231,12 +185,14 @@ export default defineComponent({
       end_date: null as any,
       species: null as any,
       quantity: 0,
-      area: null as any,
+      // area: null as any,
       // companion_days: 0,
       companion_amount: 0,
       // observer_days: 0,
       observer_amount: 0,
     })
+
+    // make as copy of pkg to form package
 
     const contactForm = reactive({
       id: null as any,
@@ -245,6 +201,10 @@ export default defineComponent({
       contact_type: null as any,
       contactable: false,
     })
+
+    const deleteChip = (chip: any) => {
+      form.package = form.package.filter((v: any) => v !== chip)
+    }
 
     const countries = ref([]) as any
     const nationality = ref([]) as any
@@ -270,7 +230,7 @@ export default defineComponent({
       validateForm,
       resetValidationForm,
       resetForm,
-
+      deleteChip,
       validators,
     }
   },
@@ -284,9 +244,20 @@ export default defineComponent({
       salesQuotasOptions: [] as any,
       speciesItemOptions: [] as any,
       currencyOptions: [] as any,
-      packageOptions: [] as any,
+      // packageOptions: [] as any,
       savingPriceList: false,
     }
+  },
+  computed: {
+    ...mapState(usePriceListStore, ['salesPackages', 'packageOptions', 'latestPackage', 'loadingpackages']),
+    ...mapWritableState(usePriceListStore, {
+      _shM: 'showModal',
+    }),
+  },
+
+  watch: {
+    // use both close modal and show modal to close modal
+    // i want if the  closeMadal is true then showModal should be false
   },
   mounted() {
     // this.getAllSpeciesPerQuotaPerArea()
@@ -296,6 +267,7 @@ export default defineComponent({
     this.getCurrencyList()
     this.getSalesPackages()
   },
+
   methods: {
     ...mapActions(useQuotaStore, ['getSpeciesList']),
     ...mapActions(useQuotaStore, ['getAllSpeciesPerQuotaPerArea']),
@@ -313,15 +285,16 @@ export default defineComponent({
 
     onAreaChange(value: any) {
       console.log(value as any)
-      this.getAllSpieces()
+      // this.getAllSpieces()
     },
 
     async submit() {
+      console.log(this.form.package)
       this.savingPriceList = true
       const requestdata = {
-        area: this.form.area.value,
+        // area: this.form.area.value,
         huntingTypeId: this.form.hunting_type_id.value,
-        sales_package_ids: this.form.package.filter((v: any) => v?.value !== undefined).map((v: any) => v?.value),
+        sales_package_ids: this.form.package?.filter((v: any) => v?.value !== undefined).map((v: any) => v?.value),
         // description: this.form.description,
         // salesQuotaId: this.form.sales_quota_id.value,
         amount: this.form.amount,
@@ -349,6 +322,7 @@ export default defineComponent({
       } catch (error: any) {
         this.savingPriceList = false
         const errors = handleErrors(error.response)
+        console.log(error)
         this.init({
           message: '\n' + errors.map((error, index) => `${index + 1}. ${error}`).join('\n'),
           color: 'danger',
@@ -375,15 +349,13 @@ export default defineComponent({
       }
     },
 
+    _showModal() {
+      this._shM = true
+    },
+
     async getSalesPackages() {
       try {
-        const response = await this.getSalesPackageList()
-        this.packageOptions = response.data.map((item: { id: any; name: any }) => {
-          return {
-            value: item.id,
-            text: item.name,
-          }
-        })
+        await this.getSalesPackageList(true)
       } catch (error) {
         console.log(error)
       }
@@ -476,24 +448,24 @@ export default defineComponent({
         console.log(error)
       }
     },
-    onChangPackage(value: any) {
+    onChangePackage(value: any) {
       console.log(value.filter((v: any) => v?.value !== undefined).map((v: any) => v?.value))
     },
 
-    async getAllSpieces() {
-      try {
-        const response = await this.getAllSpeciesPerQuotaPerArea(null, this.form.area?.value ?? null, null)
-        this.speciesItemOptions = response.data.map((item: any) => {
-          return {
-            value: item.species.id,
-            text: item.species.name,
-          }
-        })
-        // }
-      } catch (error) {
-        console.log(error)
-      }
-    },
+    // async getAllSpieces() {
+    //   try {
+    //     const response = await this.getAllSpeciesPerQuotaPerArea(null, this.form.area?.value ?? null, null)
+    //     this.speciesItemOptions = response.data.map((item: any) => {
+    //       return {
+    //         value: item.species.id,
+    //         text: item.species.name,
+    //       }
+    //     })
+    //     // }
+    //   } catch (error) {
+    //     console.log(error)
+    //   }
+    // },
 
     // get quotas
     async getQuotaList() {
