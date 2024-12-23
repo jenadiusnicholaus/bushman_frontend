@@ -1,6 +1,6 @@
 <template>
   <VaForm ref="iformRef">
-    <h3 class="font-bold text-lg mb-2">Package Details</h3>
+    <!-- <h3 class="font-bold text-lg mb-2">Package Details</h3>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
       <VaSelect
         v-model="form.regulatory_package_id"
@@ -16,8 +16,7 @@
         placeholder="Select Package"
         label="Sales Package"
       />
-      <!-- regulatory_package_id -->
-    </div>
+    </div> -->
     <h3 class="font-bold text-lg mb-2">Itinerary Details</h3>
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
@@ -201,7 +200,7 @@ export default defineComponent({
     }
 
     const form = reactive({
-      package_id: null as any,
+      // package_id: null as any,
       airport_name: null as any,
       charter_in: null as any,
       charter_out: null as any,
@@ -212,7 +211,7 @@ export default defineComponent({
       installment_due_days: 0,
       due_days_type: null as any,
       // installment_due_limit: null as any,
-      regulatory_package_id: null as any,
+      // regulatory_package_id: null as any,
     })
 
     return {
@@ -287,7 +286,7 @@ export default defineComponent({
     async getSalesPriceBreakdownForClient() {
       const payLoad = {
         salesInquiryId: this.item.id,
-        packageId: this.form.package_id.value,
+        packageId: this.item.price_list.price_list.sales_package.id,
       }
       await this.getSalesPriceBreakdown(payLoad)
     },
@@ -299,9 +298,9 @@ export default defineComponent({
         charterOut: this.form.charter_out,
         arrival: this.form.arrival,
         airportName: this.form.airport_name,
-        packageId: this.form.package_id.value,
+        packageId: this.item.price_list.price_list.sales_package.id,
         salesInquiryId: this.item.id,
-        regulatoryPackageId: this.form.regulatory_package_id.value,
+        regulatoryPackageId: this.item.price_list.price_list.sales_package.regulatory_package.id,
         installments: this.installments,
       }
 

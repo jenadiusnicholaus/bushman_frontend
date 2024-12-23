@@ -67,7 +67,7 @@
         </ModuleTable>
       </template>
       <template v-else>
-        <PricesListDetails :prece-list-item="item"></PricesListDetails>
+        <PricesListDetails :price-list-item="item"></PricesListDetails>
       </template>
     </template>
     <template v-if="ShowCreateNewPriceListForm">

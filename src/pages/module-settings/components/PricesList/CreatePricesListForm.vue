@@ -47,7 +47,7 @@
         </div>
 
         <!-- Experience and Date Group -->
-        <h3 class="font-bold text-lg mb-2">Charges per days</h3>
+        <h3 class="font-bold text-lg mb-2">Chargess</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <VaInput
             v-model="form.amount"

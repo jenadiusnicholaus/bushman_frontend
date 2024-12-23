@@ -231,6 +231,7 @@
                           increase-icon="add_circle_outline"
                           decrease-icon="remove_circle_outline"
                           class="w-100 p-0"
+                          manual-input
                           color="#6938D1"
                           max="100"
                           min="0"

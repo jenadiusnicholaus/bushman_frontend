@@ -76,6 +76,42 @@
             </tbody>
           </table>
 
+          <!-- Existing details (Client Information, Preference Information, etc.) -->
+
+          <VaDivider />
+
+          <!-- Price List Summary Section -->
+          <VaTitle style="font-weight: bold">Price List Summary</VaTitle>
+          <p><strong>Pgk Name:</strong> {{ item?.price_list?.price_list?.sales_package?.name }}</p>
+
+          <VaDivider />
+
+          <!-- Regulatory Package Section -->
+          <VaTitle style="font-weight: bold">License Package</VaTitle>
+          <p><strong>Name:</strong> {{ item?.price_list?.price_list?.sales_package.regulatory_package?.name }}</p>
+          <p>
+            <strong>Duration:</strong>
+            {{ item?.price_list?.price_list?.sales_package?.regulatory_package?.duration }} days
+          </p>
+
+          <VaDivider />
+
+          <!-- Area Information Section -->
+          <VaTitle style="font-weight: bold">Package Area Information</VaTitle>
+          <p><strong>Area Name:</strong> {{ item?.price_list?.price_list?.sales_package?.area?.name }}</p>
+          <p><strong>Description:</strong> {{ item?.price_list?.price_list?.sales_package?.area?.description }}</p>
+
+          <VaDivider />
+
+          <!-- Hunting Type Section -->
+          <VaTitle style="font-weight: bold">Hunting Type</VaTitle>
+          <p><strong>Name:</strong> {{ item?.price_list?.price_list?.price_list_type?.hunting_type?.name }}</p>
+          <!-- amount -->
+          <p>
+            <strong>Price:</strong>{{ item?.price_list?.price_list?.price_list_type?.currency }}
+            {{ item?.price_list?.price_list?.price_list_type?.amount }}
+          </p>
+
           <VaDivider />
           <VaTitle style="font-weight: bold">Observers</VaTitle>
           <VaDataTable :items="observers" />
@@ -234,8 +270,7 @@ export default defineComponent({
 .sales-inquiry {
   margin: 20px;
 }
-
-.split-demo {
+s .split-demo {
   & .custom-grabber {
     height: 100%;
     width: 100%;
