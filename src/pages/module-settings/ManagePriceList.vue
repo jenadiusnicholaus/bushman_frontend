@@ -112,7 +112,6 @@ export default defineComponent({
     const columns = [
       { key: 'id', sortable: true, sortingOptions: ['desc', 'asc'] },
       { key: 'package_name', sortable: true },
-      // { key: 'quota', sortable: true },
       { key: 'area', sortable: true },
       { key: 'hunting_type', sortable: true },
       { key: 'amount', sortable: true },

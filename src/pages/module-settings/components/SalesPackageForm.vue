@@ -29,7 +29,7 @@
           required-mark
           :rules="[(v: any) => !!v || 'Area is required']"
           required
-          :disabled="laodinglicenceAreaSpecies"
+          :disabled="laodinglicenceAreaSpecies || form.licence === null"
           :loading="laodinglicenceAreaSpecies"
           @update:modelValue="getLicenceAreaSpeciesList"
         />
@@ -53,38 +53,40 @@
   </VaForm>
 
   <h3 class="font-bold text-lg mb-2">Species</h3>
-  <div class="va-table-responsive">
-    <table class="va-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Quantity</th>
-        </tr>
-      </thead>
-      <tbody>
-        <template v-for="item in licenceAreaSpecies" :key="item.id">
+  <VaInnerLoading :loading="laodinglicenceAreaSpecies" :size="30">
+    <div class="va-table-responsive" :disabled="laodinglicenceAreaSpecies">
+      <table class="va-table">
+        <thead>
           <tr>
-            <td>{{ item.name }}</td>
-            <td>
-              <VaCounter
-                v-model="item.quantity"
-                increase-icon="add_circle_outline"
-                decrease-icon="remove_circle_outline"
-                class="w-100 p-0"
-                :success="quntityChangedsaved"
-                manual-input
-                color="#6938D1"
-                max="100"
-                min="0"
-                max-length="3"
-                @update:modelValue="(value) => onChange(item.id, value)"
-              />
-            </td>
+            <th>Name</th>
+            <th>Quantity</th>
           </tr>
-        </template>
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody>
+          <template v-for="item in licenceAreaSpecies" :key="item.id">
+            <tr>
+              <td>{{ item.name }}</td>
+              <td>
+                <VaCounter
+                  v-model="item.quantity"
+                  increase-icon="add_circle_outline"
+                  decrease-icon="remove_circle_outline"
+                  class="w-100 p-0"
+                  :success="quntityChangedsaved"
+                  manual-input
+                  color="#6938D1"
+                  max="100"
+                  min="0"
+                  max-length="3"
+                  @update:modelValue="(value) => onChange(item.id, value)"
+                />
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+  </VaInnerLoading>
   <div class="mt-4 d-flex p-2">
     <VaButton
       v-if="!showEditForm"
@@ -106,7 +108,7 @@ import handleErrors from '../../../utils/errorHandler'
 import { validators } from '../../../services/utils'
 
 import { useForm, useToast } from 'vuestic-ui'
-import { mapActions, mapState } from 'pinia'
+import { mapActions, mapState, mapWritableState } from 'pinia'
 import { useQuotaStore } from '../../../stores/quota-store'
 import { useSettingsStore } from '../../../stores/settings-store'
 import { usePriceListStore } from '../../../stores/price-list-store'
@@ -182,7 +184,7 @@ export default defineComponent({
       defaultColDef: {
         editable: true,
       },
-
+      settingsStore: useSettingsStore(),
       speciesOptions: [] as any,
       areasOptions: [] as any,
 
@@ -195,13 +197,16 @@ export default defineComponent({
       quntityChangedsaved: false,
     }
   },
+
   computed: {
-    ...mapState(useSettingsStore, ['licenceAreaSpecies', 'laodinglicenceAreaSpecies']),
+    ...mapWritableState(useSettingsStore, ['licenceAreaSpecies']),
+    ...mapState(useSettingsStore, ['laodinglicenceAreaSpecies']),
   },
 
   mounted() {
     this.getLicencePackages()
     this.getAreas()
+    this.settingsStore.licenceAreaSpecies = []
   },
 
   methods: {
@@ -262,7 +267,7 @@ export default defineComponent({
           const data = response.data
           this.regulatoryPackagesOptions = data.map((item: any) => ({
             value: item.id,
-            text: item.name,
+            text: item.name + '->' + item.duration + ' ' + ' ' + 'days',
           }))
         }
       } catch (error) {

@@ -9,6 +9,8 @@ export const useApprovalChainStore = defineStore('approval-chain-store', {
     return {
       approvalChainModules: [] as any,
       loadingApprovalChain: false,
+      approvalChainLevels: [] as any,
+      loadingApprovalChainLevels: false,
     }
   },
 
@@ -54,6 +56,36 @@ export const useApprovalChainStore = defineStore('approval-chain-store', {
             }
           })
         }
+      }
+
+      return response
+    },
+
+    // # http://localhost:8000/api/v1.0/approval-chain/approval-chain-levels-vset/?approval_chain_module_id=22
+    // VITE_APP_APPROVAL_CHAIN_LEVELS_VSET_URL=approval-chain/approval-chain-levels-vset/
+    async getApprovalChainLevels(approval_chain_module_id: any) {
+      this.loadingApprovalChainLevels = true
+      const url =
+        import.meta.env.VITE_APP_BASE_URL +
+        import.meta.env.VITE_APP_APPROVAL_CHAIN_LEVELS_VSET_URL +
+        `?approval_chain_module_id=${approval_chain_module_id}`
+      const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+      const response = await axios.request(config)
+      if (response.status === 200) {
+        this.loadingApprovalChainLevels = false
+        this.approvalChainLevels = response.data.map((level: any) => {
+          return {
+            text: level.approval_chain_role.name,
+            value: level.id,
+          }
+        })
       }
 
       return response

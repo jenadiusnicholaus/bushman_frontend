@@ -5,18 +5,21 @@
         v-model="form.approval_chain_module_id"
         :options="approvalChainModules"
         label="Approval Chain"
-        :rules="[(v) => !!v || 'Approval Chain Module is required']"
+        :rules="[(v: any) => !!v || 'Approval Chain Module is required']"
+        @update:modelValue="onApprovalChainModuleChange"
       />
-      <VaInput
+      <VaSelect
         v-model="form.level_id"
-        label="Point the starting approval level"
+        :options="approvalChainLevels"
+        placeholder="Select Level"
+        label="Set an initial approval(Optional)"
         type="number"
-        :rules="[(v) => !!v || 'Level ID is required']"
+        :disabled="!form.approval_chain_module_id"
       />
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-      <VaInput v-model="form.type" label="Type" />
+      <VaSelect v-model="form.type" :options="TYPE" placeholder="Select Type" label="Type" />
       <VaDateInput v-model="form.date" label="Date" :rules="[(v: any) => !!v || 'Date is required']" />
       <VaDateInput
         v-model="form.required_date"
@@ -30,12 +33,18 @@
         v-model="form.remarks"
         label="Remarks"
         type="textarea"
-        :rules="[(v) => !!v || 'Remarks is required']"
+        :rules="[(v: any) => !!v || 'Remarks is required']"
       />
     </div>
 
     <div class="mt-4 flex p-2">
-      <VaButton :loading="saving" icon="save" class="mr-3 mb-2" :disabled="!isValidForm" @click="handleSubmit">
+      <VaButton
+        :loading="saving"
+        icon="save"
+        class="mr-3 mb-2"
+        :disabled="!isValidForm"
+        @click="validateForm() && submitForm()"
+      >
         Save
       </VaButton>
     </div>
@@ -45,30 +54,34 @@
 <script lang="ts">
 import { mapActions, mapState } from 'pinia'
 import { defineComponent, reactive, ref } from 'vue'
-import { VaForm, VaInput, VaSelect, VaButton, VaTextarea, VaDateInput } from 'vuestic-ui'
-import { useForm } from 'vuestic-ui'
+import { VaForm, VaSelect, VaButton, VaTextarea, VaDateInput } from 'vuestic-ui'
+import { useForm, useToast } from 'vuestic-ui'
 import { useApprovalChainStore } from '../../../../stores/approval-store'
+import { useRequisitionStore } from '../../../../stores/requistions-store'
+import handleErrors from '../../../../utils/errorHandler'
 
 export default defineComponent({
   name: 'RequistionsForm',
   components: {
     VaForm,
-    VaInput,
     VaSelect,
     VaButton,
     VaTextarea,
     VaDateInput,
   },
   setup() {
+    const { init } = useToast()
+
     const formRef = ref()
     const form = reactive({
       requested_by: null,
-      approval_chain_module_id: null,
-      level_id: null,
-      type: '',
+      approval_chain_module_id: null as any,
+      level_id: null as any,
+      type: null as any,
       date: null as any,
       required_date: null as any,
       remarks: '',
+      chainModuleSelected: false,
     })
 
     const {
@@ -79,39 +92,71 @@ export default defineComponent({
     } = useForm(formRef)
 
     // Separate the submit logic into a function
-    const handleSubmit = async () => {
-      const isValid = await validateForm()
-      if (isValid) {
-        console.log('Requisition Form Submitted:', form)
-        // Handle requisition form submission...
-      } else {
-        console.log('Form validation failed')
-      }
-    }
 
     return {
       formRef,
       form,
-      handleSubmit, // Updated to use the handleSubmit function
       isValidForm,
       resetValidationForm,
       resetForm,
+      init,
+      validateForm,
     }
   },
   data() {
     return {
       saving: false,
+      TYPE: [
+        { value: 'GAME_REQ', text: 'Game Requisition' },
+        { value: 'GENERAL', text: 'General Requisition' },
+      ],
     }
   },
   computed: {
-    ...mapState(useApprovalChainStore, ['approvalChainModules']),
+    ...mapState(useApprovalChainStore, ['approvalChainModules', 'approvalChainLevels']),
   },
   mounted() {
     this.getRequisitionsApprovalChain(true)
   },
 
   methods: {
-    ...mapActions(useApprovalChainStore, ['getRequisitionsApprovalChain']),
+    ...mapActions(useApprovalChainStore, ['getRequisitionsApprovalChain', 'getApprovalChainLevels']),
+    ...mapActions(useRequisitionStore, ['createRequisition']),
+    onApprovalChainModuleChange(value: any) {
+      if (value.value !== undefined) {
+        this.getApprovalChainLevels(value.value)
+      }
+    },
+
+    async submitForm() {
+      const payload = {
+        approval_chain_module_id: this.form.approval_chain_module_id.value,
+        type: this.form.type.value,
+        date: this.form.date,
+        level_id: this.form.level_id?.value,
+        required_date: this.form.required_date,
+        remarks: this.form.remarks,
+      }
+      try {
+        this.saving = true
+        const response = await this.createRequisition(payload)
+        if (response.status === 201) {
+          this.resetForm()
+          this.saving = false
+          this.init({ message: 'Requisition created successfully', color: 'success' })
+        } else {
+          this.saving = false
+          this.init({ message: 'Something went wrong', color: 'warning' })
+        }
+      } catch (error: any) {
+        this.saving = false
+        const errors = handleErrors(error.response)
+        this.init({
+          message: '\n' + errors.map((error, index) => `${index + 1}. ${error}`).join('\n'),
+          color: 'danger',
+        })
+      }
+    },
   },
 })
 </script>

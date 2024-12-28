@@ -4,7 +4,7 @@
       <div class="p-1">
         <!-- <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4"> -->
         <h3 class="font-bold text-lg mb-2">Price list Infos</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <VaSelect
             v-model="form.package"
             :options="packageOptions"
@@ -44,10 +44,17 @@
             required-mark
             highlight-matched-text
           />
+          <VaSelect
+            v-model="form.season"
+            :options="seasonsOptions"
+            required-mark
+            label="Select season"
+            placeholder="Select season"
+          />
         </div>
 
         <!-- Experience and Date Group -->
-        <h3 class="font-bold text-lg mb-2">Chargess</h3>
+        <h3 class="font-bold text-lg mb-2">Charges</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <VaInput
             v-model="form.amount"
@@ -70,41 +77,32 @@
           />
           <!-- <vue-tel-input v-model="form.phone" mode="international" required></vue-tel-input> -->
 
-          <VaInput
+          <VaSelect
             v-model="form.duration"
             type="text"
+            :options="durationsOptions"
             required-mark
-            placeholder="Enter Duration"
-            :rules="[(value: any) => (value && value.length > 0) || 'Duration is required']"
-            label="Duration"
+            placeholder="Enter Duration eg: 21 days"
+            :rules="[(v: any) => v || 'Duration is required']"
+            label="Duration(days)"
           />
         </div>
 
         <!-- companion group -->
-        <h3 class="font-bold text-lg mb-2">Companion and Observer Charges</h3>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+        <h3 class="font-bold text-lg mb-2">Companion's and Observer's Charges(Optional)</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <VaInput
             v-model="form.companion_amount"
             type="text"
             placeholder="Enter Companion Amount"
-            :rules="[(value: any) => (value && value.length > 0) || 'Companion Amount is required']"
             label="Companion Cost(Per Person)"
-            required-mark
           />
           <VaInput
             v-model="form.observer_amount"
             type="text"
             placeholder="Enter observer Amount"
-            :rules="[(value: any) => (value && value.length > 0) || 'Companion Amount is required']"
             label="Observer Cost(Per Person)"
-            required-mark
           />
-        </div>
-
-        <h3 class="font-bold text-lg mb-2">Price List Life span</h3>
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
-          <VaDateInput v-model="form.start_date" required-mark label="Start Date" manual-input />
-          <VaDateInput v-model="form.end_date" required-mark label="End Date" manual-input />
         </div>
       </div>
 
@@ -151,9 +149,6 @@ export default defineComponent({
   },
   setup() {
     const formRef = ref()
-    // const contactFormRef = ref()
-    // const showAddSalesInquiriesForm = ref(false)
-    // const btnIcon = ref('add')
 
     const {
       isValid: isValidForm,
@@ -177,19 +172,19 @@ export default defineComponent({
       package: [] as any,
       // description: '',s
       // sales_quota_id: null as any,
-      amount: 0,
-      samount: 0,
+      amount: null as any,
+
       currency: null as any,
-      duration: 0,
-      start_date: null as any,
+      duration: null as any,
+      season: null as any,
       end_date: null as any,
       species: null as any,
-      quantity: 0,
+      quantity: null as any,
       // area: null as any,
       // companion_days: 0,
-      companion_amount: 0,
+      companion_amount: null as any,
       // observer_days: 0,
-      observer_amount: 0,
+      observer_amount: null as any,
     })
 
     // make as copy of pkg to form package
@@ -235,6 +230,30 @@ export default defineComponent({
     }
   },
   data() {
+    // 1-21
+    const durationsOptions: any = [
+      { value: 1, text: '1 day' },
+      { value: 2, text: '2 days' },
+      { value: 3, text: '3 days' },
+      { value: 4, text: '4 days' },
+      { value: 5, text: '5 days' },
+      { value: 6, text: '6 days' },
+      { value: 7, text: '7 days' },
+      { value: 8, text: '8 days' },
+      { value: 9, text: '9 days' },
+      { value: 10, text: '10 days' },
+      { value: 11, text: '11 days' },
+      { value: 12, text: '12 days' },
+      { value: 13, text: '13 days' },
+      { value: 14, text: '14 days' },
+      { value: 15, text: '15 days' },
+      { value: 16, text: '16 days' },
+      { value: 17, text: '17 days' },
+      { value: 18, text: '18 days' },
+      { value: 19, text: '19 days' },
+      { value: 20, text: '20 days' },
+      { value: 21, text: '21 days' },
+    ]
     return {
       preferred_species: [] as any,
       speciesOptions: [] as any,
@@ -246,6 +265,8 @@ export default defineComponent({
       currencyOptions: [] as any,
       // packageOptions: [] as any,
       savingPriceList: false,
+      durationsOptions,
+      seasonsOptions: [] as any,
     }
   },
   computed: {
@@ -266,6 +287,7 @@ export default defineComponent({
     this.getQuotaList()
     this.getCurrencyList()
     this.getSalesPackages()
+    this.getSeasonList()
   },
 
   methods: {
@@ -273,7 +295,7 @@ export default defineComponent({
     ...mapActions(useQuotaStore, ['getAllSpeciesPerQuotaPerArea']),
     ...mapActions(useQuotaStore, ['getAreaList']),
     ...mapActions(useSettingsStore, ['getHuntingsTypes']),
-    ...mapActions(useSettingsStore, ['getCurrencies']),
+    ...mapActions(useSettingsStore, ['getCurrencies', 'getSeasons']),
     ...mapActions(useQuotaStore, ['getQuotas']),
     ...mapActions(usePriceListStore, ['createPriceList']),
     ...mapActions(usePriceListStore, ['getSalesPackageList']),
@@ -299,9 +321,8 @@ export default defineComponent({
         // salesQuotaId: this.form.sales_quota_id.value,
         amount: this.form.amount,
         currency: this.form.currency.value,
-        duration: this.form.duration,
-        startDate: this.form.start_date,
-        endDate: this.form.end_date,
+        duration: this.form.duration.value,
+        season_id: this.form.season.value,
         // speciesObjectList: this.speciesObjects,
         // companionDays: this.form.companion_days,
         companionAmount: this.form.companion_amount,
@@ -348,6 +369,19 @@ export default defineComponent({
         console.log(error)
       }
     },
+    async getSeasonList() {
+      try {
+        const response = await this.getSeasons()
+        this.seasonsOptions = response.data.map((item: { id: any; name: any }) => {
+          return {
+            value: item.id,
+            text: item.name,
+          }
+        })
+      } catch (error) {
+        console.log(error)
+      }
+    },
 
     _showModal() {
       this._shM = true
@@ -359,60 +393,6 @@ export default defineComponent({
       } catch (error) {
         console.log(error)
       }
-    },
-
-    addNewSpeciesItemToStorage() {
-      // Check if all required fields in this.sform are not null
-      if (!this.form.species || !this.form.quantity) {
-        this.init({
-          message: 'Please fill all required fields.',
-          color: 'warning',
-        })
-        return // Exit the method if any field is null
-      }
-
-      if (this.form.samount <= 0) {
-        this.init({
-          message: 'Species cost must be greater than zero.',
-          color: 'warning',
-        })
-        return // Exit the method if species cost is less than zero
-      }
-
-      // Ensure quantity is a positive number
-      if (Number(this.form.quantity) <= 0) {
-        // Uncomment the toast message if needed
-        // this.toast.init({
-        //   message: 'Quantity must be greater than zero.',
-        //   color: 'warning',
-        // });
-
-        this.init({
-          message: 'Quantity must be greater than zero.',
-          color: 'warning',
-        })
-
-        return
-      }
-
-      // Check if the species item already exists
-      const exists = this.speciesObjects.some(
-        (species: { species_id: any }) => species.species_id === this.form.species.value,
-      )
-
-      if (!exists) {
-        this.speciesObjects.push({
-          id: this.form.species.value,
-          name: this.form.species.text,
-          amount: this.form.samount,
-          quantity: this.form.quantity,
-        })
-        // console.log('New species item added:', this.speciesObjects)
-      } else {
-        console.log('Species item already exists:', this.form.species.value)
-      }
-
-      // this.resetSForm()
     },
 
     deleteFromStorage(index: number) {

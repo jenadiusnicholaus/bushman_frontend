@@ -31,7 +31,7 @@
             <th>ID</th>
             <th>Species Name</th>
             <th>Scientific Name</th>
-            <th>Description</th>
+            <!-- <th>Description</th> -->
             <th>Quantity</th>
           </tr>
         </thead>
@@ -40,7 +40,7 @@
             <td>{{ species.id || 'N/A' }}</td>
             <td>{{ species.species?.name || 'N/A' }}</td>
             <td>{{ species.species?.scientific_name || 'N/A' }}</td>
-            <td>{{ species.species?.description || 'No description available' }}</td>
+            <!-- <td>{{ species.species?.description || 'No description available' }}</td> -->
             <td>{{ species.quantity !== null ? species.quantity : 'N/A' }}</td>
           </tr>
         </tbody>
@@ -49,7 +49,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
   props: {
     item: {
@@ -66,10 +66,6 @@ export default {
   /* max-width: 800px; */
   margin: auto;
   padding: 20px;
-  /* border: 1px solid #ddd; */
-  /* border-radius: 8px; */
-  /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
-  background-color: #f9f9f9;
 }
 
 .title {
@@ -124,7 +120,7 @@ th {
 }
 
 tr:nth-child(even) {
-  background-color: #f2f2f2;
+  /* background-color: #f2f2f2; */
 }
 
 td {

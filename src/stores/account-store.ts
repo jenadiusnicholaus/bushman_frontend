@@ -3,7 +3,9 @@ import axios from 'axios'
 
 export const useAccountsStore = defineStore('accounts-store', {
   state: () => {
-    return {}
+    return {
+      companyAccounts: [],
+    }
   },
 
   actions: {
@@ -61,6 +63,26 @@ export const useAccountsStore = defineStore('accounts-store', {
       }
 
       const response = await axios.request(config)
+      return response
+    },
+
+    async getCompanyAccounts() {
+      const config = {
+        method: 'get',
+        url: import.meta.env.VITE_APP_ACCOUNTS_BASE_URL + import.meta.env.VITE_APP_ACCOUNTS_COMPANY_VSET_URL,
+        Headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+      const response = await axios.request(config)
+      if (response.status === 200) {
+        this.companyAccounts = response.data.map((account: any) => {
+          return {
+            value: account.id,
+            text: account.account_type,
+          }
+        })
+      }
       return response
     },
   },

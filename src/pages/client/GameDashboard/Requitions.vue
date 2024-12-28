@@ -11,7 +11,7 @@
             size="small"
             @click="gotBack()"
           >
-            Go Back
+            Go Back to Requisitions
           </VaButton>
         </div>
         <VaButtonGroup>
@@ -31,7 +31,7 @@
         </VaButtonGroup>
       </div>
       <template v-if="showDetails">
-        <RequistionDetails> </RequistionDetails>
+        <RequistionDetails :rq-item="item"> </RequistionDetails>
       </template>
       <template v-else>
         <template v-if="!showAddForm">
@@ -45,7 +45,9 @@
               <strong>{{ value }}</strong>
             </template>
             <template #cell(actions)="{ rowData }">
-              <VaButton size="large" preset="plain" icon="visibility" @click="_showDetails(rowData)"> </VaButton>
+              <VaButton preset="plain" icon="visibility" @click="_showDetails(rowData)"> </VaButton>
+              <VaButton v-if="rowData.main_status === 'PENDING'" preset="plain" icon="task_alt" @click="_shM(rowData)">
+              </VaButton>
             </template>
           </VaDataTable>
         </template>
@@ -55,6 +57,10 @@
       </template>
     </VaCardContent>
   </VaCard>
+
+  <VaModal v-model="shM" ok-text="Apply" close-button size="small" :hide-default-actions="true">
+    <UpdateRequistionForm :item="item"> </UpdateRequistionForm>
+  </VaModal>
 </template>
 
 <script lang="ts">
@@ -63,10 +69,12 @@ import { defineComponent } from 'vue'
 import { useRequisitionStore } from '../../../stores/requistions-store'
 import RequistionDetails from './components/RequistionDetails.vue'
 import RequistionsForm from './components/RequistionsForm.vue'
+import UpdateRequistionForm from './components/UpdateRequistionForm.vue'
 
 export default defineComponent({
   components: {
     RequistionDetails,
+    UpdateRequistionForm,
     RequistionsForm,
   },
   data() {
@@ -87,6 +95,8 @@ export default defineComponent({
       columns,
       showDetails: false,
       showAddForm: false,
+      item: {} as any,
+      shM: false,
     }
   },
   computed: {
@@ -113,6 +123,7 @@ export default defineComponent({
     _showDetails(row: any) {
       console.log(row)
       this.getRequistionItems(row.selfItem.id)
+      this.item = row.selfItem
       this.showDetails = true
     },
 
@@ -120,9 +131,15 @@ export default defineComponent({
       this.showAddForm = show
     },
 
+    _shM(row: any) {
+      this.item = row.selfItem
+      this.shM = true
+    },
+
     gotBack() {
       this.showDetails = false
       this.showAddForm = false
+      this.getRequisitions()
     },
   },
 })

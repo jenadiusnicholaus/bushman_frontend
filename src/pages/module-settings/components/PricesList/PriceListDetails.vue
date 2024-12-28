@@ -7,7 +7,12 @@
   </VaSkeletonGroup>
 
   <template v-else>
-    <h1 class="va-h4 py-4 captalized-text text-center">Price List Details</h1>
+    <h1 class="va-h4 captalized-text text-center">Price List Details</h1>
+    <p class="va-h6 captalized-text text-center">
+      {{ format(priceListItem.price_list_type.price_list.start_date, 'MMMM yyyy') }}-{{
+        format(priceListItem.price_list_type.price_list.end_date, 'MMMM yyyy')
+      }}
+    </p>
     <VaDivider />
     <h6 class="captalized-text">
       {{ priceListItem.sales_package.area.name }}({{ priceListItem.sales_package.area.description }})
@@ -562,6 +567,7 @@ import { defineComponent } from 'vue'
 // import PaymentInfo from './../../billing/PaymentInfo.vue'
 // import Invoices from './../../billing/Invoices.vue'
 import { usePaymentCardsStore } from '../../../../stores/payment-cards'
+import { format } from 'date-fns'
 // import PriceListPackagesDetails from './PriceListPackagesDetails.vue'
 // import PriceListQuota from './PriceListQuota.vue'
 // import PriceListByHuntingType from './PriceListByHuntingType.vue'
@@ -589,6 +595,7 @@ export default defineComponent({
   data() {
     return {
       cardStore: usePaymentCardsStore(),
+      format,
     }
   },
   computed: {

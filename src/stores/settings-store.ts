@@ -13,6 +13,8 @@ export const useSettingsStore = defineStore('settings-store', {
       salesPackagesSpecies: [] as any,
       salesPackages: [] as any,
       loadingSalesPackages: false,
+      currencies: [] as any,
+      units: [] as any,
     }
   },
 
@@ -45,6 +47,16 @@ export const useSettingsStore = defineStore('settings-store', {
         },
       }
       const response = await axios.request(config)
+      if (response.status === 200) {
+        this.currencies = response.data.map((item: any) => {
+          return {
+            value: item.id,
+            text: item.name,
+            currency: item.currency,
+            price: item.price,
+          }
+        })
+      }
       return response
     },
     // VITE_APP_SEASONS_URL
@@ -131,6 +143,7 @@ export const useSettingsStore = defineStore('settings-store', {
 
     async getHuntingLicenseAreaSpecies(payload: any) {
       this.laodinglicenceAreaSpecies = true
+      this.licenceAreaSpecies = []
       const url =
         import.meta.env.VITE_APP_BASE_URL +
         import.meta.env.VITE_APP_LICENCE_AREA_SPECIES_URL +
@@ -159,7 +172,6 @@ export const useSettingsStore = defineStore('settings-store', {
       return response
     },
 
-    // getsalespackagesSpecies
     async getSalespackagesSpecies(payload: any) {
       this.loadingSalesPackages = true
       const url =
@@ -188,6 +200,29 @@ export const useSettingsStore = defineStore('settings-store', {
           }
         })
         this.loadingSalesPackages = false
+      }
+      return response
+    },
+    async getUnits() {
+      const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_UNITS_URL
+      const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+      const response = await axios.request(config)
+      if (response.status === 200) {
+        this.units = response.data.map((item: any) => {
+          return {
+            value: item.id,
+            text: item.name,
+            unit: item.unit,
+            factor: item.factor,
+          }
+        })
       }
       return response
     },

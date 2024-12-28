@@ -25,7 +25,7 @@
 
     <div v-else class="p-2">
       <VaForm ref="sformRef" class="mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6 mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-6 mb-4">
           <!-- name -->
 
           <VaInput
@@ -42,6 +42,16 @@
             :rules="[(v: any) => !!v || 'Scientific Name is required']"
             required
           />
+          <!-- Type -->
+          <div class="mb-4 grid grid-cols-1 md:grid-cols-1">
+            <VaSelect
+              v-model="sform.type"
+              label="Type"
+              :options="TYPES"
+              :rules="[(v: any) => !!v || 'Type is required']"
+              required-mark
+            />
+          </div>
         </div>
         <!-- description -->
         <div class="mb-4 grid grid-cols-1 md:grid-cols-1">
@@ -103,6 +113,8 @@ export default defineComponent({
       { key: 'id', sortable: true, sortingOptions: ['desc', 'asc'] },
       { key: 'name', sortable: true },
       { key: 'scientific_name', sortable: true },
+      { key: 'type', sortable: true },
+
       // { key: 'actions', width: 80 },
     ]
 
@@ -130,9 +142,21 @@ export default defineComponent({
     const sform = reactive({
       id: null as any,
       name: '',
+      type: null as any,
       scientific_name: '',
       description: '',
     })
+
+    const TYPES = [
+      {
+        value: 'MAIN',
+        text: 'Main Species',
+      },
+      {
+        value: 'NORMAL',
+        text: 'Normal Species',
+      },
+    ]
 
     const quotasOptions = [] as any
 
@@ -154,6 +178,7 @@ export default defineComponent({
       excellFile: [] as any,
       loading: false,
       saving: false,
+      TYPES,
     }
   },
 
@@ -183,6 +208,7 @@ export default defineComponent({
       this.saving = true
       const requestData = {
         name: this.sform.name,
+        type: this.sform.type.value,
         scientific_name: this.sform.scientific_name,
         description: this.sform.description,
       }
@@ -231,6 +257,7 @@ export default defineComponent({
           this.items = response?.data?.map((item: any) => ({
             id: item.id,
             name: item.name,
+            type: item.type,
             scientific_name: item.scientific_name,
           }))
 

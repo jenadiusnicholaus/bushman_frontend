@@ -15,6 +15,7 @@ export const useSpeciesStore = defineStore('species-store', {
       const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_SPECIES_URL
       const data = JSON.stringify({
         name: species.name,
+        type: species.type,
         scientific_name: species.scientific_name,
         description: species.description,
       })

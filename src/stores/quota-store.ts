@@ -175,11 +175,7 @@ export const useQuotaStore = defineStore('quota', {
       }
 
       const response = await axios.request(config)
-      if (response.status === 200) {
-        return response
-      } else {
-        return response
-      }
+      return response
     },
 
     async getSpeciesList() {
