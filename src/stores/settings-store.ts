@@ -1,5 +1,3 @@
-// VITE_APP_HUNTING_TYPES_URL
-
 import { defineStore } from 'pinia'
 import axios from 'axios'
 
@@ -15,6 +13,11 @@ export const useSettingsStore = defineStore('settings-store', {
       loadingSalesPackages: false,
       currencies: [] as any,
       units: [] as any,
+      safariExtras: [] as any,
+      showCreateSafariExtraModal: false,
+      savingSafariExtra: false,
+      loadingExtras: false,
+      salesInquiryEntities: [] as any,
     }
   },
 
@@ -225,6 +228,90 @@ export const useSettingsStore = defineStore('settings-store', {
         })
       }
       return response
+    },
+    // VITE_APP_SAFARY_EXTRAS_VSET_URL
+    async getSafariExtras(isUsedAsOption: boolean) {
+      this.loadingExtras = true
+      const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_SAFARY_EXTRAS_VSET_URL
+      const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+      const response = await axios.request(config)
+      if (response.status === 200) {
+        this.loadingExtras = false
+        if (!isUsedAsOption) {
+          this.safariExtras = response.data.map((item: any) => {
+            return {
+              id: item.id,
+              name: item.name,
+              amount: `${item.currency.symbol} ${item.amount} `,
+              description: item.description,
+            }
+          })
+        } else {
+          this.safariExtras = response.data.map((item: any) => {
+            return {
+              value: item.id,
+              text: item.name,
+            }
+          })
+        }
+      }
+      return response
+    },
+
+    async createSafariExtras(payload: any) {
+      this.savingSafariExtra = true
+      const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_SAFARY_EXTRAS_VSET_URL
+      const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data: payload,
+      }
+
+      const response = await axios.request(config)
+      if (response.status === 201) {
+        this.savingSafariExtra = false
+        this.showCreateSafariExtraModal = false
+        this.getSafariExtras(false)
+      }
+      return response
+    },
+
+    // # http://localhost:8000/api/v1.0/settings/sales-inquiry-entity/?sales_inquiry_id=59
+    // VITE_APP_SALES_INQUIRY_ENTITY_URL=settings/sales-inquiry-entity/
+    async getSalesInquiryEntities(salesInquiryId: any) {
+      const url =
+        import.meta.env.VITE_APP_BASE_URL +
+        import.meta.env.VITE_APP_SALES_INQUIRY_ENTITY_URL +
+        `?sales_inquiry_id=${salesInquiryId}`
+      const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+
+      const response = await axios.request(config)
+      if (response.status === 200) {
+        this.salesInquiryEntities = response.data.map((item: any) => {
+          return {
+            value: item.id,
+            text: item.full_name,
+          }
+        })
+      }
     },
   },
 })

@@ -24,7 +24,6 @@
     :columns="columns"
     :per-page="perPage"
     :current-page="currentPage"
-    selectable
     :filter="filter"
     @filtered="filtered = $event.items"
   >
@@ -59,6 +58,7 @@ export default defineComponent({
     return {
       loading: ref(false),
       columns: [
+        { key: 'id', label: 'ID', width: 80 },
         { key: 'name' },
         { key: 'country' },
         { key: 'nationality' },

@@ -1,6 +1,6 @@
 <template>
   <div class="sales-confirmation">
-    <h1 class="header">Sales Confirmation Details</h1>
+    <h1 class="header text-center text-lg font-bold">SALES CONFIRMATION</h1>
 
     <!-- Actions Button Section -->
     <div class="action-buttons">
@@ -102,16 +102,10 @@
         <div><strong>No. of Hunters:</strong> {{ salesData?.sales_inquiry?.preference?.no_of_hunters ?? 'N/A' }}</div>
         <div>
           <strong>No. of Observers:</strong> {{ salesData?.sales_inquiry?.preference?.no_of_observers ?? 'N/A' }}
-          <VaButton size="small" round preset="secondary" border-color="primary" @click="showObModal = !showObModal">
-            Add observers
-          </VaButton>
         </div>
         <div><strong>No. of Days:</strong> {{ salesData?.sales_inquiry?.preference?.no_of_days ?? 'N/A' }}</div>
         <div>
           <strong>No. of Companions:</strong> {{ salesData?.sales_inquiry?.preference?.no_of_companions ?? 'N/A' }}
-          <VaButton size="small" preset="secondary" round border-color="primary" @click="showComModal = !showComModal">
-            Add companions
-          </VaButton>
         </div>
         <div>
           <strong>Preferred Date:</strong>
@@ -201,7 +195,7 @@
     <!-- Price Breakdown -->
     <section class="section">
       <h2>Price Breakdown</h2>
-      <div class="details-grid">
+      <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between px-4 py-2">
         <div>
           <strong>Total Amount:</strong>
           {{ salesData?.price_break_down?.total_amount?.currency?.symbol ?? 'N/A' }}
@@ -242,6 +236,56 @@
           </div>
         </div>
       </div>
+      <!-- more information -->
+      <!-- h2 -->
+      <VaDivider class="my-4" />
+
+      <h2 class="text-center text-lg font-bold">MORE INFORMATION</h2>
+
+      <VaDivider class="my-4" />
+      <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between px-4 py-2">
+        <div class="flex flex-col md:flex-row gap-2 justify-start">
+          <VaTitle class="font-bold">Companions</VaTitle>
+        </div>
+        <VaButton size="small" preset="secondary" round border-color="primary" @click="_shCMd = !_shCMd">
+          Add companions
+        </VaButton>
+      </div>
+      <VaDataTable :items="companions" />
+
+      <VaDivider class="my-4" />
+
+      <h2 class="text-center text-lg font-bold">Safari Extras</h2>
+      <VaDivider class="my-4 va-divider--dashed" />
+      <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between px-4 py-2">
+        <div class="flex flex-col md:flex-row gap-2 justify-start">
+          <p><strong>Observers</strong></p>
+        </div>
+        <VaButton size="small" round preset="secondary" border-color="primary" @click="_shOMd = !_shOMd">
+          Add observers
+        </VaButton>
+      </div>
+      <VaDataTable :items="observers" />
+      <VaDivider class="my-4" />
+      <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between px-4 py-2">
+        <div class="flex flex-col md:flex-row gap-2 justify-start">
+          <p><strong>Safari Extras services</strong></p>
+        </div>
+
+        <VaButton
+          preset="primary"
+          class="mr-2 mb-2"
+          border-color="primary"
+          round
+          icon="add"
+          size="small"
+          @click="_showSafariExtrasModal()"
+        >
+          Add Extras
+        </VaButton>
+      </div>
+
+      <VaDataTable :items="clientSafariExtras" />
     </section>
 
     <!-- <VaInnerLoading :loading="loading"> -->
@@ -407,21 +451,25 @@
       </div>
     </VaModal>
 
-    <VaModal v-model="showComModal" :close-button="true" :hide-default-actions="true">
+    <VaModal v-model="_shCMd" :close-button="true" :hide-default-actions="true">
       <!-- <ObserversForm :sales-inquiry-id="item.id"> </ObserversForm>
       </section> -->
 
       <CompanionForm :sales-inquiry-id="salesData?.sales_inquiry.id"> </CompanionForm>
     </VaModal>
 
-    <VaModal v-model="showObModal" :close-button="true" :hide-default-actions="true">
+    <VaModal v-model="_shOMd" :close-button="true" :hide-default-actions="true">
       <ObserversForm :sales-inquiry-id="salesData?.sales_inquiry.id"> </ObserversForm>
+    </VaModal>
+
+    <VaModal v-model="_shM" width="60%" height="80%" :hide-default-actions="true">
+      <SafariExtrasList :table-selectable="true" :item="salesData.sales_inquiry" />
     </VaModal>
   </div>
 </template>
 
 <script lang="ts">
-import { mapActions } from 'pinia'
+import { mapActions, mapState, mapWritableState } from 'pinia'
 import { defineComponent } from 'vue'
 import { useSettingsStore } from '../../../../stores/settings-store'
 import { useSalesInquiriesStore } from '../../../../stores/sales-store'
@@ -432,11 +480,13 @@ import { format } from 'date-fns'
 import downloadPdf from '../../../../utils/pdfDownloader'
 import CompanionForm from './CompanionForm.vue'
 import ObserversForm from './ObserversForm.vue'
+import SafariExtrasList from './SalesClientSafariExtrasForm.vue'
 
 export default defineComponent({
   components: {
     CompanionForm,
     ObserversForm,
+    SafariExtrasList,
   },
 
   props: {
@@ -478,8 +528,8 @@ export default defineComponent({
       createDRTransaction: false,
       createCRTransaction: false,
       completingSales: false,
-      showComModal: false,
-      showObModal: false,
+      // showComModal: false,
+      // showObModal: false,
 
       downloadPdf,
 
@@ -521,20 +571,38 @@ export default defineComponent({
       ],
     }
   },
+  computed: {
+    ...mapState(useSalesInquiriesStore, ['observers', 'companions', 'clientSafariExtras']),
+    ...mapWritableState(useSalesInquiriesStore, {
+      _shM: 'showSafariExtrasModal',
+    }),
+
+    ...mapWritableState(useSalesInquiriesStore, { _shOMd: 'showObserversModal' }),
+    ...mapWritableState(useSalesInquiriesStore, { _shCMd: 'showCompanionsModal' }),
+  },
   mounted() {
     // this.getDocTypeOptions()
     this.showConfirmButtonTextByStatus()
+    this.getObservers(this.salesData.sales_inquiry.id)
+    this.getCompanions(this.salesData.sales_inquiry.id)
+    this.getClienSafariExtras(this.salesData.sales_inquiry.id)
   },
   methods: {
     ...mapActions(useSettingsStore, ['getDocTypes']),
     ...mapActions(useSalesInquiriesStore, ['updatesalesConfirmationStatus']),
     ...mapActions(useAccountsStore, ['createCRDRTransaction', 'createDRCRTransaction']),
+    ...mapActions(useSalesInquiriesStore, ['getObservers', 'getCompanions']),
+    ...mapActions(useSalesInquiriesStore, ['createsafariExtras', 'getClienSafariExtras']),
+
     getContactByType(type: any) {
       return this.salesData.sales_inquiry.entity.contacts.find((contact: any) => contact.contact_type === type)
     },
     formatDate(dateString: any) {
       const options: any = { year: 'numeric', month: 'long', day: 'numeric' }
       return new Date(dateString).toLocaleDateString(undefined, options)
+    },
+    _showSafariExtrasModal() {
+      this._shM = true
     },
 
     downloadConfirmation() {
@@ -864,7 +932,7 @@ export default defineComponent({
 <style scoped>
 .sales-confirmation {
   font-family: 'Arial', sans-serif;
-  max-width: 800px;
+  max-width: 1000px;
   margin: auto;
   padding: 20px;
   border: 1px solid #ddd;

@@ -12,7 +12,14 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
       priceBreakDown: null as any,
       addCompanions: false,
       observers: [] as any,
+      showObserversModal: false,
+      showCompanionsModal: false,
       companions: [] as any,
+      savingSafariExtras: false,
+      clientSafariExtras: [] as any,
+      showSafariExtrasModal: false,
+      showAccommodationModal: false,
+      accommodations: [] as any,
     }
   },
 
@@ -229,6 +236,9 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
         identity_number: payload.identityNumber,
         sales_inquiry_id: payload.salesInquiryId,
         contacts: payload.contacts,
+        charter_in: payload.charter_in,
+        charter_out: payload.charter_out,
+        arrival_airport: payload.arrival_airport,
       }
 
       const json_data = JSON.stringify(request_data)
@@ -246,6 +256,7 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
 
       if (response.status === 201) {
         this.addCompanions = true
+        this.showObserversModal = false
       }
       return response
     },
@@ -296,6 +307,10 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
         sales_inquiry_id: payload.salesInquiryId,
         regulatory_package_id: payload.regulatoryPackageId,
         contacts: payload.contacts,
+        charter_in: payload.charter_in,
+        arrival_airport: payload.arrival_airport,
+
+        charter_out: payload.charter_out,
       }
 
       const json_data = JSON.stringify(request_data)
@@ -313,6 +328,7 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
 
       if (response.status === 201) {
         this.addCompanions = true
+        this.showCompanionsModal = false
       }
       return response
     },
@@ -358,6 +374,116 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
       } catch (error) {
         console.log(error)
         return error
+      }
+    },
+
+    async createsafariExtras(payload: any) {
+      this.savingSafariExtras = true
+      const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_CLIENT_SAFARI_EXTRAS_VSET_URL
+      const data = JSON.stringify({
+        safary_extras: payload,
+      })
+
+      const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: url,
+        data: data,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+      const response = await axios.request(config)
+      if (response.status === 201) {
+        this.showSafariExtrasModal = false
+        this.savingSafariExtras = false
+        return response
+      } else {
+        this.savingSafariExtras = false
+        return response
+      }
+      return response
+    },
+
+    async getClienSafariExtras(salesInquiryId: any) {
+      const url =
+        import.meta.env.VITE_APP_BASE_URL +
+        import.meta.env.VITE_APP_CLIENT_SAFARI_EXTRAS_VSET_URL +
+        '?sales_inquiry_id=' +
+        salesInquiryId
+      const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+      this.clientSafariExtras = []
+
+      const response = await axios.request(config)
+
+      if (response.status === 200) {
+        this.clientSafariExtras = response?.data?.map((item: any) => {
+          return {
+            name: item.safari_extras.name,
+            amount: `${item.safari_extras.currency.symbol} ${item.safari_extras.amount}`,
+          }
+        })
+      }
+      return response
+    },
+
+    async getAccommodation(salesInquiryId: any) {
+      const url =
+        import.meta.env.VITE_APP_BASE_URL +
+        import.meta.env.VITE_APP_SALES_CONFIRMATION_ACCOMMODATION_VSET_URL +
+        '?sales_inquiry_id=' +
+        salesInquiryId
+      const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+      const response = await axios.request(config)
+      if (response.status === 200) {
+        this.accommodations = response.data.map((item: any) => {
+          return {
+            id: item.id,
+            name: item.entity.full_name,
+            type_name: item.type.name,
+            check_in: formatDateTime(item.check_in),
+            check_out: formatDateTime(item.check_out),
+          }
+        })
+      }
+      return response
+    },
+
+    async createAccommodation(payload: any) {
+      const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_SALES_CONFIRMATION_ACCOMMODATION_VSET_URL
+      const data = JSON.stringify(payload)
+
+      const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data: data,
+      }
+
+      const response = await axios.request(config)
+      if (response.status === 201) {
+        this.showAccommodationModal = false
+        this.getAccommodation(payload.sales_inquiry_id)
+        return response
+      } else {
+        return response
       }
     },
   },

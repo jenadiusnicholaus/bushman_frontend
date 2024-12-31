@@ -203,7 +203,7 @@ export default {
         {
           name: 'species-settings',
           meta: {
-            icon: 'pets',
+            icon: 'cruelty_free',
           },
 
           displayName: 'menu.settings-species',
@@ -230,10 +230,19 @@ export default {
         {
           name: 'sales-package',
           meta: {
-            icon: 'check_box',
+            icon: 'inventory_2',
           },
 
           displayName: 'menu.sales-package',
+        },
+
+        {
+          // sales-extra-services
+          name: 'sales-extra-services',
+          meta: {
+            icon: 'browse_gallery',
+          },
+          displayName: 'menu.sales-extra-services',
         },
 
         // price-list

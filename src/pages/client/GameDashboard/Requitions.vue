@@ -9,7 +9,7 @@
             class="px-2 py-2"
             icon="arrow_back"
             size="small"
-            @click="gotBack()"
+            @click="goBack()"
           >
             Go Back to Requisitions
           </VaButton>
@@ -136,7 +136,7 @@ export default defineComponent({
       this.shM = true
     },
 
-    gotBack() {
+    goBack() {
       this.showDetails = false
       this.showAddForm = false
       this.getRequisitions()

@@ -64,8 +64,38 @@
               type="text"
               :max-length="30"
               placeholder="Enter your address"
-              :rules="[(value: any) => (value && value.length > 0) || 'Address is required']"
+              :rules="[(v: any) => !!v || 'This field is required']"
               label="Address"
+            />
+          </div>
+
+          <h3 class="font-bold text-lg mb-2">Charters</h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 mt-6">
+            <VaInput
+              v-model="form.charter_in"
+              placeholder="Charter in"
+              type="datetime-local"
+              :rules="[(v: any) => !!v || 'This field is required']"
+              label="Charter in"
+            />
+            <VaInput
+              v-model="form.charter_out"
+              type="datetime-local"
+              placeholder="Charter out"
+              :rules="[
+                (v: any) => !!v || 'This field is required',
+                (v: any) => new Date(v) > new Date(form.charter_in) || 'Check out date must be after check-in date',
+              ]"
+              label="Charter out"
+            />
+
+            <VaInput
+              v-model="form.arrival_airport"
+              type="text"
+              placeholder="Arrival airport"
+              :rules="[(v: any) => !!v || 'This field is required']"
+              label="Arrival airport"
             />
           </div>
 
@@ -156,6 +186,7 @@ import { useQuotaStore } from '../../../../stores/quota-store'
 import { useSalesInquiriesStore } from '../../../../stores/sales-store'
 import { useSettingsStore } from '../../../../stores/settings-store'
 import handleErrors from '../../../../utils/errorHandler'
+import { format } from 'date-fns'
 
 export default defineComponent({
   components: {
@@ -205,6 +236,9 @@ export default defineComponent({
       email: '',
       phone: '',
       address: '',
+      arrival_airport: '',
+      charter_in: null as any,
+      charter_out: null as any,
       // no_of_hunters: 1,
       // no_of_observers: 0,
       // no_of_days: 0,
@@ -438,6 +472,10 @@ export default defineComponent({
         // areaId: this.form.area.value,
         // season: this.form.season,
         // preferredDate: this.form.preferred_date,
+
+        arrival_airport: this.form.arrival_airport,
+        charter_in: format(this.form.charter_in, 'yyyy-MM-dd HH:mm:ss'),
+        charter_out: format(this.form.charter_in, 'yyyy-MM-dd HH:mm:ss'),
         identityNumber: this.form.id_number,
       }
       try {

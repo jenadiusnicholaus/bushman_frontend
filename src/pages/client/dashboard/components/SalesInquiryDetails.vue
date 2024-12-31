@@ -1,4 +1,32 @@
 <template>
+  <div class="flex justify-end">
+    <VaButton preset="primary" class="mr-2 mb-2" round icon="add" size="small" @click="_showAccommodationModal()">
+      add accommodation
+    </VaButton>
+    <VaButton preset="primary" class="mr-2 mb-2" round icon="add" size="small" @click="_showSafariExtrasModal()">
+      Add Safari Extras Services
+    </VaButton>
+    <VaButton
+      preset="primary"
+      class="mr-2 mb-2"
+      round
+      icon="arrow_downward"
+      size="small"
+      @click="scrollTo(observerScollRef)"
+    >
+      Add Observers
+    </VaButton>
+    <VaButton
+      preset="primary"
+      class="mr-2 mb-2"
+      round
+      icon="arrow_downward"
+      size="small"
+      @click="scrollTo(companionsScollRef)"
+    >
+      Add Companions
+    </VaButton>
+  </div>
   <VaSplit
     class="split-demo h-[40rem]"
     :limits="[
@@ -7,43 +35,42 @@
     ]"
   >
     <template #start>
-      <div class="p-1">
-        <VaTitle style="font-weight: bold">Sales Inquiry Details</VaTitle>
+      <div class="p-4 bg-gray-100 rounded-lg shadow-md">
+        <VaTitle class="font-bold text-xl mb-2">Sales Inquiry Details</VaTitle>
 
-        <h2>Inquiry Code: {{ item?.code }}</h2>
-        <VaTitle>Created on: {{ formatDate(item?.create_date) }}</VaTitle>
+        <h2 class="text-lg">Inquiry Code: {{ item?.code }}</h2>
+        <VaTitle class="text-gray-600">Created on: {{ formatDate(item?.create_date) }}</VaTitle>
 
-        <VaDivider />
-        <div class="flex flex-col py-4 px-6">
-          <VaTitle style="font-weight: bold">Client Information</VaTitle>
-          <p>Full Name: {{ safeString(item?.entity?.full_name) }}</p>
-          <p>Nationality: {{ safeString(item?.entity?.nationality?.name) }}</p>
-          <p>Country: {{ safeString(item?.entity?.country?.name) }}</p>
+        <VaDivider class="my-4" />
+        <div class="flex flex-col">
+          <VaTitle class="font-bold">Client Information</VaTitle>
+          <p><strong>Full Name:</strong> {{ safeString(item?.entity?.full_name) }}</p>
+          <p><strong>Nationality:</strong> {{ safeString(item?.entity?.nationality?.name) }}</p>
+          <p><strong>Country:</strong> {{ safeString(item?.entity?.country?.name) }}</p>
 
-          <VaTitle style="font-weight: bold">Contacts:</VaTitle>
+          <VaTitle class="font-bold mt-4">Contacts:</VaTitle>
           <VaList>
             <VaListItem v-for="(contact, index) in safeArray(item.entity?.contacts)" :key="index">
               <VaListItemContent>{{ contact.contact }}</VaListItemContent>
             </VaListItem>
           </VaList>
 
-          <VaDivider />
+          <VaDivider class="my-4" />
 
-          <VaTitle style="font-weight: bold">Preference Information</VaTitle>
-          <p>Preferred Date: {{ formatDate(item?.preference?.preferred_date) }}</p>
-          <p>No of Companions: {{ safeString(item?.preference?.no_of_companions?.toString()) }}</p>
-          <p>No of Observers: {{ safeString(item?.preference?.no_of_observers?.toString()) }}</p>
+          <VaTitle class="font-bold">Preference Information</VaTitle>
+          <p><strong>Preferred Date:</strong> {{ formatDate(item?.preference?.preferred_date) }}</p>
+          <p><strong>No of Companions:</strong> {{ safeString(item?.preference?.no_of_companions.toString()) }}</p>
+          <p><strong>No of Observers:</strong> {{ safeString(item?.preference?.no_of_observers.toString()) }}</p>
+          <p><strong>Number of Days:</strong> {{ safeString(item?.preference?.no_of_days.toString()) }}</p>
 
-          <p>Number of Days: {{ safeString(item?.preference?.no_of_days?.toString()) }}</p>
+          <VaDivider class="my-4" />
 
-          <VaDivider />
-
-          <VaTitle style="font-weight: bold">Preferred Species</VaTitle>
-          <table class="table-auto w-full mb-4 va-table">
+          <VaTitle class="font-bold">Preferred Species</VaTitle>
+          <table class="table-auto w-full mb-4 border-collapse">
             <thead>
               <tr>
-                <th class="px-4 py-2">Species Name</th>
-                <th class="px-4 py-2">Quantity</th>
+                <th class="px-4 py-2 border-b">Species Name</th>
+                <th class="px-4 py-2 border-b">Quantity</th>
               </tr>
             </thead>
             <tbody>
@@ -57,12 +84,12 @@
             </tbody>
           </table>
 
-          <VaTitle style="font-weight: bold">Area Information</VaTitle>
-          <table class="table-auto w-full va-table">
+          <VaTitle class="font-bold">Area Information</VaTitle>
+          <table class="table-auto w-full border-collapse">
             <thead>
               <tr>
-                <th class="px-4 py-2">Area ID</th>
-                <th class="px-4 py-2">Area Name</th>
+                <th class="px-4 py-2 border-b">Area ID</th>
+                <th class="px-4 py-2 border-b">Area Name</th>
               </tr>
             </thead>
             <tbody>
@@ -76,101 +103,96 @@
             </tbody>
           </table>
 
-          <!-- Existing details (Client Information, Preference Information, etc.) -->
+          <VaDivider class="my-4" />
 
-          <VaDivider />
+          <VaTitle class="font-bold">Price List Summary</VaTitle>
+          <p><strong>Package Name:</strong> {{ item?.price_list?.price_list?.sales_package?.name }}</p>
 
-          <!-- Price List Summary Section -->
-          <VaTitle style="font-weight: bold">Price List Summary</VaTitle>
-          <p><strong>Pgk Name:</strong> {{ item?.price_list?.price_list?.sales_package?.name }}</p>
+          <VaDivider class="my-4" />
 
-          <VaDivider />
-
-          <!-- Regulatory Package Section -->
-          <VaTitle style="font-weight: bold">License Package</VaTitle>
+          <VaTitle class="font-bold">License Package</VaTitle>
           <p><strong>Name:</strong> {{ item?.price_list?.price_list?.sales_package.regulatory_package?.name }}</p>
           <p>
             <strong>Duration:</strong>
             {{ item?.price_list?.price_list?.sales_package?.regulatory_package?.duration }} days
           </p>
 
-          <VaDivider />
+          <VaDivider class="my-4" />
 
-          <!-- Area Information Section -->
-          <VaTitle style="font-weight: bold">Package Area Information</VaTitle>
+          <VaTitle class="font-bold">Package Area Information</VaTitle>
           <p><strong>Area Name:</strong> {{ item?.price_list?.price_list?.sales_package?.area?.name }}</p>
           <p><strong>Description:</strong> {{ item?.price_list?.price_list?.sales_package?.area?.description }}</p>
 
-          <VaDivider />
+          <VaDivider class="my-4" />
 
-          <!-- Hunting Type Section -->
-          <VaTitle style="font-weight: bold">Hunting Type</VaTitle>
+          <VaTitle class="font-bold">Hunting Type</VaTitle>
           <p><strong>Name:</strong> {{ item?.price_list?.price_list?.price_list_type?.hunting_type?.name }}</p>
-          <!-- amount -->
           <p>
-            <strong>Price:</strong>{{ item?.price_list?.price_list?.price_list_type?.currency }}
+            <strong>Price:</strong> {{ item?.price_list?.price_list?.price_list_type?.currency }}
             {{ item?.price_list?.price_list?.price_list_type?.amount }}
           </p>
 
-          <VaDivider />
-          <VaTitle style="font-weight: bold">Observers</VaTitle>
-          <VaDataTable :items="observers" />
-          <VaTitle style="font-weight: bold">Companions</VaTitle>
+          <VaDivider class="my-4" />
 
+          <VaTitle class="font-bold">Companions</VaTitle>
           <VaDataTable :items="companions" />
+
+          <VaDivider class="my-4" />
+
+          <VaTitle class="font-bold">Safari Extras</VaTitle>
+          <p><strong>Observers</strong></p>
+          <VaDataTable :items="observers" />
+          <p><strong>Other Safari Extras</strong></p>
+          <VaDataTable :items="clientSafariExtras" />
+
+          <VaDivider class="my-4" />
+
+          <VaTitle class="font-bold">Accommodation</VaTitle>
+          <VaDataTable :items="accommodations" />
         </div>
       </div>
     </template>
+
     <template #grabber>
       <div class="custom-grabber">
         <VaIcon name="swap_horiz" />
       </div>
     </template>
+
     <template #end>
       <div class="p-6">
-        <SalesProposalForm :item="item"> </SalesProposalForm>
+        <SalesProposalForm :item="item" />
       </div>
-      <div class="flex justify-end">
-        <VaButton
-          preset="primary"
-          class="mr-6 mb-2"
-          round
-          icon="arrow_downward"
-          size="small"
-          border-color="primary"
-          @click="scrollTo(observerScollRef)"
-          >Add Observers</VaButton
-        >
-        <VaButton
-          preset="primary"
-          class="mr-6 mb-2"
-          round
-          icon="arrow_downward"
-          border-color="primary"
-          size="small"
-          @click="scrollTo(companionsScollRef)"
-          >Companions</VaButton
-        >
-      </div>
+
       <section ref="observerScollRef">
-        <ObserversForm :sales-inquiry-id="item.id"> </ObserversForm>
+        <ObserversForm :sales-inquiry-id="item.id" />
       </section>
       <section ref="companionsScollRef">
-        <CompanionForm :sales-inquiry-id="item.id"> </CompanionForm>
+        <CompanionForm :sales-inquiry-id="item.id" />
       </section>
     </template>
   </VaSplit>
+
+  <VaModal v-model="_shM" width="60%" height="80%" :hide-default-actions="true">
+    <SafariExtrasList :table-selectable="true" :item="item" />
+  </VaModal>
+
+  <VaModal v-model="_shAM" width="60%" height="80%" :hide-default-actions="true">
+    <AccommodationForm :item="item" />
+  </VaModal>
 </template>
 
 <script lang="ts">
-import { useForm } from 'vuestic-ui'
+import { useForm, useToast } from 'vuestic-ui'
 import { defineComponent, ref, reactive } from 'vue'
 import { useSettingsStore } from '../../../../stores/settings-store'
 import SalesProposalForm from './SalesProposalForm.vue'
 import ObserversForm from './ObserversForm.vue'
 import CompanionForm from './CompanionForm.vue'
 import { useSalesInquiriesStore } from '../../../../stores/sales-store'
-import { mapState, mapActions } from 'pinia'
+import SafariExtrasList from './SalesClientSafariExtrasForm.vue'
+import { mapState, mapActions, mapWritableState } from 'pinia'
+import AccommodationForm from './AccommodationForm.vue'
 
 export default defineComponent({
   name: 'SalesConfirmationClientDetails',
@@ -178,6 +200,8 @@ export default defineComponent({
     SalesProposalForm,
     ObserversForm,
     CompanionForm,
+    SafariExtrasList,
+    AccommodationForm,
   },
   props: {
     item: {
@@ -187,8 +211,11 @@ export default defineComponent({
   },
 
   setup() {
+    const { init } = useToast()
+
     const observerScollRef = ref<HTMLDivElement | null>(null)
     const companionsScollRef = ref<HTMLDivElement | null>(null)
+    const safariExtrasRef = ref<HTMLDivElement | null>(null)
 
     const scrollTo = (view: any) => {
       console.log('Scroll View:', view) // For debugging
@@ -203,7 +230,9 @@ export default defineComponent({
     return {
       observerScollRef,
       companionsScollRef,
+      safariExtrasRef,
       scrollTo,
+      init,
     }
   },
 
@@ -235,10 +264,18 @@ export default defineComponent({
       formRef,
       form,
       searchText: '',
+      // showSafariExtrasModal: false,
     }
   },
   computed: {
-    ...mapState(useSalesInquiriesStore, ['observers', 'companions']),
+    ...mapState(useSalesInquiriesStore, ['observers', 'companions', 'clientSafariExtras', 'accommodations']),
+    ...mapWritableState(useSalesInquiriesStore, {
+      _shM: 'showSafariExtrasModal',
+    }),
+    ...mapWritableState(useSalesInquiriesStore, {
+      _shAM: 'showAccommodationModal',
+    }),
+
     logo() {
       return useSettingsStore().logo // Get the logo from the store
     },
@@ -246,9 +283,13 @@ export default defineComponent({
   mounted() {
     this.getObservers(this.item.id)
     this.getCompanions(this.item.id)
+    this.getClienSafariExtras(this.item.id)
+    this.getAccommodation(this.item.id)
   },
   methods: {
     ...mapActions(useSalesInquiriesStore, ['getObservers', 'getCompanions']),
+    ...mapActions(useSalesInquiriesStore, ['createsafariExtras', 'getClienSafariExtras', 'getAccommodation']),
+
     formatDate(dateString: string | number | Date) {
       return dateString ? new Date(dateString).toLocaleDateString() : 'Not provided'
     },
@@ -262,6 +303,13 @@ export default defineComponent({
       // Your logic to go back to the previous view
     },
     getOrsearchSalesInquiry() {},
+    _showSafariExtrasModal() {
+      this._shM = true
+    },
+    _showAccommodationModal() {
+      this._shAM = true
+    },
+    // async submitSelectedItems(selectedItems: any) {
   },
 })
 </script>
@@ -270,14 +318,14 @@ export default defineComponent({
 .sales-inquiry {
   margin: 20px;
 }
-s .split-demo {
+.split-demo {
   & .custom-grabber {
     height: 100%;
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--va-background-element);
+    // background-color: var(--va-background-element);
   }
 }
 </style>

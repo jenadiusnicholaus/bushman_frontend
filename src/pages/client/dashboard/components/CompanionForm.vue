@@ -69,6 +69,39 @@
             />
           </div>
 
+          <!-- "charter_in": request.data.get("charter_in"),
+          "charter_out": request.data.get("charter_out"), -->
+          <h3 class="font-bold text-lg mb-2">Charters</h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 mt-6">
+            <VaInput
+              v-model="form.charter_in"
+              placeholder="Charter in"
+              type="datetime-local"
+              :rules="[(v: any) => !!v || 'This field is required']"
+              label="Charter in"
+            />
+            <VaInput
+              v-model="form.charter_out"
+              type="datetime-local"
+              placeholder="Charter out"
+              :rules="[
+                (v: any) => !!v || 'This field is required',
+                (v: any) => new Date(v) > new Date(form.charter_in) || 'Check out date must be after check-in date',
+              ]"
+              label="Charter out"
+            />
+            <!-- arrival_airport
+              -->
+            <VaInput
+              v-model="form.arrival_airport"
+              type="text"
+              placeholder="Arrival airport"
+              :rules="[(v: any) => !!v || 'This field is required']"
+              label="Arrival airport"
+            />
+          </div>
+
           <h3 class="font-bold text-lg mb-2">Regulatory Package</h3>
 
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
@@ -169,6 +202,7 @@ import { useSalesInquiriesStore } from '../../../../stores/sales-store'
 import { useSettingsStore } from '../../../../stores/settings-store'
 import handleErrors from '../../../../utils/errorHandler'
 import { useRegulatoryPackageStore } from '../../../../stores/regulatrory-store'
+import { format } from 'date-fns'
 
 export default defineComponent({
   components: {
@@ -218,6 +252,9 @@ export default defineComponent({
       email: '',
       phone: '',
       address: '',
+      arrival_airport: '',
+      charter_in: null as any,
+      charter_out: null as any,
       regulatory_package_id: null as any,
       // no_of_hunters: 1,
       // no_of_observers: 0,
@@ -451,6 +488,9 @@ export default defineComponent({
         salesInquiryId: this.salesInquiryId,
         regulatoryPackageId: this.form.regulatory_package_id.value,
         identityNumber: this.form.id_number,
+        arrival_airport: this.form.arrival_airport,
+        charter_in: format(this.form.charter_in, 'yyyy-MM-dd HH:mm:ss'),
+        charter_out: format(this.form.charter_in, 'yyyy-MM-dd HH:mm:ss'),
       }
       try {
         const response: any = await this.createSalesConfirmationCompanion(requestdata)

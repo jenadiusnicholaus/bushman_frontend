@@ -1,6 +1,8 @@
 <template>
-  <VaForm ref="iformRef">
-    <!-- <h3 class="font-bold text-lg mb-2">Package Details</h3>
+  <VaCard class="w-full">
+    <VaCardContent>
+      <VaForm ref="iformRef">
+        <!-- <h3 class="font-bold text-lg mb-2">Package Details</h3>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
       <VaSelect
         v-model="form.regulatory_package_id"
@@ -17,149 +19,151 @@
         label="Sales Package"
       />
     </div> -->
-    <h3 class="font-bold text-lg mb-2">Itinerary Details</h3>
+        <h3 class="font-bold text-lg mb-2">Mian Hunter safari information</h3>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-      <VaInput
-        v-model="form.airport_name"
-        type="text"
-        placeholder=" Enter Airport Name"
-        :rules="[(value: any) => (value && value.length > 0) || ' Airport Name is required']"
-        label="Airport Name"
-      />
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+          <VaInput
+            v-model="form.airport_name"
+            type="text"
+            placeholder=" Enter Airport Name"
+            :rules="[(value: any) => (value && value.length > 0) || ' Airport Name is required']"
+            label="Airport Name"
+          />
 
-      <!-- arrival -->
-      <VaDateInput
-        v-model="form.arrival"
-        placeholder="Select Arrival Date"
-        :rules="[(value: any) => value || 'Arrival Date is required']"
-        label="Arrival Date"
-      />
-      <VaDateInput
-        v-model="form.charter_in"
-        placeholder="Choose charter in date"
-        :rules="[(value: any) => value || 'Arrival Date is required']"
-        label="Charter In Date"
-      />
-      <VaDateInput
-        v-model="form.charter_out"
-        placeholder="Choose charter out date"
-        :rules="[(value: any) => value || 'Arrival Date is required']"
-        label="Charter Out Date"
-      />
-    </div>
+          <!-- arrival -->
+          <VaDateInput
+            v-model="form.arrival"
+            placeholder="Select Arrival Date"
+            :rules="[(value: any) => value || 'Arrival Date is required']"
+            label="Arrival Date"
+          />
+          <VaDateInput
+            v-model="form.charter_in"
+            placeholder="Choose charter in date"
+            :rules="[(value: any) => value || 'Arrival Date is required']"
+            label="Charter In Date"
+          />
+          <VaDateInput
+            v-model="form.charter_out"
+            placeholder="Choose charter out date"
+            :rules="[(value: any) => value || 'Arrival Date is required']"
+            label="Charter Out Date"
+          />
+        </div>
 
-    <h3 class="font-bold text-lg mb-2">
-      Create Client Installment plan
-      <!-- <span v-if="priceBreakDown">
+        <h3 class="font-bold text-lg mb-2">
+          Create Client Installment plan
+          <!-- <span v-if="priceBreakDown">
         - <b>{{ priceBreakDown.total_amount.currency.symbol }}{{ priceBreakDown.total_amount.amount }}</b>
       </span> -->
-    </h3>
-    <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4">
-      <VaTextarea
-        v-model="form.installment_narration"
-        type="text"
-        placeholder="Description"
-        :rules="[(value: any) => (value && value.length > 0) || ' Installment Description is required']"
-      />
-    </div>
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4">
+          <VaTextarea
+            v-model="form.installment_narration"
+            type="text"
+            placeholder="Description"
+            :rules="[(value: any) => (value && value.length > 0) || ' Installment Description is required']"
+          />
+        </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
-      <VaInput
-        v-model="form.installment_due_amount"
-        type="number"
-        label="Amount"
-        placeholder="Amount"
-        :rules="[(value: any) => (value && value > 0) || ' Installment Amount is required']"
-      />
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+          <VaInput
+            v-model="form.installment_due_amount"
+            type="number"
+            label="Amount"
+            placeholder="Amount"
+            :rules="[(value: any) => (value && value > 0) || ' Installment Amount is required']"
+          />
 
-      <VaSelect
-        v-model="form.installment_amount_type"
-        :options="[
-          // up on Booking
-          { value: 'PERCENT', text: 'PERCENT' },
-          { value: 'LAPS', text: `LAPS ` },
-        ]"
-        label="Amount type"
-        :rules="[(value: any) => value || 'Due amoun type is required']"
-        placeholder="Select Due amount type"
-        @update:modelValue="onInputChange"
-      />
+          <VaSelect
+            v-model="form.installment_amount_type"
+            :options="[
+              // up on Booking
+              { value: 'PERCENT', text: 'PERCENT' },
+              { value: 'LAPS', text: `LAPS ` },
+            ]"
+            label="Amount type"
+            :rules="[(value: any) => value || 'Due amoun type is required']"
+            placeholder="Select Due amount type"
+            @update:modelValue="onInputChange"
+          />
 
-      <!-- limit -->
+          <!-- limit -->
 
-      <VaInput
-        v-model="form.installment_due_days"
-        type="number"
-        label="Days"
-        :rules="[(value: any) => (value && value > 0) || ' Installment Days is required']"
-        placeholder="Days"
-      />
+          <VaInput
+            v-model="form.installment_due_days"
+            type="number"
+            label="Days"
+            :rules="[(value: any) => (value && value > 0) || ' Installment Days is required']"
+            placeholder="Days"
+          />
 
-      <VaSelect
-        v-model="form.due_days_type"
-        label="Due days type"
-        :options="[
-          // up on Booking
-          { value: 'UPON_SALES_CONFIRMATION', text: 'UPON_SALES_CONFIRMATION' },
-          { value: 'PRIOR_SAFARI', text: `PRIOR_SAFARI ` },
-        ]"
-        :rules="[(value: any) => value || 'Due days type is required']"
-        placeholder="Select Due days type"
-        @update:modelValue="onInputChange"
-      />
+          <VaSelect
+            v-model="form.due_days_type"
+            label="Due days type"
+            :options="[
+              // up on Booking
+              { value: 'UPON_SALES_CONFIRMATION', text: 'UPON_SALES_CONFIRMATION' },
+              { value: 'PRIOR_SAFARI', text: `PRIOR_SAFARI ` },
+            ]"
+            :rules="[(value: any) => value || 'Due days type is required']"
+            placeholder="Select Due days type"
+            @update:modelValue="onInputChange"
+          />
 
-      <!-- installment_amount_type -->
+          <!-- installment_amount_type -->
 
-      <VaButton icon="add" @click="createInstallmentList()"> </VaButton>
-    </div>
+          <VaButton icon="add" @click="createInstallmentList()"> </VaButton>
+        </div>
 
-    <div v-if="installments.length > 0" class="mb-4">
-      <h3 class="font-bold text-lg mb-2">Installment Plans</h3>
-      <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4">
-        <div class="flex items-center">
-          <div class="va-table-responsive">
-            <table class="va-table va-table--striped">
-              <thead>
-                <tr>
-                  <th>Description</th>
-                  <th>Amount</th>
-                  <th>installment In (PERCENT/LAPS)</th>
-                  <th>Days</th>
-                  <th>Due Days Limit</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="i in installments" :key="i.id">
-                  <td>{{ i.narration }}</td>
-                  <td>{{ i.amount }}</td>
-                  <td>{{ i.amount_type }}</td>
+        <div v-if="installments.length > 0" class="mb-4">
+          <h3 class="font-bold text-lg mb-2">Installment Plans</h3>
+          <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4">
+            <div class="flex items-center">
+              <div class="va-table-responsive">
+                <table class="va-table va-table--striped">
+                  <thead>
+                    <tr>
+                      <th>Description</th>
+                      <th>Amount</th>
+                      <th>installment In (PERCENT/LAPS)</th>
+                      <th>Days</th>
+                      <th>Due Days Limit</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="i in installments" :key="i.id">
+                      <td>{{ i.narration }}</td>
+                      <td>{{ i.amount }}</td>
+                      <td>{{ i.amount_type }}</td>
 
-                  <td>{{ i.days }}</td>
-                  <td>{{ i.due_days_type }}</td>
+                      <td>{{ i.days }}</td>
+                      <td>{{ i.due_days_type }}</td>
 
-                  <td><VaButton plain icon="delete" @click="deleteInstallment(i.id)"> </VaButton></td>
-                </tr>
-              </tbody>
-            </table>
+                      <td><VaButton plain icon="delete" @click="deleteInstallment(i.id)"> </VaButton></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <div class="flex justify-end">
-      <VaButton
-        save
-        icon="save"
-        :loading="saving"
-        :disabled="!isValidForm || saving || installments.length < 0"
-        @click="validateForm() && onSubmit()"
-      >
-        save</VaButton
-      >
-    </div>
-  </VaForm>
+        <div class="flex justify-end">
+          <VaButton
+            save
+            icon="save"
+            :loading="saving"
+            :disabled="!isValidForm || saving || installments.length < 0"
+            @click="validateForm() && onSubmit()"
+          >
+            save</VaButton
+          >
+        </div>
+      </VaForm>
+    </VaCardContent>
+  </VaCard>
 </template>
 
 <script lang="ts">
@@ -243,7 +247,6 @@ export default defineComponent({
   mounted() {
     this.getPL()
     this.getLicencePackages()
-    // this.getSalesPackages()
   },
 
   methods: {

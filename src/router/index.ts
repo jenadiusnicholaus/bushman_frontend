@@ -169,6 +169,11 @@ const routes: Array<RouteRecordRaw> = [
             path: 'sales-package',
             component: () => import('../pages/module-settings/ManageSalesPackage.vue'),
           },
+          {
+            name: 'sales-extra-services',
+            path: 'sales-extra-services',
+            component: () => import('../pages/module-settings/ManageExtras.vue'),
+          },
 
           // PriceList
           {
