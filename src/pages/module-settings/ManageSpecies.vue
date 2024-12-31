@@ -4,7 +4,7 @@
 
     <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between">
       <div class="flex flex-col md:flex-row gap-2 justify-start">
-        <VaButton v-if="!showSpeciesList" class="px-2 py-2" icon="arrow_back" size="small" @click="showSpecies">
+        <VaButton v-if="!showSpeciesList" size="small" class="px-2" icon="arrow_back" @click="showSpecies">
           Go Back
         </VaButton>
       </div>

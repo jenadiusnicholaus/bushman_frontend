@@ -1,10 +1,10 @@
 <template>
   <VaCard class="w-full">
-    <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between px-4 pt-2">
+    <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between px-4 mt-2 py-2">
       <div class="flex flex-col md:flex-row gap-2 justify-start">
         <VaButton
           v-if="showAddSalesInquiriesForm || showDetailsPage"
-          class="px-2 py-2"
+          class="px-2"
           icon="arrow_back"
           size="small"
           @click="gotBack()"
@@ -14,7 +14,7 @@
       </div>
       <VaButtonGroup v-if="!showAddSalesInquiriesForm && !showDetailsPage">
         <VaButton
-          class="px-2 py-2"
+          class="px-2"
           color="primary"
           label="Add New Quota"
           round

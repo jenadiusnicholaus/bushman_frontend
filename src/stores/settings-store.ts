@@ -18,6 +18,22 @@ export const useSettingsStore = defineStore('settings-store', {
       savingSafariExtra: false,
       loadingExtras: false,
       salesInquiryEntities: [] as any,
+      accommodationTypes: [] as any,
+
+      // seasons
+      seasons: [] as any,
+
+      // accommodationType vars
+      loadingAccommodationTypes: false,
+      loadingSalesInquiryEntities: false,
+      showAccommodationTypeModal: false,
+      savingAccommodationType: false,
+
+      // sales charters price list
+      salesChartersPriceList: [] as any,
+      loadingSalesChartersPriceList: false,
+      savingSalesChartersPriceList: false,
+      showSalesChartersPriceListModal: false,
     }
   },
 
@@ -63,7 +79,7 @@ export const useSettingsStore = defineStore('settings-store', {
       return response
     },
     // VITE_APP_SEASONS_URL
-    async getSeasons() {
+    async getSeasons(isUsedAsOption: boolean = false) {
       const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_SEASONS_URL
 
       const config = {
@@ -75,6 +91,19 @@ export const useSettingsStore = defineStore('settings-store', {
         },
       }
       const response = await axios.request(config)
+      if (response.status === 200) {
+        if (isUsedAsOption) {
+          this.seasons = response.data.map((item: any) => {
+            return {
+              value: item.id,
+              text: item.name,
+            }
+          })
+        } else {
+          this.seasons = response.data
+        }
+      }
+
       return response
     },
 
@@ -312,6 +341,126 @@ export const useSettingsStore = defineStore('settings-store', {
           }
         })
       }
+    },
+    // VITE_APP_ACCOMMODATION_TYPES_URL=settings/accommodation-types/
+    // get
+    async getAccommodationTypes(isUsedAsOption: boolean) {
+      this.loadingAccommodationTypes = true
+      const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_ACCOMMODATION_TYPES_URL
+      const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+      const response = await axios.request(config)
+      if (response.status === 200) {
+        this.loadingAccommodationTypes = false
+        if (!isUsedAsOption) {
+          this.accommodationTypes = response.data.map((item: any) => {
+            return {
+              id: item.id,
+              name: item.name,
+              description: item.description,
+            }
+          })
+        } else {
+          this.accommodationTypes = response.data.map((item: any) => {
+            return {
+              value: item.id,
+              text: item.name,
+            }
+          })
+        }
+      }
+      return response
+    },
+
+    // create
+    async createAccommodationType(payload: any) {
+      this.savingAccommodationType = true
+      const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_ACCOMMODATION_TYPES_URL
+      const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data: payload,
+      }
+
+      const response = await axios.request(config)
+      if (response.status === 201) {
+        this.savingAccommodationType = false
+        this.showAccommodationTypeModal = false
+        this.getAccommodationTypes(true)
+      }
+      return response
+    },
+
+    async getSalesChartersPriceList(isUsedAsOption: boolean) {
+      this.loadingSalesChartersPriceList = true
+      const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_SALES_CHARTERS_PRICE_LIST_URL
+      const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+      const response = await axios.request(config)
+      try {
+        if (response.status === 200) {
+          this.loadingSalesChartersPriceList = false
+          if (!isUsedAsOption) {
+            this.salesChartersPriceList = response.data.map((item: any) => {
+              return {
+                id: item.id,
+                name: item.name,
+                description: item.description,
+                price: item.price,
+              }
+            })
+          } else {
+            this.salesChartersPriceList = response.data.map((item: any) => {
+              return {
+                value: item.id,
+                text: item.name,
+              }
+            })
+          }
+        }
+      } catch (error) {
+        this.loadingSalesChartersPriceList = false
+        console.log(error)
+      }
+    },
+
+    // create
+    async createSalesChartersPriceList(payload: any) {
+      this.savingSalesChartersPriceList = true
+      const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_SALES_CHARTERS_PRICE_LIST_URL
+      const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data: payload,
+      }
+
+      const response = await axios.request(config)
+      if (response.status === 201) {
+        this.savingSalesChartersPriceList = false
+        this.showSalesChartersPriceListModal = false
+        this.getSalesChartersPriceList(true)
+      }
+      return response
     },
   },
 })

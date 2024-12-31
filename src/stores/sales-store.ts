@@ -20,6 +20,11 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
       showSafariExtrasModal: false,
       showAccommodationModal: false,
       accommodations: [] as any,
+      // charterPrices: [] as any,
+      chartersPrices: [] as any,
+      showChartersPriceModal: false,
+      savingCharterPrices: false,
+      loadingCharterPrices: false,
     }
   },
 
@@ -481,6 +486,59 @@ export const useSalesInquiriesStore = defineStore('sales_inquiries', {
       if (response.status === 201) {
         this.showAccommodationModal = false
         this.getAccommodation(payload.sales_inquiry_id)
+        return response
+      } else {
+        return response
+      }
+    },
+
+    // VITE_APP_SALES_CHARTERS_PRICE_VSET_URL
+    async getChartersPrice(salesInquiryId: any) {
+      const url =
+        import.meta.env.VITE_APP_BASE_URL +
+        import.meta.env.VITE_APP_SALES_CHARTERS_PRICE_VSET_URL +
+        '?sales_inquiry_id=' +
+        salesInquiryId
+
+      const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+      const response = await axios.request(config)
+      if (response.status === 200) {
+        this.chartersPrices = response.data.map((item: any) => {
+          return {
+            id: item.id,
+            name: item.charters_price_list.name,
+            amount: `${item?.charters_price_list?.currency?.symbol} ${item?.charters_price_list?.amount}`,
+          }
+        })
+      }
+    },
+    // create
+    async createChartersPrice(payload: any) {
+      const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_SALES_CHARTERS_PRICE_VSET_URL
+      const data = JSON.stringify(payload)
+
+      const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data: data,
+      }
+
+      const response = await axios.request(config)
+      if (response.status === 201) {
+        this.showChartersPriceModal = false
+        this.getChartersPrice(payload.sales_inquiry_id)
         return response
       } else {
         return response

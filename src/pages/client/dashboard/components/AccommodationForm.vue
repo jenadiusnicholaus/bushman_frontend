@@ -11,17 +11,21 @@
             required
             required-mark
             :rules="[(v: any) => !!v || 'This field is required']"
-          />
+          >
+          </VaSelect>
         </div>
         <div>
-          <VaInput
-            v-model="form.type_name"
-            label="Accommodation Type Name"
-            placeholder="Enter type name"
+          <VaSelect
+            v-model="form.type_id"
+            :options="accommodationTypes"
+            label="Accommodation Type "
+            placeholder="Enter type"
             required
             required-mark
             :rules="[(v: any) => !!v || 'This field is required']"
-          />
+          >
+            <template #append> <VaIcon name="add" class="ml-2" @click="_showModal()" /> </template>
+          </VaSelect>
         </div>
         <div>
           <VaInput
@@ -117,19 +121,26 @@
       <VaButton icon="save" :disabled="!isValidForm" @click="validateForm() && submitForm()">Save</VaButton>
     </VaForm>
   </div>
+  <VaModal v-model="_shtyMd" title="Accommodation Type" width="600px" :show-default-actions="false">
+    <AccomodationTypeForm></AccomodationTypeForm>
+  </VaModal>
 </template>
 
 <script lang="ts">
 import { useForm, useToast } from 'vuestic-ui'
 import { defineComponent, ref, reactive } from 'vue'
 import { useSettingsStore } from '../../../../stores/settings-store'
-import { mapActions, mapState } from 'pinia'
+import { mapActions, mapState, mapWritableState } from 'pinia'
 import { useAccountsStore } from '../../../../stores/account-store'
 import { format } from 'date-fns'
 import handleErrors from '../../../../utils/errorHandler'
 import { useSalesInquiriesStore } from '../../../../stores/sales-store'
+import AccomodationTypeForm from '../../../module-settings/components/AccomodationTypeForm.vue'
 
 export default defineComponent({
+  components: {
+    AccomodationTypeForm,
+  },
   props: {
     item: {
       type: Object,
@@ -149,7 +160,7 @@ export default defineComponent({
     } = useForm(formRef)
 
     const form = reactive({
-      type_name: '',
+      type_id: null as any,
       address_street: '',
       address_city: '',
       address_zipcode: '',
@@ -175,16 +186,20 @@ export default defineComponent({
     return {}
   },
   computed: {
-    ...mapState(useSettingsStore, ['salesInquiryEntities', 'currencies']),
+    ...mapState(useSettingsStore, ['salesInquiryEntities', 'currencies', 'accommodationTypes']),
     ...mapState(useAccountsStore, ['companyAccounts']),
+    ...mapWritableState(useSettingsStore, {
+      _shtyMd: 'showAccommodationTypeModal',
+    }),
   },
   mounted() {
     this.getSalesInquiryEntities(this.item.id)
     this.getCompanyAccounts()
     this.getCurrencies()
+    this.getAccommodationTypes(true)
   },
   methods: {
-    ...mapActions(useSettingsStore, ['getSalesInquiryEntities', 'getCurrencies']),
+    ...mapActions(useSettingsStore, ['getSalesInquiryEntities', 'getCurrencies', 'getAccommodationTypes']),
     ...mapActions(useAccountsStore, ['getCompanyAccounts']),
     ...mapActions(useSalesInquiriesStore, ['createAccommodation']),
 
@@ -192,7 +207,7 @@ export default defineComponent({
       const checkInDate = new Date(this.form.check_in)
       const checkOutDate = new Date(this.form.check_out)
       const payload = {
-        type_name: this.form.type_name,
+        type_id: this.form.type_id.value,
         address_street: this.form.address_street,
         address_city: this.form.address_city,
         address_zipcode: this.form.address_zipcode,
@@ -219,6 +234,10 @@ export default defineComponent({
           color: 'danger',
         })
       }
+    },
+
+    _showModal() {
+      this._shtyMd = true
     },
   },
 })

@@ -1,5 +1,8 @@
 <template>
   <div class="flex justify-end">
+    <VaButton preset="primary" class="mr-2 mb-2" round icon="add" size="small" @click="_showChartersPriceModal()">
+      add Charters Price
+    </VaButton>
     <VaButton preset="primary" class="mr-2 mb-2" round icon="add" size="small" @click="_showAccommodationModal()">
       add accommodation
     </VaButton>
@@ -139,7 +142,6 @@
 
           <VaDivider class="my-4" />
 
-          <VaTitle class="font-bold">Safari Extras</VaTitle>
           <p><strong>Observers</strong></p>
           <VaDataTable :items="observers" />
           <p><strong>Other Safari Extras</strong></p>
@@ -149,6 +151,10 @@
 
           <VaTitle class="font-bold">Accommodation</VaTitle>
           <VaDataTable :items="accommodations" />
+
+          <VaDivider class="my-4" />
+          <VaTitle class="font-bold">Charters Price</VaTitle>
+          <VaDataTable :items="chartersPrices" />
         </div>
       </div>
     </template>
@@ -173,12 +179,16 @@
     </template>
   </VaSplit>
 
-  <VaModal v-model="_shM" width="60%" height="80%" :hide-default-actions="true">
-    <SafariExtrasList :table-selectable="true" :item="item" />
+  <VaModal v-model="_shM" width="60%" height="80%">
+    <SalesClientSafariExtrasForm :table-selectable="true" :item="item" />
   </VaModal>
 
-  <VaModal v-model="_shAM" width="60%" height="80%" :hide-default-actions="true">
+  <VaModal v-model="_shAM" width="60%" height="80%">
     <AccommodationForm :item="item" />
+  </VaModal>
+
+  <VaModal v-model="_shCM" width="60%" height="80%">
+    <ChartersPriceForm :item="item" />
   </VaModal>
 </template>
 
@@ -190,9 +200,10 @@ import SalesProposalForm from './SalesProposalForm.vue'
 import ObserversForm from './ObserversForm.vue'
 import CompanionForm from './CompanionForm.vue'
 import { useSalesInquiriesStore } from '../../../../stores/sales-store'
-import SafariExtrasList from './SalesClientSafariExtrasForm.vue'
+import SalesClientSafariExtrasForm from './SalesClientSafariExtrasForm.vue'
 import { mapState, mapActions, mapWritableState } from 'pinia'
 import AccommodationForm from './AccommodationForm.vue'
+import ChartersPriceForm from './ChartersPriceForm.vue'
 
 export default defineComponent({
   name: 'SalesConfirmationClientDetails',
@@ -200,8 +211,9 @@ export default defineComponent({
     SalesProposalForm,
     ObserversForm,
     CompanionForm,
-    SafariExtrasList,
+    SalesClientSafariExtrasForm,
     AccommodationForm,
+    ChartersPriceForm,
   },
   props: {
     item: {
@@ -268,12 +280,22 @@ export default defineComponent({
     }
   },
   computed: {
-    ...mapState(useSalesInquiriesStore, ['observers', 'companions', 'clientSafariExtras', 'accommodations']),
+    ...mapState(useSalesInquiriesStore, [
+      'observers',
+      'companions',
+      'clientSafariExtras',
+      'accommodations',
+      'chartersPrices',
+    ]),
     ...mapWritableState(useSalesInquiriesStore, {
       _shM: 'showSafariExtrasModal',
     }),
     ...mapWritableState(useSalesInquiriesStore, {
       _shAM: 'showAccommodationModal',
+    }),
+
+    ...mapWritableState(useSalesInquiriesStore, {
+      _shCM: 'showChartersPriceModal',
     }),
 
     logo() {
@@ -285,10 +307,16 @@ export default defineComponent({
     this.getCompanions(this.item.id)
     this.getClienSafariExtras(this.item.id)
     this.getAccommodation(this.item.id)
+    this.getChartersPrice(this.item.id)
   },
   methods: {
     ...mapActions(useSalesInquiriesStore, ['getObservers', 'getCompanions']),
-    ...mapActions(useSalesInquiriesStore, ['createsafariExtras', 'getClienSafariExtras', 'getAccommodation']),
+    ...mapActions(useSalesInquiriesStore, [
+      'createsafariExtras',
+      'getClienSafariExtras',
+      'getAccommodation',
+      'getChartersPrice',
+    ]),
 
     formatDate(dateString: string | number | Date) {
       return dateString ? new Date(dateString).toLocaleDateString() : 'Not provided'
@@ -308,6 +336,9 @@ export default defineComponent({
     },
     _showAccommodationModal() {
       this._shAM = true
+    },
+    _showChartersPriceModal() {
+      this._shCM = true
     },
     // async submitSelectedItems(selectedItems: any) {
   },
