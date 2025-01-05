@@ -245,7 +245,14 @@ export default {
           displayName: 'menu.sales-extra-services',
         },
 
-        // price-list
+        // approval - chain,
+        {
+          name: 'approval-chain',
+          meta: {
+            icon: 'published_with_changes',
+          },
+          displayName: 'menu.approval-chain',
+        },
       ],
     },
     // {

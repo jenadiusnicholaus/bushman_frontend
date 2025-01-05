@@ -19,7 +19,7 @@
         label="Sales Package"
       />
     </div> -->
-        <h3 class="font-bold text-lg mb-2">Mian Hunter safari information</h3>
+        <h3 class="font-bold text-lg mb-2">Main Hunter safari information</h3>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
           <VaInput

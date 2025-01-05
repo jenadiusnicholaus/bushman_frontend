@@ -102,8 +102,6 @@ const submit = async () => {
   } catch (error: any) {
     loading.value = false
 
-    resetForm()
-    resetValidationForm()
     init({ message: error.response.data.detail, color: 'danger' })
   }
 }

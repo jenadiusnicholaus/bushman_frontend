@@ -1,10 +1,10 @@
 <template>
   <div class="flex justify-end">
     <VaButton preset="primary" class="mr-2 mb-2" round icon="add" size="small" @click="_showChartersPriceModal()">
-      add Charters Price
+      Add Charters Costs
     </VaButton>
     <VaButton preset="primary" class="mr-2 mb-2" round icon="add" size="small" @click="_showAccommodationModal()">
-      add accommodation
+      Add accommodation
     </VaButton>
     <VaButton preset="primary" class="mr-2 mb-2" round icon="add" size="small" @click="_showSafariExtrasModal()">
       Add Safari Extras Services

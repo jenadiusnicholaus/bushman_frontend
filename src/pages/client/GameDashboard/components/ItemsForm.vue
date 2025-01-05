@@ -32,8 +32,8 @@
         <!-- amount -->
         <VaInput
           v-model="requisitionItemForm.amount"
-          label="Amount"
-          placeholder="Amount"
+          label="Total items Amount"
+          placeholder="Total items Amount"
           type="number"
           required
           :rules="[(v: any) => !!v || 'Amount is required']"
@@ -71,7 +71,7 @@
     <VaForm ref="iformRef">
       <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4 bordered-items-form">
         <!-- item items -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
           <VaInput
             v-model="itemsForm.name"
             label="Sub Item Name"
@@ -88,6 +88,14 @@
             :rules="[(v: any) => !!v || 'Exchange Rate is required']"
           />
           <VaInput v-model="itemsForm.rate" label="Rate" placeholder="Rate" type="number" required />
+          <VaSelect
+            v-model="itemsForm.currency_id"
+            placeholder="Currency"
+            label="Currency"
+            :options="currencies"
+            required
+            :rules="[(v: any) => !!v || 'Currency is required']"
+          />
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <VaSelect
@@ -107,6 +115,7 @@
             :rules="[(v: any) => !!v || 'Quantity is required']"
           />
         </div>
+
         <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4">
           <VaTextarea
             v-model="itemsForm.descriptions"
@@ -167,7 +176,7 @@ export default defineComponent({
       mode_of_payment_id: null as any,
       remarks: '',
       item_name: '',
-      amount: 0,
+      amount: null as any,
     })
 
     const itemsForm = reactive({
@@ -175,7 +184,8 @@ export default defineComponent({
       exchange_rate: null as any,
       unit_of_measurement_id: null as any,
       quantity: 1,
-      rate: 0.0,
+      currency_id: null as any,
+      rate: null as any,
       descriptions: '',
     })
 
@@ -334,6 +344,7 @@ export default defineComponent({
         unit_of_measurement_text: this.itemsForm.unit_of_measurement_id.text,
         quantity: this.itemsForm.quantity,
         rate: this.itemsForm.rate,
+        currency_id: this.itemsForm.currency_id.value,
         descriptions: this.itemsForm.descriptions,
       })
     },
@@ -348,7 +359,7 @@ export default defineComponent({
 <style scoped>
 /* Add any relevant styles here */
 .bordered-items-form {
-  border-color: rgb(65, 217, 225) !important;
+  border-color: #5c4033;
   border-width: 2px !important;
   border-style: solid !important;
   border-radius: 10px !important;

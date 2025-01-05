@@ -5,7 +5,7 @@
         v-model="form.extra_id"
         type="text"
         placeholder="Extra service"
-        :rules="[(v) => !!v || 'This field is required']"
+        :rules="[(v: any) => !!v || 'This field is required']"
         :options="safariExtras"
         label="Service"
       >
@@ -15,7 +15,7 @@
       </VaSelect>
       <VaSelect
         v-model="form.account_id"
-        :rules="[(v) => !!v || 'This field is required']"
+        :rules="[(v: any) => !!v || 'This field is required']"
         :options="companyAccounts"
         label="Account"
       />

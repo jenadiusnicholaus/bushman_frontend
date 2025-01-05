@@ -108,7 +108,7 @@ export default defineComponent({
   },
 
   methods: {
-    ...mapActions(useRequisitionStore, ['updateRequisitionStatus']),
+    ...mapActions(useRequisitionStore, ['updateRequisitionStatus', 'getRequisitions']),
     ...mapActions(useApprovalChainStore, ['getApprovalChainLevels']),
 
     async submit() {
@@ -129,6 +129,7 @@ export default defineComponent({
         } else {
           this.saving = false
           this.init({ message: 'Something went wrong', color: 'danger' })
+          this.getRequisitions()
         }
       } catch (error: any) {
         this.saving = false

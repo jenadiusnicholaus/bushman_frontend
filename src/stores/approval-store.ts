@@ -2,7 +2,6 @@
 
 import { defineStore } from 'pinia'
 import axios from 'axios'
-import { formatDate } from 'date-fns'
 
 export const useApprovalChainStore = defineStore('approval-chain-store', {
   state: () => {
@@ -11,6 +10,7 @@ export const useApprovalChainStore = defineStore('approval-chain-store', {
       loadingApprovalChain: false,
       approvalChainLevels: [] as any,
       loadingApprovalChainLevels: false,
+      approvalChainRoles: [] as any,
     }
   },
 
@@ -32,27 +32,18 @@ export const useApprovalChainStore = defineStore('approval-chain-store', {
       if (response.status === 200) {
         this.loadingApprovalChain = false
         if (!usedAsOptions) {
-          this.approvalChainModules = response.data.map((requisition: any) => {
+          this.approvalChainModules = response.data.map((approval_chain: any) => {
             return {
-              status:
-                requisition.next_level !== null
-                  ? `Waiting to be ${requisition.next_level.approval_chain_role.past} by ${requisition.next_level.approval_chain_role.name}`
-                  : requisition.status,
-              requested_at: formatDate(requisition.date, 'MMM dd yyyy'),
-              required_date: formatDate(requisition.required_date, 'MMM dd yyyy'),
-              requested_by:
-                requisition.requested_by.first_name === '' && requisition.requested_by.last_name === ''
-                  ? requisition.requested_by.username
-                  : requisition.requested_by.first_name + '' + requisition.requested_by.last_name,
-              type: requisition.type,
-              selfItem: requisition,
+              name: approval_chain.name,
+              is_active: approval_chain.active,
+              selfitem: approval_chain,
             }
           })
         } else {
-          this.approvalChainModules = response.data.map((requisition: any) => {
+          this.approvalChainModules = response.data.map((approval_chain: any) => {
             return {
-              value: requisition.id,
-              text: requisition.name,
+              value: approval_chain.id,
+              text: approval_chain.name,
             }
           })
         }
@@ -61,8 +52,30 @@ export const useApprovalChainStore = defineStore('approval-chain-store', {
       return response
     },
 
-    // # http://localhost:8000/api/v1.0/approval-chain/approval-chain-levels-vset/?approval_chain_module_id=22
-    // VITE_APP_APPROVAL_CHAIN_LEVELS_VSET_URL=approval-chain/approval-chain-levels-vset/
+    async createApprovalChain(payload: any) {
+      const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_APPROVAL_CHAIN_VSET_URL
+      const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data: payload,
+      }
+      const response = await axios.request(config)
+      if (response.status === 200) {
+        this.approvalChainModules = response.data.map((approval_chain: any) => {
+          return {
+            name: approval_chain.name,
+            is_active: approval_chain.active,
+            selfitem: approval_chain,
+          }
+        })
+      }
+      return response
+    },
+
     async getApprovalChainLevels(approval_chain_module_id: any) {
       this.loadingApprovalChainLevels = true
       const url =
@@ -88,6 +101,32 @@ export const useApprovalChainStore = defineStore('approval-chain-store', {
         })
       }
 
+      return response
+    },
+
+    // GET ROLES
+    // VITE_APP_APPROVAL_CHAIN_ROLE_VSET_URL
+    async getApprovalChainRoles() {
+      const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_APPROVAL_CHAIN_ROLE_VSET_URL
+
+      const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+
+      const response = await axios.request(config)
+      if (response.status === 200) {
+        this.approvalChainRoles = response.data.map((role: any) => {
+          return {
+            text: role.name,
+            value: role.id,
+          }
+        })
+      }
       return response
     },
   },

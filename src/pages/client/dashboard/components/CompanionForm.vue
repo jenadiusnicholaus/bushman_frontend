@@ -102,15 +102,15 @@
             />
           </div>
 
-          <h3 class="font-bold text-lg mb-2">Regulatory Package</h3>
+          <h3 class="font-bold text-lg mb-2">Licence</h3>
 
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <VaSelect
               v-model="form.regulatory_package_id"
               :options="regulatoryPackages"
-              :rules="[(value: any) => value || 'Regulatory Package is required']"
-              placeholder="Select Regulatory Package"
-              label="Regulatory Package"
+              :rules="[(value: any) => value || 'Licence is required']"
+              placeholder="Select Licence"
+              label="Licence"
             />
           </div>
 

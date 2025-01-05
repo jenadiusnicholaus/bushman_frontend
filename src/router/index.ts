@@ -181,6 +181,12 @@ const routes: Array<RouteRecordRaw> = [
             path: 'price-list',
             component: () => import('../pages/module-settings/ManagePriceList.vue'),
           },
+          // MangeApprovalChain
+          {
+            name: 'approval-chain',
+            path: 'approval-chain',
+            component: () => import('../pages/module-settings/MangeApprovalChain.vue'),
+          },
         ],
       },
     ],

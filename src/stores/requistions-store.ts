@@ -10,6 +10,7 @@ export const useRequisitionStore = defineStore('requisition-store', {
       requistionItems: [] as any,
       loadingRequisitions: false,
       loadingRequistionItems: false,
+      showApprovalModal: false,
     }
   },
 
@@ -31,12 +32,6 @@ export const useRequisitionStore = defineStore('requisition-store', {
       if (response.status === 200) {
         this.loadingRequisitions = false
         this.requisitions = response.data.map((requisition: any) => {
-          // requisition.current_level_status !== null && requisition.current_level_status.status === 'PENDING'
-          //   ? `Waiting to be ${requisition.current_level_status.level?.approval_chain_role?.past} by ${requisition?.current_level_status?.level?.approval_chain_role?.name}`
-          //   : requisition.current_level_status !== null &&
-          //       requisition?.current_level_status?.status === 'IN_PROGRESS'
-          //     ? `Waiting to be ${requisition?.next_level?.approval_chain_role?.past} by ${requisition?.next_level?.approval_chain_role?.name}`
-          //     : requisition.status,
           return {
             status: requestStatus(requisition),
             requested_at: formatDate(requisition.date, 'MMM dd yyyy'),
@@ -73,6 +68,7 @@ export const useRequisitionStore = defineStore('requisition-store', {
         this.requistionItems = response.data.map((item: any) => {
           return {
             item_name: item.name,
+            accounts: item.accounts,
             items: item.items,
           }
         })
@@ -126,6 +122,11 @@ export const useRequisitionStore = defineStore('requisition-store', {
       }
 
       const response = await axios.request(config)
+      if (response.status === 200) {
+        this.showApprovalModal = false
+        this.getRequisitions()
+      }
+
       return response
     },
 

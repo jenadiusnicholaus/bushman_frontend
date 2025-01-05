@@ -74,7 +74,13 @@ export default {
   },
 
   data() {
-    const columns = [{ key: 'name', label: 'Name' }, { key: 'quantity' }]
+    const columns = [
+      { key: 'name', label: 'Name' },
+      { key: 'quantity' },
+      { key: 'unit_of_measurement.name', label: 'Unit' },
+      { key: 'exchange_rate' },
+      { key: 'rate', label: 'Price' },
+    ]
 
     return {
       isStriped: true,

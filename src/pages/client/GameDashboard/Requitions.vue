@@ -45,8 +45,13 @@
               <strong>{{ value }}</strong>
             </template>
             <template #cell(actions)="{ rowData }">
-              <VaButton preset="plain" icon="visibility" @click="_showDetails(rowData)"> </VaButton>
-              <VaButton v-if="rowData.main_status === 'PENDING'" preset="plain" icon="task_alt" @click="_shM(rowData)">
+              <VaButton preset="plain" icon="visibility" class="px-2" @click="_showDetails(rowData)"> </VaButton>
+              <VaButton
+                v-if="rowData.main_status === 'PENDING'"
+                preset="plain"
+                icon="published_with_changes"
+                @click="_shM(rowData)"
+              >
               </VaButton>
             </template>
           </VaDataTable>
@@ -64,7 +69,7 @@
 </template>
 
 <script lang="ts">
-import { mapActions, mapState } from 'pinia'
+import { mapActions, mapState, mapWritableState } from 'pinia'
 import { defineComponent } from 'vue'
 import { useRequisitionStore } from '../../../stores/requistions-store'
 import RequistionDetails from './components/RequistionDetails.vue'
@@ -85,7 +90,6 @@ export default defineComponent({
       { key: 'requested_by' },
       { key: 'requested_at' },
       { key: 'required_date' },
-
       { key: 'status', name: 'status', label: 'Status' },
       { key: 'actions', label: 'Actions', sortable: false },
     ]
@@ -96,11 +100,13 @@ export default defineComponent({
       showDetails: false,
       showAddForm: false,
       item: {} as any,
-      shM: false,
     }
   },
   computed: {
     ...mapState(useRequisitionStore, ['requisitions', 'loadingRequisitions']),
+    ...mapWritableState(useRequisitionStore, {
+      shM: 'showApprovalModal',
+    }),
   },
 
   mounted() {

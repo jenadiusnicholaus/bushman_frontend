@@ -5,21 +5,21 @@
         v-model="form.name"
         type="text"
         placeholder="Service name"
-        :rules="[(v) => !!v || 'This field is required']"
+        :rules="[(v: any) => !!v || 'This field is required']"
         label="Service name"
       />
       <VaInput
         v-model="form.amount"
         type="number"
         placeholder="Amount"
-        :rules="[(v) => !!v || 'This field is required']"
+        :rules="[(v: any) => !!v || 'This field is required']"
         label="Amount"
       />
       <VaSelect
         v-model="form.currency_id"
         type="text"
         placeholder="Currency"
-        :rules="[(v) => !!v || 'This field is required']"
+        :rules="[(v: any) => !!v || 'This field is required']"
         :options="currenciesOptions"
         label="Currency"
       />
@@ -29,7 +29,7 @@
         v-model="form.season_id"
         type="text"
         placeholder="Extra service"
-        :rules="[(v) => !!v || 'This field is required']"
+        :rules="[(v: any) => !!v || 'This field is required']"
         :options="seasonsOptions"
         label="Service"
       />
@@ -38,7 +38,7 @@
         :options="chargesPerOptions"
         type="number"
         placeholder="Charges per"
-        :rules="[(v) => !!v || 'This field is required']"
+        :rules="[(v: any) => !!v || 'This field is required']"
         label="Charges per"
       />
     </div>
@@ -47,7 +47,7 @@
         v-model="form.description"
         type="text"
         placeholder="Description"
-        :rules="[(v) => !!v || 'This field is required']"
+        :rules="[(v: any) => !!v || 'This field is required']"
         label="Description"
       />
     </div>
