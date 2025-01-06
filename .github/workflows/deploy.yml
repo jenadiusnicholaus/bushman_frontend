@@ -21,7 +21,9 @@ jobs:
         # password: ${{ secrets.SSH_PASSWORD }}
         key: ${{ secrets.SSH_KEY }}
         script: |
-          /var/www/deploy.sh
+            cd /var/www/html/bushman_frontend
+            chmod +x /var/www/deploy.sh
+            ./deploy.sh
 
         debug: true                    # Enable debugging for more detailed logs
-        port: 22  
+        port: 2222
