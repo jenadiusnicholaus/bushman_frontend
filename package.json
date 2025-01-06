@@ -87,6 +87,8 @@
     "typescript": "^5.2.2",
     "vite": "^4.4.6",
     "vue-eslint-parser": "^9.3.2",
-    "vue-tsc": "^1.8.22"
+    "vue-tsc": "^1.8.22",
+    "esbuild": "0.23.1",
+    "tsup": "^5.9.0"
   }
 }

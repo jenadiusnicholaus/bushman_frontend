@@ -49,24 +49,13 @@ jobs:
       with:
         node-version: '16'
 
-    - name: Install Dependencies
+    - name: Clean and Install Dependencies
       run: |
-        # Clean up node_modules and package-lock.json
         rm -rf node_modules
         rm -f package-lock.json
-
-        # Force install dependencies, even if there are conflicts
         npm install --force
-
-        # Ensure correct esbuild version (0.23.1)
         npm install esbuild@0.23.1 --save-dev --force
-
-        # Optionally: Update deprecated packages (glob, rimraf)
-        npm install glob@latest rimraf@latest --force
-
-        # Handle Vue.js Version Conflict
-        npm uninstall vue2-leaflet
-        npm install vue3-leaflet --force  # or any other compatible Vue 3 package if needed
+        npm install eslint@latest --save-dev
 
     - name: Build Vue.js App
       run: npm run build
@@ -84,5 +73,6 @@ jobs:
           chmod -R 755 /var/www/html/bushman_frontend
         debug: true
         port: 22
+
 
 
