@@ -140,6 +140,11 @@ jobs:
       with:
         name: dist-artifact
 
+    - name: List contents of the downloaded directory
+      run: |
+        echo "Listing the contents of /home/runner/work/bushman_frontend/bushman_frontend:"
+        ls -alh /home/runner/work/bushman_frontend/bushman_frontend
+
     - name: Deploy Dist Folder to VPS
       uses: appleboy/ssh-action@v0.1.7
       with:
@@ -159,7 +164,7 @@ jobs:
           # Remove all files in the dist folder (including hidden files)
           echo "${{ secrets.SSH_PASSWORD }}" | sudo -S rm -rf /var/www/html/bushman_frontend/*
         
-          # List the dist directory contents before copying (for debugging)
+          # List the dist directory contents after downloading the artifact (for debugging)
           echo "Listing the dist directory contents after download:"
           ls -alh /home/runner/work/bushman_frontend/bushman_frontend/dist/
 
@@ -171,6 +176,7 @@ jobs:
           echo "${{ secrets.SSH_PASSWORD }}" | sudo -S chmod -R 755 /var/www/html/bushman_frontend
         debug: true
         port: 22
+
 
 
 
