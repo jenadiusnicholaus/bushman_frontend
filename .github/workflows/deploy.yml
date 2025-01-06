@@ -72,13 +72,13 @@ jobs:
           cd /var/www/html/bushman_frontend
           
           # Ensure that the user has proper permissions to modify files
-          echo "$SUDO_PASSWORD" | sudo -S chown -R $USER:$USER /var/www/html/bushman_frontend
+          echo "${{ env.SUDO_PASSWORD }}" | sudo -S chown -R $USER:$USER /var/www/html/bushman_frontend
           
           # Change permissions to ensure we can remove files
-          echo "$SUDO_PASSWORD" | sudo -S chmod -R 777 /var/www/html/bushman_frontend/*
+          echo "${{ env.SUDO_PASSWORD }}" | sudo -S chmod -R 777 /var/www/html/bushman_frontend/*
           
           # Remove all files in the dist folder (including hidden files)
-          echo "$SUDO_PASSWORD" | sudo -S rm -rf /var/www/html/bushman_frontend/*
+          echo "${{ env.SUDO_PASSWORD }}" | sudo -S rm -rf /var/www/html/bushman_frontend/*
           
           # List the dist directory before copying (for debugging)
           ls -alh /home/runner/work/bushman_frontend/bushman_frontend/dist/
@@ -87,7 +87,7 @@ jobs:
           cp -r /home/runner/work/bushman_frontend/bushman_frontend/dist/* /var/www/html/bushman_frontend/
           
           # Ensure the proper file permissions for the dist folder
-          echo "$SUDO_PASSWORD" | sudo -S chmod -R 755 /var/www/html/bushman_frontend
+          echo "${{ env.SUDO_PASSWORD }}" | sudo -S chmod -R 755 /var/www/html/bushman_frontend
         debug: true
         port: 22
 
