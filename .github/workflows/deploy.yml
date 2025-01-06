@@ -53,9 +53,7 @@ jobs:
       run: |
         rm -rf node_modules
         rm -f package-lock.json
-        npm install --force
-        npm install esbuild@0.23.1 --save-dev --force
-        npm install eslint@latest --save-dev
+        npm install --force --legacy-peer-deps
 
     - name: Build Vue.js App
       run: npm run build
@@ -73,6 +71,7 @@ jobs:
           chmod -R 755 /var/www/html/bushman_frontend
         debug: true
         port: 22
+
 
 
 
