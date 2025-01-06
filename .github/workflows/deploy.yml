@@ -79,10 +79,10 @@ jobs:
           echo "${{ secrets.SSH_PASSWORD }}" | sudo -S rm -rf /var/www/html/bushman_frontend/*
           
           # List the dist directory before copying (for debugging)
-          ls -alh /home/runner/work/bushman_frontend/bushman_frontend/dist/
+          ls -alh ./dist
           
           # Copy the new build from GitHub Actions workspace to the VPS
-          cp -r /home/runner/work/bushman_frontend/bushman_frontend/dist/* /var/www/html/bushman_frontend/
+          cp -r ./dist/* /var/www/html/bushman_frontend/
           
           # Ensure the proper file permissions for the dist folder
           echo "${{ secrets.SSH_PASSWORD }}" | sudo -S chmod -R 755 /var/www/html/bushman_frontend
