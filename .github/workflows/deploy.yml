@@ -59,14 +59,14 @@ jobs:
         npm install --force
 
         # If you need to handle specific version of esbuild:
-        npm install esbuild@0.23.1
+        npm install esbuild@0.23.1 --force
 
         # Optionally: Update deprecated packages (glob, rimraf)
-        npm install glob@latest rimraf@latest
+        npm install glob@latest rimraf@latest --force
 
         # Handle Vue.js Version Conflict
         npm uninstall vue2-leaflet
-        npm install vue3-leaflet  # or any other compatible Vue 3 package if needed
+        npm install vue3-leaflet --force  # or any other compatible Vue 3 package if needed
 
     - name: Build Vue.js App
       run: npm run build
