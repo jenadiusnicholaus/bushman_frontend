@@ -121,7 +121,7 @@ jobs:
       run: npm run build
 
     - name: Upload dist folder as artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: dist-artifact
         path: ./dist
@@ -132,7 +132,7 @@ jobs:
 
     steps:
     - name: Download dist artifact
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: dist-artifact
 
@@ -141,7 +141,7 @@ jobs:
       with:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USERNAME }}
-        key: ${{ secrets.SSH_KEY }}
+        password: ${{ secrets.SSH_PASSWORD }}  # Use password for SSH authentication
         script: |
           # Navigate to the Vue.js app directory
           cd /var/www/html/bushman_frontend
