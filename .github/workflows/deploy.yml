@@ -166,11 +166,12 @@ jobs:
         
           # List the dist directory contents after downloading the artifact (for debugging)
           echo "Listing the dist directory contents after download:"
-          ls -alh /home/runner/work/bushman_frontend/bushman_frontend/dist/
+          ls -alh /home/runner/work/bushman_frontend/bushman_frontend
 
           # Copy the new build from GitHub Actions workspace to the VPS
           echo "Copying the new build..."
-          cp -r /home/runner/work/bushman_frontend/bushman_frontend/dist/* /var/www/html/bushman_frontend/
+        
+          cp -r /home/runner/work/bushman_frontend/bushman_frontend/* /var/www/html/bushman_frontend/
           
           # Ensure the proper file permissions for the dist folder
           echo "${{ secrets.SSH_PASSWORD }}" | sudo -S chmod -R 755 /var/www/html/bushman_frontend
