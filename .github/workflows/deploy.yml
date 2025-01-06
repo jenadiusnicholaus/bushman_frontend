@@ -40,8 +40,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    env:
-      SUDO_PASSWORD: ${{ env.SUDO_PASSWORD }}  # Set the password as an environment variable
 
     steps:
     - name: Checkout Code
