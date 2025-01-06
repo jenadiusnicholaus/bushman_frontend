@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-        env_var: ${{ vars.SUDO_PASSWORD }}
+      SUDO_PASSWORD: ${{ env.SUDO_PASSWORD }}  # Set the password as an environment variable
 
     steps:
     - name: Checkout Code
