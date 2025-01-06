@@ -154,19 +154,20 @@ jobs:
           
           # Remove all files in the dist folder (including hidden files)
           echo "${{ secrets.SSH_PASSWORD }}" | sudo -S rm -rf /var/www/html/bushman_frontend/*
-          
-               echo "Listing the dist directory contents:"
-          ls -alh /home/runner/work/bushman_frontend/bushman_frontend/dist/
         
-        # Copy the new build from GitHub Actions workspace to the VPS
+          # List the dist directory contents before copying (for debugging)
+          echo "Listing the dist directory contents:"
+          ls -alh /home/runner/work/bushman_frontend/bushman_frontend/dist/
+
+          # Copy the new build from GitHub Actions workspace to the VPS
           echo "Copying the new build..."
           cp -r /home/runner/work/bushman_frontend/bushman_frontend/dist/* /var/www/html/bushman_frontend/
-      
           
           # Ensure the proper file permissions for the dist folder
           echo "${{ secrets.SSH_PASSWORD }}" | sudo -S chmod -R 755 /var/www/html/bushman_frontend
         debug: true
         port: 22
+
 
 
 
