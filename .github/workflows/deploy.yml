@@ -89,8 +89,6 @@
 #         debug: true
 #         port: 22
 
-
-
 name: Deploy Vue.js App
 
 on:
@@ -140,44 +138,39 @@ jobs:
       with:
         name: dist-artifact
 
-    - name: List contents of the downloaded directory
+    - name: List contents of the downloaded artifact
       run: |
-        echo "Listing the contents of /home/runner/work/bushman_frontend/bushman_frontend:"
-        ls -alh /home/runner/work/bushman_frontend/bushman_frontend
+        echo "Listing the contents of the downloaded artifact:"
+        ls -alh ./dist
 
-    - name: Deploy Dist Folder to VPS
+    - name: Deploy Vue.js App to VPS
       uses: appleboy/ssh-action@v0.1.7
       with:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USERNAME }}
-        password: ${{ secrets.SSH_PASSWORD }}  # Use password for SSH authentication
+        password: ${{ secrets.SSH_PASSWORD }}
         script: |
-          # Navigate to the Vue.js app directory
+          # Navigate to the deployment directory
           cd /var/www/html/bushman_frontend
           
-          # Ensure that the user has proper permissions to modify files
+          # Ensure proper permissions for file modification
           echo "${{ secrets.SSH_PASSWORD }}" | sudo -S chown -R $USER:$USER /var/www/html/bushman_frontend
-          
-          # Change permissions to ensure we can remove files
-          echo "${{ secrets.SSH_PASSWORD }}" | sudo -S chmod -R 777 /var/www/html/bushman_frontend/*
-          
-          # Remove all files in the dist folder (including hidden files)
-          echo "${{ secrets.SSH_PASSWORD }}" | sudo -S rm -rf /var/www/html/bushman_frontend/*
-        
-          # List the dist directory contents after downloading the artifact (for debugging)
-          echo "Listing the dist directory contents after download:"
-          ls -alh /home/runner/work/bushman_frontend/bushman_frontend
 
-          # Copy the new build from GitHub Actions workspace to the VPS
-          echo "Copying the new build..."
-        
-          cp -r /home/runner/work/bushman_frontend/bushman_frontend/* /var/www/html/bushman_frontend/
-          
-          # Ensure the proper file permissions for the dist folder
+          # Remove all files in the current deployment folder
+          echo "${{ secrets.SSH_PASSWORD }}" | sudo -S rm -rf /var/www/html/bushman_frontend/*
+
+          # Copy the new build files to the VPS
+          echo "Copying new build files..."
+          scp -r ./dist/* /var/www/html/bushman_frontend/
+
+          # Ensure correct permissions for the deployed files
           echo "${{ secrets.SSH_PASSWORD }}" | sudo -S chmod -R 755 /var/www/html/bushman_frontend
+
+          # List the deployed files for verification
+          echo "Deployment complete. Listing deployed files:"
+          ls -alh /var/www/html/bushman_frontend
         debug: true
         port: 22
-
 
 
 
