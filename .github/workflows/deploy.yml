@@ -118,7 +118,11 @@ jobs:
         npm install --force --legacy-peer-deps
 
     - name: Build Vue.js App
-      run: npm run build
+      run: |
+        npm run build
+        # List the contents of the build directory for debugging
+        echo "Listing the build directory contents:"
+        ls -alh ./dist
 
     - name: Upload dist folder as artifact
       uses: actions/upload-artifact@v3
@@ -156,7 +160,7 @@ jobs:
           echo "${{ secrets.SSH_PASSWORD }}" | sudo -S rm -rf /var/www/html/bushman_frontend/*
         
           # List the dist directory contents before copying (for debugging)
-          echo "Listing the dist directory contents:"
+          echo "Listing the dist directory contents after download:"
           ls -alh /home/runner/work/bushman_frontend/bushman_frontend/dist/
 
           # Copy the new build from GitHub Actions workspace to the VPS
@@ -167,6 +171,7 @@ jobs:
           echo "${{ secrets.SSH_PASSWORD }}" | sudo -S chmod -R 755 /var/www/html/bushman_frontend
         debug: true
         port: 22
+
 
 
 
