@@ -23,7 +23,7 @@ jobs:
         script: |
             cd /var/www/html/bushman_frontend
             chmod +x /var/www/deploy.sh
-            ./deploy.sh
+            /var/www/deploy.sh
 
         debug: true                    # Enable debugging for more detailed logs
-        port: 22
+        port: 22  
