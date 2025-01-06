@@ -26,4 +26,4 @@ jobs:
             ./deploy.sh
 
         debug: true                    # Enable debugging for more detailed logs
-        port: 2222
+        port: 22
