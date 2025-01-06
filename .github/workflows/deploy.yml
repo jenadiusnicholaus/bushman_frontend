@@ -58,14 +58,14 @@ jobs:
     - name: Build Vue.js App
       run: npm run build
 
-    - name: Deploy 
+    - name: Deploy Dist Folder to VPS
       uses: appleboy/ssh-action@v0.1.7
       with:
         host: ${{ secrets.SSH_HOST }}   
         username: ${{ secrets.SSH_USERNAME }}    
         key: ${{ secrets.SSH_KEY }}
         script: |
-           # Navigate to the Vue.js app directory
+          # Navigate to the Vue.js app directory
           cd /var/www/html/bushman_frontend
 
           # Change permissions to ensure we can remove files
@@ -81,8 +81,6 @@ jobs:
           sudo chmod -R 755 /var/www/html/bushman_frontend
         debug: true
         port: 22
-
-
 
 
 
