@@ -47,15 +47,15 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '16'  # Set your preferred Node.js version here
+        node-version: '16'  
 
     - name: Install Dependencies
       run: |
-        npm install
+        npm install --force  
 
     - name: Build Vue.js App
       run: |
-        npm run build  # This will build your Vue.js app and create the dist folder
+        npm run build 
 
     - name: Deploy to VPS
       uses: appleboy/ssh-action@v0.1.7
@@ -65,9 +65,9 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         script: |
             cd /var/www/html
-            rm -rf bushman_frontend/*  # Remove existing files in the bushman_frontend folder
-            cp -r dist/* bushman_frontend/  # Copy only the contents of the dist folder to the VPS
-            chmod -R 755 bushman_frontend  # Set appropriate permissions for the files
+            rm -rf bushman_frontend/*  
+            cp -r dist/* bushman_frontend/  
+            chmod -R 755 bushman_frontend  
         debug: true
         port: 22
 
