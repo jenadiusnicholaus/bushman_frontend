@@ -66,7 +66,7 @@ jobs:
         username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_KEY }}
         script: |
-          # Navigate to the Vue.js app directory
+          # Navigate to the Vue.js app directory ${{ env.SUDO_PASSWORD }}
           cd /var/www/html/bushman_frontend
           
           # Ensure that the user has proper permissions to modify files
