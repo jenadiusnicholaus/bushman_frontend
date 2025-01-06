@@ -1,3 +1,34 @@
+# name: Deploy Vue.js App
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#     - name: Checkout Code
+#       uses: actions/checkout@v3
+
+#     - name: Deployment
+#       uses: appleboy/ssh-action@v0.1.7
+#       with:
+#         host: ${{ secrets.SSH_HOST }}   
+#         username: ${{ secrets.SSH_USERNAME }}    
+#         # password: ${{ secrets.SSH_PASSWORD }}
+#         key: ${{ secrets.SSH_KEY }}
+#         script: |
+#             cd /var/www/html
+#             chmod +x /var/www/deploy.sh
+#             /var/www/deploy.sh
+
+#         debug: true                    # Enable debugging for more detailed logs
+#         port: 22  
+
+
 name: Deploy Vue.js App
 
 on:
@@ -13,17 +44,30 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v3
 
-    - name: Deployment
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'  # Set your preferred Node.js version here
+
+    - name: Install Dependencies
+      run: |
+        npm install
+
+    - name: Build Vue.js App
+      run: |
+        npm run build  # This will build your Vue.js app and create the dist folder
+
+    - name: Deploy to VPS
       uses: appleboy/ssh-action@v0.1.7
       with:
         host: ${{ secrets.SSH_HOST }}   
         username: ${{ secrets.SSH_USERNAME }}    
-        # password: ${{ secrets.SSH_PASSWORD }}
         key: ${{ secrets.SSH_KEY }}
         script: |
             cd /var/www/html
-            chmod +x /var/www/deploy.sh
-            /var/www/deploy.sh
+            rm -rf bushman_frontend/*  # Remove existing files in the bushman_frontend folder
+            cp -r dist/* bushman_frontend/  # Copy only the contents of the dist folder to the VPS
+            chmod -R 755 bushman_frontend  # Set appropriate permissions for the files
+        debug: true
+        port: 22
 
-        debug: true                    # Enable debugging for more detailed logs
-        port: 22  
