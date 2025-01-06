@@ -58,19 +58,30 @@ jobs:
     - name: Build Vue.js App
       run: npm run build
 
-    - name: Deploy Dist Folder to VPS
+    - name: Deploy 
       uses: appleboy/ssh-action@v0.1.7
       with:
         host: ${{ secrets.SSH_HOST }}   
         username: ${{ secrets.SSH_USERNAME }}    
         key: ${{ secrets.SSH_KEY }}
         script: |
+          # Navigate to the Vue.js app directory
           cd /var/www/html/bushman_frontend
+
+          # Change permissions to ensure we can remove files
+          sudo chmod -R 777 /var/www/html/bushman_frontend/*
+
+          # Remove all files in the dist folder
           rm -rf *
+
+          # Copy the new build from GitHub Actions workspace to the VPS
           cp -r /home/runner/work/bushman_frontend/bushman_frontend/dist/* /var/www/html/bushman_frontend/
-          chmod -R 755 /var/www/html/bushman_frontend
+
+          # Ensure the proper file permissions for the dist folder
+          sudo chmod -R 755 /var/www/html/bushman_frontend
         debug: true
         port: 22
+
 
 
 
