@@ -55,11 +55,11 @@ jobs:
         rm -rf node_modules
         rm -f package-lock.json
 
-        # Install dependencies
+        # Force install dependencies, even if there are conflicts
         npm install --force
 
-        # If you need to handle specific version of esbuild:
-        npm install esbuild@0.23.1 --force
+        # Ensure correct esbuild version (0.23.1)
+        npm install esbuild@0.23.1 --save-dev --force
 
         # Optionally: Update deprecated packages (glob, rimraf)
         npm install glob@latest rimraf@latest --force
@@ -84,4 +84,5 @@ jobs:
           chmod -R 755 /var/www/html/bushman_frontend
         debug: true
         port: 22
+
 
