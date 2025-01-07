@@ -182,6 +182,95 @@
 
 
 
+# name: Deploy Vue.js App
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#     - name: Checkout Code
+#       uses: actions/checkout@v3
+
+#     - name: Set up Node.js
+#       uses: actions/setup-node@v3
+#       with:
+#         node-version: '16'
+
+#     - name: Clean and Install Dependencies
+#       run: |
+#         rm -rf node_modules
+#         rm -f package-lock.json
+#         npm install --force --legacy-peer-deps
+
+#     - name: Build Vue.js App
+#       run: |
+#         npm run build
+#         # List the contents of the project directory after build for debugging
+#         echo "Listing project directory contents after build:"
+#         ls -alh /home/runner/work/bushman_frontend/bushman_frontend
+
+#     - name: Upload project directory as artifact
+#       uses: actions/upload-artifact@v3
+#       with:
+#         name: project-artifact
+#         path: ./dist
+
+#   deploy:
+#     runs-on: ubuntu-latest
+#     needs: build  # Ensure deployment runs after the build job
+
+#     steps:
+#     - name: Download project artifact
+#       uses: actions/download-artifact@v3
+#       with:
+#         name: project-artifact
+
+#     - name: List contents of the downloaded directory
+#       run: |
+#         echo "Listing the contents of /home/runner/work/bushman_frontend/bushman_frontend:"
+#         ls -alh /home/runner/work/bushman_frontend/bushman_frontend
+
+#     - name: Deploy Vue.js App to VPS
+#       uses: appleboy/ssh-action@v0.1.7
+#       with:
+#         host: ${{ secrets.SSH_HOST }}
+#         username: ${{ secrets.SSH_USERNAME }}
+#         password: ${{ secrets.SSH_PASSWORD }}
+#         script: |
+#           # Navigate to the deployment directory
+#           cd /var/www/html/bushman_frontend
+          
+#           # Ensure proper permissions for file modification
+#           echo "${{ secrets.SSH_PASSWORD }}" | sudo -S chown -R $USER:$USER /var/www/html/bushman_frontend
+
+#           # Remove all files in the current deployment folder
+#           echo "${{ secrets.SSH_PASSWORD }}" | sudo -S rm -rf /var/www/html/bushman_frontend/*
+
+#     - name: Copy build files to VPS
+#       run: |
+#         scp -r /home/runner/work/bushman_frontend/bushman_frontend/* ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/var/www/html/bushman_frontend
+
+#     - name: Finalize Deployment on VPS
+#       uses: appleboy/ssh-action@v0.1.7
+#       with:
+#         host: ${{ secrets.SSH_HOST }}
+#         username: ${{ secrets.SSH_USERNAME }}
+#         password: ${{ secrets.SSH_PASSWORD }}
+#         script: |
+#           # Ensure correct permissions for the deployed files
+#           echo "${{ secrets.SSH_PASSWORD }}" | sudo -S chmod -R 755 /var/www/html/bushman_frontend
+
+#           # List the deployed files for verification
+#           echo "Deployment complete. Listing deployed files:"
+#           ls -alh /var/www/html/bushman_frontend
+
+
 name: Deploy Vue.js App
 
 on:
@@ -211,64 +300,43 @@ jobs:
     - name: Build Vue.js App
       run: |
         npm run build
-        # List the contents of the project directory after build for debugging
-        echo "Listing project directory contents after build:"
-        ls -alh /home/runner/work/bushman_frontend/bushman_frontend
-
-    - name: Upload project directory as artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: project-artifact
-        path: ./dist
+        # List the contents of the build directory for debugging
+        echo "Listing the build directory contents:"
+        ls -alh ./dist
 
   deploy:
     runs-on: ubuntu-latest
     needs: build  # Ensure deployment runs after the build job
 
     steps:
-    - name: Download project artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: project-artifact
+    - name: Checkout Code
+      uses: actions/checkout@v3
 
-    - name: List contents of the downloaded directory
-      run: |
-        echo "Listing the contents of /home/runner/work/bushman_frontend/bushman_frontend:"
-        ls -alh /home/runner/work/bushman_frontend/bushman_frontend
-
-    - name: Deploy Vue.js App to VPS
-      uses: appleboy/ssh-action@v0.1.7
+    - name: Copy Build Files via SCP
+      uses: appleboy/scp-action@master
       with:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USERNAME }}
-        password: ${{ secrets.SSH_PASSWORD }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        source: "./dist/*"
+        target: "/var/www/html/bushman_frontend"
+
+    - name: Execute Remote Commands
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ secrets.SSH_PORT }}
         script: |
-          # Navigate to the deployment directory
-          cd /var/www/html/bushman_frontend
+          # Ensure correct file permissions
+          echo "Setting proper file permissions"
+          sudo chmod -R 755 /var/www/html/bushman_frontend
           
-          # Ensure proper permissions for file modification
-          echo "${{ secrets.SSH_PASSWORD }}" | sudo -S chown -R $USER:$USER /var/www/html/bushman_frontend
-
-          # Remove all files in the current deployment folder
-          echo "${{ secrets.SSH_PASSWORD }}" | sudo -S rm -rf /var/www/html/bushman_frontend/*
-
-    - name: Copy build files to VPS
-      run: |
-        scp -r /home/runner/work/bushman_frontend/bushman_frontend/* ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/var/www/html/bushman_frontend
-
-    - name: Finalize Deployment on VPS
-      uses: appleboy/ssh-action@v0.1.7
-      with:
-        host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SSH_USERNAME }}
-        password: ${{ secrets.SSH_PASSWORD }}
-        script: |
-          # Ensure correct permissions for the deployed files
-          echo "${{ secrets.SSH_PASSWORD }}" | sudo -S chmod -R 755 /var/www/html/bushman_frontend
-
-          # List the deployed files for verification
-          echo "Deployment complete. Listing deployed files:"
+          # List deployed files for verification
+          echo "Deployment complete. Listing files:"
           ls -alh /var/www/html/bushman_frontend
+
 
 
 
