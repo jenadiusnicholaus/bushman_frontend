@@ -326,8 +326,8 @@ jobs:
       with:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        port: ${{ secrets.SSH_PORT }}
+        key: ${{ secrets.SSH_KEY }}
+        # port: ${{ secrets.SSH_PORT }}
         script: |
           # Ensure correct file permissions
           echo "Setting proper file permissions"
