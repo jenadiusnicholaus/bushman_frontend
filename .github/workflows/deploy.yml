@@ -318,7 +318,7 @@ jobs:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_KEY }}
-        source: "/home/runner/work/bushman_frontend/bushman_frontend/*"
+        source: "/home/runner/work/bushman_frontend/bushman_frontend/github/workspace/*"
         target: "/var/www/html/bushman_frontend"
 
     - name: Execute Remote Commands
