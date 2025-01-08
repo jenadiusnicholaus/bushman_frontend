@@ -30,29 +30,50 @@ export const useGameStore = defineStore('sales_game', {
           'Content-Type': 'application/json',
         },
       }
-      const response = await axios.request(config)
 
-      if (response.status === 200) {
-        this.games = response.data.map((item: any) => {
-          return {
-            permit_number: item?.entity_contract_permit?.permit_number ?? '',
-            client_name: item?.client.full_name,
-            status: item.status,
-            pdf: item.pdf,
-            selfitem: item,
-            start_date: formatDateTime(item?.start_date),
-            end_date: formatDateTime(item.end_date),
-          }
-        })
-        this.loadinggames = false
+      try {
+        const response = await axios.request(config)
+
+        if (response.status === 200) {
+          this.games = response.data.map((item: any) => {
+            return {
+              permit_number: item?.entity_contract_permit?.permit_number ?? '',
+              client_name: item?.client.full_name,
+              status: item.status,
+              pdf: item.pdf,
+              selfitem: item,
+              start_date: formatDateTime(item?.start_date),
+              end_date: formatDateTime(item.end_date),
+            }
+          })
+          this.loadinggames = false
+          return response
+        }
+        console.log(this.games)
         return response
+      } catch (error) {
+        this.loadinggames = false
       }
-      console.log(this.games)
+    },
+
+    async initiateGameActivity(payload: any) {
+      const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_CREATE_GAME_ACTIVITY_VSET_URL
+      const data = JSON.stringify(payload)
+      const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data: data,
+      }
+      const response = await axios.request(config)
       return response
     },
 
     // create Game Activity
-    async createGameActivity(payload: any) {
+    async iniateandOrSaveGameActivity(payload: any) {
       const url = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_GAME_ACTIVITY_REGISTRATION_VSET_URL
       const data = JSON.stringify({
         entity_contract_permit_id: payload.entity_contract_permit_id,

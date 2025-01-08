@@ -48,109 +48,16 @@
         </VaSelect>
       </div>
       <VaDivider />
-      <!-- isAddGameActivities: false, 
-        -->
-
-      <VaCheckbox v-model="isAddGameActivities" label="Add Game Activities" @input="addGameActivities" />
-
-      <VaAlert v-if="isAddGameActivities" color="info" outline class="mb-6">
-        <h3 class="font-bold text-lg mb-2">Add Game Activities</h3>
-
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-          <!-- lat -->
-          <VaInput v-model="form.lat" type="number" placeholder="Enter Latitude" label="Latitude" />
-          <!-- long -->
-          <VaInput v-model="form.lng" type="number" placeholder="Enter Longitude" label="Longitude" />
-          <!-- area -->
-          <VaSelect v-model="form.area_id" :options="areaOptions" placeholder="Select Area" label="Area" />
-
-          <!-- time -->
-          <VaDateInput v-model="form.date" placeholder="wounded/killed date" label="Start Date" />
-          <VaTimeInput v-model="form.time" clearable label="Time" placeholder="Wounded/Killed Time" />
-          <!-- weapon -->
-          <VaInput v-model="form.weapon_used" type="number" placeholder="weapon used" label="Weapon Used" />
-          <!-- spacies -->
-          <VaSelect v-model="form.spacies_gender" :options="genderOptions" placeholder="Select Gender" label="Gender" />
-          <!-- status -->
-          <VaSelect v-model="form.status" :options="statusOptions" placeholder="Select Status" label="Status" />
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <VaSelect
-            v-model="form.species"
-            label="Species"
-            :options="speciesOptions"
-            placeholder="Select Species"
-            required
-          />
-
-          <VaCounter v-model="form.quantity" label="Quantity" manual-input :min="1" :max="1" />
-          <VaTextarea
-            v-model="form.description"
-            max-length="125"
-            label="Short text about something"
-            counter
-            required-mark
-            :rules="[(v: any) => (v && v.length > 0) || 'Required', (v: any) => v && v.length < 125]"
-          />
-        </div>
-        <!-- <div class="flex justify-end">
-          <VaButton class="px-0 py-0" color="primary" icon="add" size="small" @click="createGameListObject()" />
-        </div>
-
-        <div class="mt-1">
-          <VaList>
-            <VaListLabel v-if="games.length > 0" class="text-md mb-2 text-left">Games</VaListLabel>
-            <VaListLabel v-else color="secondary" class="va-text-code mb-2 text-left">No Game Added</VaListLabel>
-
-             <VaListItem v-for="(s, index) in games" :key="index" class="list__item">
-              <VaListItemSection>
-                <VaListItemLabel>
-                  Name: {{ s.name }}
-                  <VaIcon name="delete" size="small" color="primary" @click="deleteFromStorage(index)" />
-                </VaListItemLabel>
-                <VaListItemLabel caption>Quantity: {{ s.quantity }}</VaListItemLabel>
-              </VaListItemSection>
-            </VaListItem> 
-
-            <VaDataTable :items="games" :columns="columns">
-              <template #cell(status)="{ value }">
-                <strong>{{ value }}</strong>
-              </template>
-              <template #cell(actions)="{ rowData }">
-                <VaButton size="small" color="error" icon="delete" @click="deleteFromStorage(games.indexOf(rowData))" />
-              </template>
-            </VaDataTable>
-          </VaList>
-         </div> -->
-      </VaAlert>
 
       <div class="flex justify-end">
         <VaButton
           :loading="sendingData"
-          class="p-2 m-2"
           :disabled="!isValidForm"
           icon="save"
           @click="validateForm() && onSubmit('IN_PROGRESS')"
           >Save</VaButton
         >
-        <VaButton
-          v-if="isAddGameActivities"
-          :loading="sendingData"
-          class="p-2 m-2"
-          :disabled="!isValidForm"
-          icon="save"
-          color="warning"
-          @click="validateForm() && onSubmit('CLOSED')"
-        >
-          Save and close the game activities</VaButton
-        >
       </div>
-
-      <!-- <div class="flex justify-end">
-        <VaButton :loading="sendingData" :disabled="!isValidForm" @click="validateForm() && onSubmit()">
-          Submit</VaButton
-        > -->
-      <!-- </div> -->
     </VaForm>
   </VaInnerLoading>
 </template>
@@ -274,7 +181,7 @@ export default defineComponent({
   },
 
   methods: {
-    ...mapActions(useGameStore, ['createGameActivity']),
+    ...mapActions(useGameStore, ['initiateGameActivity']),
     ...mapActions(useContractsStore, ['getContractPermits']),
     ...mapActions(useSalesInquiriesStore, ['getallSalesConfirmation']),
     ...mapActions(useQuotaStore, ['getSpeciesList', 'getAreaList']),
@@ -294,37 +201,46 @@ export default defineComponent({
     async onSubmit(gameState: any) {
       this.sendingData = true
       const professional_hunters_ids = this.form.professional_hunters_ids.map((item: any) => item.value)
+      //       {
+      //     "entity_contract_permit_id": 5,
+      //     "client_id": 2,
+      //     "start_date": "2024-11-01",
+      //     "end_date": "2024-12-01",
+      //     "coordinates_type": "Point",
+      //     "professional_hunters_ids": [7]
+
+      // }
 
       const data = {
         entity_contract_permit_id: this.form.entity_contract_permit?.value,
         client_id: this.client_id,
-        start_date: this.form.start_date,
-        end_date: this.form.end_date,
-        // i want
+        start_date: format(this.form.start_date, 'yyyy-MM-dd'),
+        end_date: format(this.form.end_date, 'yyyy-MM-dd'),
+
         professional_hunters_ids: professional_hunters_ids,
         game_state: gameState,
-        // games: this.games,
-        coordinates_type: 'Point',
-        coordinates: [
-          {
-            lat: this.form.lat,
-            lng: this.form.lng,
-          },
-        ],
-        species_id: this.form.species?.value,
-        quantity: this.form.quantity,
-        area_id: this.form.area_id?.value,
-        time: format(this.form.time, 'HH:mm'),
-        date: format(this.form.date, 'yyyy-MM-dd'),
-        weapon_used: this.form.weapon_used,
-        description: this.form.description,
-        spacies_gender: this.form.spacies_gender.value,
-        status: this.form.status.value,
+        // // games: this.games,
+        // coordinates_type: 'Point',
+        // coordinates: [
+        //   {
+        //     lat: this.form.lat,
+        //     lng: this.form.lng,
+        //   },
+        // ],
+        // species_id: this.form.species?.value ?? null,
+        // quantity: this.form.quantity,
+        // area_id: this.form.area_id?.value ?? null,
+        // time: format(this.form.time, 'HH:mm'),
+        // date: format(this.form.date, 'yyyy-MM-dd'),
+        // weapon_used: this.form.weapon_used,
+        // description: this.form.description,
+        // spacies_gender: this.form.spacies_gender?.value ?? null,
+        // status: this.form.status?.value ?? null,
       }
 
       console.log(data)
       try {
-        const response: any = await this.createGameActivity(data)
+        const response: any = await this.initiateGameActivity(data)
         if (response.status === 201) {
           this.init({ message: 'Contract created successfully', color: 'success' })
           this.sendingData = false

@@ -28,28 +28,35 @@ export const useApprovalChainStore = defineStore('approval-chain-store', {
           'Content-Type': 'application/json',
         },
       }
-      const response = await axios.request(config)
-      if (response.status === 200) {
-        this.loadingApprovalChain = false
-        if (!usedAsOptions) {
-          this.approvalChainModules = response.data.map((approval_chain: any) => {
-            return {
-              name: approval_chain.name,
-              is_active: approval_chain.active,
-              selfitem: approval_chain,
-            }
-          })
-        } else {
-          this.approvalChainModules = response.data.map((approval_chain: any) => {
-            return {
-              value: approval_chain.id,
-              text: approval_chain.name,
-            }
-          })
-        }
-      }
 
-      return response
+      try {
+        const response = await axios.request(config)
+        if (response.status === 200) {
+          this.loadingApprovalChain = false
+          if (!usedAsOptions) {
+            this.approvalChainModules = response.data.map((approval_chain: any) => {
+              return {
+                name: approval_chain.name,
+                is_active: approval_chain.active,
+                selfitem: approval_chain,
+              }
+            })
+          } else {
+            this.approvalChainModules = response.data.map((approval_chain: any) => {
+              return {
+                value: approval_chain.id,
+                text: approval_chain.name,
+              }
+            })
+          }
+        }
+
+        return response
+      } catch (error) {
+        console.log(error)
+        this.loadingApprovalChain = false
+        return error
+      }
     },
 
     async createApprovalChain(payload: any) {

@@ -295,7 +295,7 @@ export default defineComponent({
   },
 
   methods: {
-    ...mapActions(useGameStore, ['createGameActivity']),
+    ...mapActions(useGameStore, ['iniateandOrSaveGameActivity']),
     ...mapActions(useContractsStore, ['getContractPermits']),
     ...mapActions(useSalesInquiriesStore, ['getallSalesConfirmation']),
     ...mapActions(useQuotaStore, ['getSpeciesList', 'getAreaList']),
@@ -341,7 +341,7 @@ export default defineComponent({
       }
 
       try {
-        const response: any = await this.createGameActivity(data)
+        const response: any = await this.iniateandOrSaveGameActivity(data)
         if (response.status === 201) {
           this.init({ message: response.data.message, color: 'success' })
           this.sendingData = false

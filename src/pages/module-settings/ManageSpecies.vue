@@ -270,6 +270,7 @@ export default defineComponent({
           })
         }
       } catch (error) {
+        this.loading = false
         console.log(error)
       }
     },

@@ -270,28 +270,33 @@ export const useSettingsStore = defineStore('settings-store', {
           'Content-Type': 'application/json',
         },
       }
-      const response = await axios.request(config)
-      if (response.status === 200) {
-        this.loadingExtras = false
-        if (!isUsedAsOption) {
-          this.safariExtras = response.data.map((item: any) => {
-            return {
-              id: item.id,
-              name: item.name,
-              amount: `${item.currency.symbol} ${item.amount} `,
-              description: item.description,
-            }
-          })
-        } else {
-          this.safariExtras = response.data.map((item: any) => {
-            return {
-              value: item.id,
-              text: item.name,
-            }
-          })
+      try {
+        const response = await axios.request(config)
+
+        if (response.status === 200) {
+          this.loadingExtras = false
+          if (!isUsedAsOption) {
+            this.safariExtras = response.data.map((item: any) => {
+              return {
+                id: item.id,
+                name: item.name,
+                amount: `${item.currency.symbol} ${item.amount} `,
+                description: item.description,
+              }
+            })
+          } else {
+            this.safariExtras = response.data.map((item: any) => {
+              return {
+                value: item.id,
+                text: item.name,
+              }
+            })
+          }
         }
+        return response
+      } catch (error) {
+        this.loadingExtras = false
       }
-      return response
     },
 
     async createSafariExtras(payload: any) {

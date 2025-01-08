@@ -32,25 +32,31 @@ export const useContractsStore = defineStore('sales_contracts', {
           'Content-Type': 'application/json',
         },
       }
-      const response = await axios.request(config)
+      try {
+        const response = await axios.request(config)
 
-      if (response.status === 200) {
-        this.contracts = response.data.map((contract: any) => {
-          return {
-            contract_number: contract.contract_number,
-            start_date: formatDateTime(contract.start_date),
-            end_date: formatDateTime(contract.end_date),
-            created_at: formatDateTime(contract.created_at),
-            client_name: contract?.sales_confirmation_proposal?.sales_inquiry?.entity?.full_name,
-            pdf: contract.pdf,
-            selfitem: contract,
-          }
-        })
-        this.loadingContracts = false
+        if (response.status === 200) {
+          this.contracts = response.data.map((contract: any) => {
+            return {
+              contract_number: contract.contract_number,
+              start_date: formatDateTime(contract.start_date),
+              end_date: formatDateTime(contract.end_date),
+              created_at: formatDateTime(contract.created_at),
+              client_name: contract?.sales_confirmation_proposal?.sales_inquiry?.entity?.full_name,
+              pdf: contract.pdf,
+              selfitem: contract,
+            }
+          })
+          this.loadingContracts = false
+          return response
+        }
+        console.log(this.contracts)
         return response
+      } catch (error) {
+        this.loadingContracts = false
+        console.log(error)
+        return error
       }
-      console.log(this.contracts)
-      return response
     },
 
     async getContractPermits() {

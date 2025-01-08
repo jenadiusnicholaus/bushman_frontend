@@ -140,7 +140,7 @@ const routes: Array<RouteRecordRaw> = [
           {
             name: 'qoutas-settings',
             path: 'qoutas-settings',
-            component: () => import('../pages/module-settings/ManageQoutas.vue'),
+            component: () => import('../pages/module-settings/ManageQuota.vue'),
           },
           // manageRegulatoryPackage
           {

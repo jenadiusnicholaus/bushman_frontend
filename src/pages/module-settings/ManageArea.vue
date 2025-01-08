@@ -285,11 +285,8 @@ export default defineComponent({
             color: 'info',
           })
         }
-      } catch (error) {
-        this.toast.init({
-          message: 'Error fetching hunting areas',
-          color: 'danger',
-        })
+      } catch (error: any) {
+        this.loading = false
       }
     },
   },
