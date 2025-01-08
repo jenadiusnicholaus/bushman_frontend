@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import { format } from 'date-fns'
 
 export const useQuotaStore = defineStore('quota', {
   state: () => {
@@ -56,8 +57,8 @@ export const useQuotaStore = defineStore('quota', {
       const q_data = JSON.stringify({
         name: quota.name,
         description: quota.description,
-        start_date: quota.start_date?.toISOString().split('T')[0],
-        end_date: quota.end_date.toISOString().split('T')[0],
+        start_date: format(quota.start_date, 'yyyy-MM-dd'),
+        end_date: format(quota.end_date, 'yyyy-MM-dd'),
       })
       // const data = JSON.stringify({
       //   name: quota.name,

@@ -156,6 +156,15 @@
             placeholder="Select a date"
           />
         </div>
+        <div class="mb-4">
+          <VaButton
+            :loading="savingQuota"
+            :disabled="!isValidForm || savingQuota"
+            color="primary"
+            @click="createNewQuota()"
+            >Save</VaButton
+          >
+        </div>
       </VaForm>
     </VaModal>
   </VaCard>
@@ -264,6 +273,7 @@ export default defineComponent({
       quotaItems: [] as any,
       savingQuotaSpecies: false,
       loadingQuotas: false,
+      savingQuota: false,
     }
   },
 
@@ -405,6 +415,7 @@ export default defineComponent({
       }
     },
     async createNewQuota() {
+      this.savingQuota = true
       const quota = {
         name: this.form.name,
         start_date: this.form.start_date,
@@ -412,15 +423,25 @@ export default defineComponent({
         description: this.form.description,
       }
 
-      const response = await this.createQuota(quota)
-      if (response.status === 201) {
-        this.toast.init({ message: response.data.message, color: 'success' })
-        this.resetForm()
-        this.resetCreatedItem()
-      } else {
-        const errors = handleErrors(response)
+      try {
+        const response = await this.createQuota(quota)
+        if (response.status === 201) {
+          this.savingQuota = false
+          this.toast.init({ message: response.data.message, color: 'success' })
+          this.resetForm()
+          this.resetCreatedItem()
+        } else {
+          const errors = handleErrors(response)
+          this.toast.init({
+            message: '\n' + errors.map((error, index) => `${index + 1}. ${error}`).join('\n'),
+          })
+        }
+      } catch (error) {
+        this.savingQuota = false
+        const errors = handleErrors(error)
         this.toast.init({
           message: '\n' + errors.map((error, index) => `${index + 1}. ${error}`).join('\n'),
+          color: 'danger',
         })
       }
     },
