@@ -166,7 +166,7 @@ export default defineComponent({
               provision_sales: item.provision_quantity,
               confirmed: item.confirmed_quantity,
               canceled: item.declined_quantity || item.cancelled_quantity,
-              taken: item.completed_quantity, // New column
+              taken: item.completed_quantity,
             }
           })
         } else {

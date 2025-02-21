@@ -1,6 +1,6 @@
 <template>
   <VaCard class="w-full">
-    <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between px-4 mt-2 py-2">
+    <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between px-4 mt-2">
       <div class="flex flex-col md:flex-row gap-2 justify-start">
         <VaButton
           v-if="showAddSalesInquiriesForm || showDetailsPage"
@@ -23,7 +23,7 @@
           icon="add"
           size="small"
           @click="toggleAddSalesInquiriesForm()"
-          >Add sales Inquiry</VaButton
+          >Create Enquiry</VaButton
         >
       </VaButtonGroup>
     </div>
